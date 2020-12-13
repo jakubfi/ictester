@@ -1,0 +1,7 @@
+fw/*.lst
+fw/*.o
+fw/*.out
+fw/*.out.map
+tool/*.pyc
+tool/__pycache__
+*.swp
