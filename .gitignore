@@ -1,6 +1,7 @@
 fw/*.lst
 fw/*.o
 fw/*.out
+fw/*.hex
 fw/*.out.map
 tool/*.pyc
 tool/__pycache__

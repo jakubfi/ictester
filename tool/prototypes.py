@@ -11,6 +11,7 @@ class Pin:
         self.name = name
         self.role = role
 
+
 # ------------------------------------------------------------------------
 class Part:
     pincount = 0
@@ -33,18 +34,20 @@ class Part:
                 v_out.append(0)
         return v_out
 
+
 # ------------------------------------------------------------------------
 class PartDIP14(Part):
     package_name = "DIP14"
     pincount = 14
+
 
 # ------------------------------------------------------------------------
 class PartDIP16(Part):
     package_name = "DIP16"
     pincount = 16
 
+
 # ------------------------------------------------------------------------
 class PartDIP24(Part):
     package_name = "DIP24"
     pincount = 24
-

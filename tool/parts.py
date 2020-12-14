@@ -1,6 +1,7 @@
 import sys
 import inspect
-from prototypes import *
+from prototypes import (Pin, PartDIP14)
+
 
 # ------------------------------------------------------------------------
 class Part7400(PartDIP14):
@@ -34,6 +35,7 @@ class Part7400(PartDIP14):
         "Complete logic": (test, False)
     }
 
+
 # ------------------------------------------------------------------------
 class Part7402(PartDIP14):
     name = "7402"
@@ -66,6 +68,7 @@ class Part7402(PartDIP14):
         "Complete logic": (test, False)
     }
 
+
 # ------------------------------------------------------------------------
 class Part7404(PartDIP14):
     name = "7404"
@@ -95,6 +98,7 @@ class Part7404(PartDIP14):
     tests = {
         "Complete logic": (test, False)
     }
+
 
 # ------------------------------------------------------------------------
 class Part7408(PartDIP14):
@@ -127,6 +131,7 @@ class Part7408(PartDIP14):
     tests = {
         "Complete logic": (test, False)
     }
+
 
 # ------------------------------------------------------------------------
 class Part7410(PartDIP14):
@@ -163,6 +168,7 @@ class Part7410(PartDIP14):
     tests = {
         "Complete logic": (test, False)
     }
+
 
 # ------------------------------------------------------------------------
 class Part7413(PartDIP14):
@@ -208,10 +214,12 @@ class Part7413(PartDIP14):
         "Complete logic": (test, False)
     }
 
+
 # ------------------------------------------------------------------------
 class Part7420(Part7413):
     name = "7420"
     desc = "Dual 4-input positive-NAND gates"
+
 
 # ------------------------------------------------------------------------
 class Part7432(PartDIP14):
@@ -245,10 +253,12 @@ class Part7432(PartDIP14):
         "Complete logic": (test, False)
     }
 
+
 # ------------------------------------------------------------------------
 class Part7437(Part7400):
     name = "7437"
     desc = "Quad 2-input positive-NAND buffers"
+
 
 # ------------------------------------------------------------------------
 class Part7474(PartDIP14):
@@ -286,6 +296,7 @@ class Part7474(PartDIP14):
         "Synchronous operation": (sync_test, True),
         "Asynchronous operation": (async_test, False),
     }
+
 
 # build parts catalog
 catalog = {}

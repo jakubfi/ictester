@@ -1,8 +1,6 @@
 #!/usr/bin/env python3.8
 
 import sys
-import serial
-import struct
 import argparse
 
 from tester import Tester
@@ -20,7 +18,7 @@ if '--list' in sys.argv:
 parser = argparse.ArgumentParser(description='IC tester controller')
 parser.add_argument('--device', default="/dev/ttyUSB1", help='Serial port where the IC tester is connected')
 parser.add_argument('--speed', default="19200", help='Port speed')
-parser.add_argument('--loops_pow', default=10, type=int, choices=range(0, 16), help='Loop count power (test is repeated 2^loop_pow times)')
+parser.add_argument('--loop_pow', default=10, type=int, choices=range(0, 16), help='Loop count power (2^loop_pow)')
 parser.add_argument('--list', action="store_true", help='List all supported parts')
 parser.add_argument('--debug', action="store_true", help='Enable debug output')
 parser.add_argument('part', help='Part symbol')
@@ -38,7 +36,7 @@ print("Loading {}-pin part {}: {}, package {}...".format(part.pincount, part.nam
 tester.load_part(part)
 for t in tester.tests_available():
     print("Running test: {}... ".format(t), end='', flush=True)
-    res = tester.run(t, args.loops_pow)
+    res = tester.run(t, args.loop_pow)
     if res == Tester.RES_PASS:
         print("PASS")
     else:
