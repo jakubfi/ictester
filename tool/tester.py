@@ -13,16 +13,22 @@ class Tester:
     RES_PASS = 2
     RES_FAIL = 3
 
-#    pin_map_dip14 = [
-#        0, 0, 8, 9, 10, 11, 12, 13,  # port A
-#        0, 0, 0, 0,  0,  0,  0,  0,  # port B
-#        0, 0, 6, 5,  4,  3,  2,  1,  # port C
-#    ]
-
     pin_map_dip14 = [
-        0, 0, 6, 5, 4, 3, 2, 1,  # port A
-        0, 0, 0, 0, 0, 0, 0, 0,  # port B
-        0, 0,13,12,11,10, 9, 8,  # port C
+        0, 0, 6,  5,  4,  3, 2, 1,   # port A
+        0, 0, 0,  0,  0,  0, 0, 0,   # port B
+        0, 0, 13, 12, 11, 10, 9, 8,  # port C
+    ]
+
+    pin_map_dip16 = [
+        0, 9, 10, 11, 12, 13, 14, 15,  # port A
+        0, 0, 0,  0,  0,  0,  0,  0,   # port B
+        0, 1, 2,  3,  4,  5,  6,  7,   # port C
+    ]
+
+    pin_map_dip24 = [
+        8,  7,  6,  5,  4,  3,  2,  1,   # port A
+        0,  0,  21, 22, 23, 11, 10, 9,   # port B
+        20, 19, 18, 17, 16, 15, 14, 13,  # port C
     ]
 
     def __init__(self, port, speed, debug=False):

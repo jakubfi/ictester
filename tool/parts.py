@@ -353,6 +353,7 @@ class Part7495(PartDIP14):
         "Right Shift": (test_rshift, True),
     }
 
+
 # build parts catalog
 catalog = {}
 for i in inspect.getmembers(sys.modules[__name__]):
