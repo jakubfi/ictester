@@ -13,23 +13,23 @@ class Tester:
     RES_PASS = 2
     RES_FAIL = 3
 
-    pin_map_dip14 = [
-        0, 0, 6,  5,  4,  3, 2, 1,   # port A
-        0, 0, 0,  0,  0,  0, 0, 0,   # port B
-        0, 0, 13, 12, 11, 10, 9, 8,  # port C
-    ]
-
-    pin_map_dip16 = [
-        0, 9, 10, 11, 12, 13, 14, 15,  # port A
-        0, 0, 0,  0,  0,  0,  0,  0,   # port B
-        0, 1, 2,  3,  4,  5,  6,  7,   # port C
-    ]
-
-    pin_map_dip24 = [
-        8,  7,  6,  5,  4,  3,  2,  1,   # port A
-        0,  0,  21, 22, 23, 11, 10, 9,   # port B
-        20, 19, 18, 17, 16, 15, 14, 13,  # port C
-    ]
+    pin_map = {
+        "DIP14": [
+            0, 0, 6,  5,  4,  3, 2, 1,   # port A
+            0, 0, 0,  0,  0,  0, 0, 0,   # port B
+            0, 0, 13, 12, 11, 10, 9, 8,  # port C
+        ],
+        "DIP16": [
+            0, 9, 10, 11, 12, 13, 14, 15,  # port A
+            0, 0, 0,  0,  0,  0,  0,  0,   # port B
+            0, 1, 2,  3,  4,  5,  6,  7,   # port C
+        ],
+        "DIP24": [
+            8,  7,  6,  5,  4,  3,  2,  1,   # port A
+            0,  0,  21, 22, 23, 11, 10, 9,   # port B
+            20, 19, 18, 17, 16, 15, 14, 13,  # port C
+        ],
+    }
 
     def __init__(self, port, speed, debug=False):
         self.part = None
@@ -70,14 +70,20 @@ class Tester:
 
     def load_part(self, part_class):
         self.part = part_class()
-        self.used = self.tf_to_bin([
+        used_pins = [
             False if not p else self.part.pins[p-1].role not in [Pin.POWER, Pin.NC]
-            for p in Tester.pin_map_dip14
-        ])
-        self.inputs = self.tf_to_bin([
+            for p in Tester.pin_map[self.part.package_name]
+        ]
+        if self.debug:
+            print("Used pins: {}".format(used_pins))
+        self.used = self.tf_to_bin(used_pins)
+        input_pins = [
             False if not p else self.part.pins[p-1].role == Pin.INPUT
-            for p in Tester.pin_map_dip14
-        ])
+            for p in Tester.pin_map[self.part.package_name]
+        ]
+        if self.debug:
+            print("Input pins: {}".format(input_pins))
+        self.inputs = self.tf_to_bin(input_pins)
 
         self.setup()
 
@@ -114,12 +120,14 @@ class Tester:
             if self.debug:
                 print("Pin vector: {}".format(test_vector))
             # translate pin-order test vector to a port-order vector
-            test_vector_out = self.tf_to_bin([
-                False if not p else test_vector[p-1]
-                for p in Tester.pin_map_dip14
-            ])
+            test_vector_port = [
+                0 if not p else test_vector[p-1]
+                for p in Tester.pin_map[self.part.package_name]
+            ]
+            test_vector_out = self.tf_to_bin(test_vector_port)
             if self.debug:
-                print("Port vector: {:024b}".format(test_vector_out))
+                print("Port vector: {}".format(test_vector_port))
+                print("Port vector (bin): {:024b}".format(test_vector_out))
             for shift in [16, 8, 0]:
                 self.write((test_vector_out >> shift) & 0xff)
 

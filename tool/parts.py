@@ -1,6 +1,6 @@
 import sys
 import inspect
-from prototypes import (Pin, PartDIP14)
+from prototypes import (Pin, PartDIP14, PartDIP16)
 
 
 # ------------------------------------------------------------------------
@@ -258,6 +258,57 @@ class Part7432(PartDIP14):
 class Part7437(Part7400):
     name = "7437"
     desc = "Quad 2-input positive-NAND buffers"
+
+
+# ------------------------------------------------------------------------
+class Part74153(PartDIP16):
+    name = "74153"
+    desc = "Dual 4-line to 1-line data selectors/multiplexers"
+    pins = [
+        Pin(1, "1~G", Pin.INPUT),
+        Pin(2, "B", Pin.INPUT),
+        Pin(3, "1C3", Pin.INPUT),
+        Pin(4, "1C2", Pin.INPUT),
+        Pin(5, "1C1", Pin.INPUT),
+        Pin(6, "1C0", Pin.INPUT),
+        Pin(7, "1Y", Pin.OUTPUT),
+        Pin(8, "GND", Pin.POWER),
+        Pin(9, "2Y", Pin.OUTPUT),
+        Pin(10, "2C0", Pin.INPUT),
+        Pin(11, "2C1", Pin.INPUT),
+        Pin(12, "2C2", Pin.INPUT),
+        Pin(13, "2C3", Pin.INPUT),
+        Pin(14, "A", Pin.INPUT),
+        Pin(15, "2~G", Pin.INPUT),
+        Pin(16, "VCC", Pin.POWER),
+    ]
+    vector_in = [2, 14, 1, 3, 4, 5, 6, 15, 13, 12, 11, 10]
+    vector_out = [7, 9]
+    test = [
+            # output is always "0" when G is high
+            [[0, 0,  1,  0, 0, 0, 0,  1,  0, 0, 0, 0], [0, 0]],
+            [[0, 1,  1,  0, 0, 0, 0,  1,  0, 0, 0, 0], [0, 0]],
+            [[1, 0,  1,  0, 0, 0, 0,  1,  0, 0, 0, 0], [0, 0]],
+            [[1, 1,  1,  0, 0, 0, 0,  1,  0, 0, 0, 0], [0, 0]],
+            [[0, 0,  1,  1, 1, 1, 1,  1,  1, 1, 1, 1], [0, 0]],
+            [[0, 1,  1,  1, 1, 1, 1,  1,  1, 1, 1, 1], [0, 0]],
+            [[1, 0,  1,  1, 1, 1, 1,  1,  1, 1, 1, 1], [0, 0]],
+            [[1, 1,  1,  1, 1, 1, 1,  1,  1, 1, 1, 1], [0, 0]],
+
+            # selection if G is low
+            [[0, 0,  0,  1, 1, 1, 0,  0,  1, 1, 1, 0], [0, 0]],
+            [[0, 1,  0,  1, 1, 0, 1,  0,  1, 1, 0, 1], [0, 0]],
+            [[1, 0,  0,  1, 0, 1, 1,  0,  1, 0, 1, 1], [0, 0]],
+            [[1, 1,  0,  0, 1, 1, 1,  0,  0, 1, 1, 1], [0, 0]],
+
+            [[0, 0,  0,  0, 0, 0, 1,  0,  0, 0, 0, 1], [1, 1]],
+            [[0, 1,  0,  0, 0, 1, 0,  0,  0, 0, 1, 0], [1, 1]],
+            [[1, 0,  0,  0, 1, 0, 0,  0,  0, 1, 0, 0], [1, 1]],
+            [[1, 1,  0,  1, 0, 0, 0,  0,  1, 0, 0, 0], [1, 1]],
+    ]
+    tests = {
+        "Complete logic": (test, False)
+    }
 
 
 # ------------------------------------------------------------------------
