@@ -1,6 +1,6 @@
 import sys
 import inspect
-from prototypes import (Test, Pin, PartDIP14, PartDIP16)
+from prototypes import (Test, Pin, PartDIP14, PartDIP16, PartDIP24)
 
 
 # ------------------------------------------------------------------------
@@ -295,6 +295,39 @@ class Part7474(PartDIP14):
     tests = [
         Test("Synchronous operation", Test.SEQ, sync_test),
         Test("Asynchronous operation", Test.SEQ, async_test),
+    ]
+
+
+# ------------------------------------------------------------------------
+class Part7486(PartDIP14):
+    name = "7486"
+    desc = "Quad 2-input exclusive-OR gates"
+    pins = [
+        Pin(1, "1A", Pin.INPUT),
+        Pin(2, "1B", Pin.INPUT),
+        Pin(3, "1Y", Pin.OUTPUT),
+        Pin(4, "2A", Pin.INPUT),
+        Pin(5, "2B", Pin.INPUT),
+        Pin(6, "2Y", Pin.OUTPUT),
+        Pin(7, "GND", Pin.POWER),
+        Pin(8, "3Y", Pin.OUTPUT),
+        Pin(9, "3A", Pin.INPUT),
+        Pin(10, "3B", Pin.INPUT),
+        Pin(11, "4Y", Pin.OUTPUT),
+        Pin(12, "4A", Pin.INPUT),
+        Pin(13, "4B", Pin.INPUT),
+        Pin(14, "VCC", Pin.POWER),
+    ]
+    vector_in = [1, 2, 4, 5, 10, 9, 13, 12]
+    vector_out = [3, 6, 8, 11]
+    test = [
+            [[0, 0,  0, 0,  0, 0,  0, 0], [0, 0, 0, 0]],
+            [[0, 1,  0, 1,  0, 1,  0, 1], [1, 1, 1, 1]],
+            [[1, 0,  1, 0,  1, 0,  1, 0], [1, 1, 1, 1]],
+            [[1, 1,  1, 1,  1, 1,  1, 1], [0, 0, 0, 0]],
+    ]
+    tests = [
+        Test("Complete logic", Test.COMB, test),
     ]
 
 
