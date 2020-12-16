@@ -60,6 +60,7 @@ class PartDIP24(Part):
 class Test():
     COMB = 0
     SEQ = 1
+
     def __init__(self, name, ttype, body):
         assert name
         assert ttype in [Test.COMB, Test.SEQ]

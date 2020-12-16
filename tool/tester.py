@@ -1,5 +1,5 @@
 import serial
-from prototypes import (Pin, Test)
+from prototypes import (Pin)
 
 
 class Tester:
