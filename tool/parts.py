@@ -405,6 +405,47 @@ class Part74153(PartDIP16):
     ]
 
 
+# ------------------------------------------------------------------------
+class Part74181(PartDIP24):
+    name = "74181"
+    desc = "Arithmetic logic units/function generators"
+    pins = [
+        Pin(1, "B~0", Pin.INPUT),
+        Pin(2, "A~0", Pin.INPUT),
+        Pin(3, "S3", Pin.INPUT),
+        Pin(4, "S2", Pin.INPUT),
+        Pin(5, "S1", Pin.INPUT),
+        Pin(6, "S0", Pin.INPUT),
+        Pin(7, "Cn", Pin.INPUT),
+        Pin(8, "M", Pin.INPUT),
+        Pin(9, "F~0", Pin.OUTPUT),
+        Pin(10, "F~1", Pin.OUTPUT),
+        Pin(11, "F~2", Pin.OUTPUT),
+        Pin(12, "GND", Pin.POWER),
+        Pin(13, "F~3", Pin.OUTPUT),
+        Pin(14, "A=B", Pin.OUTPUT),
+        Pin(15, "~P", Pin.OUTPUT),
+        Pin(16, "Cn+4", Pin.OUTPUT),
+        Pin(17, "~G", Pin.OUTPUT),
+        Pin(18, "B~3", Pin.INPUT),
+        Pin(19, "A~3", Pin.INPUT),
+        Pin(20, "B~2", Pin.INPUT),
+        Pin(21, "A~2", Pin.INPUT),
+        Pin(22, "B~1", Pin.INPUT),
+        Pin(23, "A~1", Pin.INPUT),
+        Pin(24, "VCC", Pin.POWER),
+    ]
+    vector_in = [8, 3, 4, 5, 6,  7,  19, 21, 23, 2,  18, 20, 22, 1]
+    vector_out = [13, 11, 10, 9,  16, 14,  17, 15]
+    test_add = [
+        # M  S3 S2 S1 S0  C   A            B             F            C  A=B G  P
+        [[0, 1, 1, 1, 1,  0,  1, 1, 1, 1,  1, 1, 1, 1], [1, 1, 1, 1,  0, 0,  0, 0]],
+    ]
+    tests = [
+        Test("Addition", Test.COMB, test_add),
+    ]
+
+
 # build parts catalog
 catalog = {}
 for i in inspect.getmembers(sys.modules[__name__]):
