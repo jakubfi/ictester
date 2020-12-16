@@ -1,6 +1,6 @@
 import sys
 import inspect
-from prototypes import (Pin, PartDIP14, PartDIP16)
+from prototypes import (Test, Pin, PartDIP14, PartDIP16)
 
 
 # ------------------------------------------------------------------------
@@ -31,9 +31,9 @@ class Part7400(PartDIP14):
             [[1, 0,  1, 0,  1, 0,  1, 0], [1, 1, 1, 1]],
             [[1, 1,  1, 1,  1, 1,  1, 1], [0, 0, 0, 0]],
     ]
-    tests = {
-        "Complete logic": (test, False)
-    }
+    tests = [
+        Test("Complete logic", Test.COMB, test),
+    ]
 
 
 # ------------------------------------------------------------------------
@@ -64,9 +64,9 @@ class Part7402(PartDIP14):
             [[1, 0,  1, 0,  1, 0,  1, 0], [0, 0, 0, 0]],
             [[1, 1,  1, 1,  1, 1,  1, 1], [0, 0, 0, 0]],
     ]
-    tests = {
-        "Complete logic": (test, False)
-    }
+    tests = [
+        Test("Complete logic", Test.COMB, test),
+    ]
 
 
 # ------------------------------------------------------------------------
@@ -95,9 +95,9 @@ class Part7404(PartDIP14):
             [[0, 0, 0, 0, 0, 0], [1, 1, 1, 1, 1, 1]],
             [[1, 1, 1, 1, 1, 1], [0, 0, 0, 0, 0, 0]]
     ]
-    tests = {
-        "Complete logic": (test, False)
-    }
+    tests = [
+        Test("Complete logic", Test.COMB, test),
+    ]
 
 
 # ------------------------------------------------------------------------
@@ -128,9 +128,9 @@ class Part7408(PartDIP14):
             [[1, 0,  1, 0,  1, 0,  1, 0], [0, 0, 0, 0]],
             [[1, 1,  1, 1,  1, 1,  1, 1], [1, 1, 1, 1]],
     ]
-    tests = {
-        "Complete logic": (test, False)
-    }
+    tests = [
+        Test("Complete logic", Test.COMB, test),
+    ]
 
 
 # ------------------------------------------------------------------------
@@ -165,9 +165,9 @@ class Part7410(PartDIP14):
             [[1, 1, 0,  1, 1, 0,  1, 1, 0], [1, 1, 1]],
             [[1, 1, 1,  1, 1, 1,  1, 1, 1], [0, 0, 0]],
     ]
-    tests = {
-        "Complete logic": (test, False)
-    }
+    tests = [
+        Test("Complete logic", Test.COMB, test),
+    ]
 
 
 # ------------------------------------------------------------------------
@@ -210,9 +210,9 @@ class Part7413(PartDIP14):
             [[1, 1, 1, 0,  1, 1, 1, 0], [1, 1]],
             [[1, 1, 1, 1,  1, 1, 1, 1], [0, 0]],
     ]
-    tests = {
-        "Complete logic": (test, False)
-    }
+    tests = [
+        Test("Complete logic", Test.COMB, test),
+    ]
 
 
 # ------------------------------------------------------------------------
@@ -249,9 +249,9 @@ class Part7432(PartDIP14):
             [[1, 0,  1, 0,  1, 0,  1, 0], [1, 1, 1, 1]],
             [[1, 1,  1, 1,  1, 1,  1, 1], [1, 1, 1, 1]],
     ]
-    tests = {
-        "Complete logic": (test, False)
-    }
+    tests = [
+        Test("Complete logic", Test.COMB, test),
+    ]
 
 
 # ------------------------------------------------------------------------
@@ -306,9 +306,9 @@ class Part74153(PartDIP16):
             [[1, 0,  0,  0, 1, 0, 0,  0,  0, 1, 0, 0], [1, 1]],
             [[1, 1,  0,  1, 0, 0, 0,  0,  1, 0, 0, 0], [1, 1]],
     ]
-    tests = {
-        "Complete logic": (test, False)
-    }
+    tests = [
+        Test("Complete logic", Test.COMB, test),
+    ]
 
 
 # ------------------------------------------------------------------------
@@ -343,10 +343,10 @@ class Part7474(PartDIP14):
         [[0, 1, 0, 0,  0, 1, 0, 0], [0, 1,  0, 1]],
         [[1, 0, 0, 0,  1, 0, 0, 0], [1, 0,  1, 0]],
     ]
-    tests = {
-        "Synchronous operation": (sync_test, True),
-        "Asynchronous operation": (async_test, False),
-    }
+    tests = [
+        Test("Synchronous operation", Test.SEQ, sync_test),
+        Test("Asynchronous operation", Test.SEQ, async_test),
+    ]
 
 
 # ------------------------------------------------------------------------
@@ -399,10 +399,10 @@ class Part7495(PartDIP14):
         [[0, 0, 1, 0, 0, 0, 0, 0], [0, 0, 0, 0]],
         [[0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0]],
     ]
-    tests = {
-        "Parallel load": (test_parallel, True),
-        "Right Shift": (test_rshift, True),
-    }
+    tests = [
+        Test("Parallel load", Test.SEQ, test_parallel),
+        Test("Right Shift", Test.SEQ, test_rshift),
+    ]
 
 
 # build parts catalog

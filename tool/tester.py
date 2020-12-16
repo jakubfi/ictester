@@ -1,5 +1,5 @@
 import serial
-from prototypes import Pin
+from prototypes import (Pin, Test)
 
 
 class Tester:
@@ -95,14 +95,21 @@ class Tester:
         if self.read() != Tester.RES_OK:
             raise RuntimeError("Setup failed")
 
+    def deconfigure(self):
+        self.write(Tester.CMD_SETUP)
+        for shift in range(0, 6):
+            self.write(0)
+        if self.read() != Tester.RES_OK:
+            raise RuntimeError("Deconfiguration failed")
+
     def tests_available(self):
-        return [t for t in self.part.tests.keys()]
+        return [t.name for t in self.part.tests]
 
     def upload(self, test_name):
-        test_body, test_seq = self.part.tests[test_name]
+        test = self.part.get_test(test_name)
 
         self.write(Tester.CMD_UPLOAD)
-        if test_seq:
+        if test.type == Test.SEQ:
             if self.debug:
                 print("Sequential test")
             self.write(Tester.TYPE_SEQ)
@@ -111,9 +118,9 @@ class Tester:
                 print("Combinatorial test")
             self.write(Tester.TYPE_COMB)
 
-        self.write(len(test_body))
+        self.write(len(test.body))
 
-        for v in test_body:
+        for v in test.body:
             if self.debug:
                 print("User vector: {}".format(v))
             test_vector = self.part.vector_by_pins(v)

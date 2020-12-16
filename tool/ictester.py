@@ -41,3 +41,4 @@ for t in tester.tests_available():
         print("PASS")
     else:
         print("FAIL")
+    tester.deconfigure()

@@ -34,6 +34,9 @@ class Part:
                 v_out.append(0)
         return v_out
 
+    def get_test(self, name):
+        return next(t for t in self.tests if t.name == name)
+
 
 # ------------------------------------------------------------------------
 class PartDIP14(Part):
@@ -51,3 +54,16 @@ class PartDIP16(Part):
 class PartDIP24(Part):
     package_name = "DIP24"
     pincount = 24
+
+
+# ------------------------------------------------------------------------
+class Test():
+    COMB = 1
+    SEQ = 2
+    def __init__(self, name, ttype, body):
+        assert name
+        assert ttype in [Test.COMB, Test.SEQ]
+        assert body
+        self.name = name
+        self.type = ttype
+        self.body = body
