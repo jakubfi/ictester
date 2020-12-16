@@ -6,8 +6,6 @@ class Tester:
     CMD_SETUP = 0b00000000
     CMD_UPLOAD = 0b00100000
     CMD_RUN = 0b01000000
-    TYPE_COMB = 0
-    TYPE_SEQ = 1
     RES_OK = 0
     RES_ERR = 1
     RES_PASS = 2
@@ -46,13 +44,13 @@ class Tester:
             dsrdtr=False
         )
 
-    def write(self, b):
+    def send(self, b):
         if self.debug:
             print("<- {:08b} {}".format(b, b))
         data = bytes([b])
         self.s.write(data)
 
-    def read(self):
+    def recv(self):
         b = ord(self.s.read(1))
         if self.debug:
             print("-> {:08b} {}".format(b, b))
@@ -74,32 +72,31 @@ class Tester:
             False if not p else self.part.pins[p-1].role not in [Pin.POWER, Pin.NC]
             for p in Tester.pin_map[self.part.package_name]
         ]
-        if self.debug:
-            print("Used pins: {}".format(used_pins))
-        self.used = self.tf_to_bin(used_pins)
         input_pins = [
             False if not p else self.part.pins[p-1].role == Pin.INPUT
             for p in Tester.pin_map[self.part.package_name]
         ]
         if self.debug:
             print("Input pins: {}".format(input_pins))
-        self.inputs = self.tf_to_bin(input_pins)
+            print("Used pins: {}".format(used_pins))
 
-        self.setup()
+        self._setup(used_pins, input_pins)
 
-    def setup(self):
-        self.write(Tester.CMD_SETUP)
+    def _setup(self, used, inputs):
+        used = self.tf_to_bin(used)
+        inputs = self.tf_to_bin(inputs)
+        self.send(Tester.CMD_SETUP)
         for shift in [16, 8, 0]:
-            self.write((self.used >> shift) & 0xff)
-            self.write((self.inputs >> shift) & 0xff)
-        if self.read() != Tester.RES_OK:
+            self.send((used >> shift) & 0xff)
+            self.send((inputs >> shift) & 0xff)
+        if self.recv() != Tester.RES_OK:
             raise RuntimeError("Setup failed")
 
     def deconfigure(self):
-        self.write(Tester.CMD_SETUP)
+        self.send(Tester.CMD_SETUP)
         for shift in range(0, 6):
-            self.write(0)
-        if self.read() != Tester.RES_OK:
+            self.send(0)
+        if self.recv() != Tester.RES_OK:
             raise RuntimeError("Deconfiguration failed")
 
     def tests_available(self):
@@ -108,42 +105,30 @@ class Tester:
     def upload(self, test_name):
         test = self.part.get_test(test_name)
 
-        self.write(Tester.CMD_UPLOAD)
-        if test.type == Test.SEQ:
-            if self.debug:
-                print("Sequential test")
-            self.write(Tester.TYPE_SEQ)
-        else:
-            if self.debug:
-                print("Combinatorial test")
-            self.write(Tester.TYPE_COMB)
-
-        self.write(len(test.body))
+        self.send(Tester.CMD_UPLOAD)
+        self.send(test.type)
+        self.send(len(test.body))
 
         for v in test.body:
-            if self.debug:
-                print("User vector: {}".format(v))
-            test_vector = self.part.vector_by_pins(v)
-            if self.debug:
-                print("Pin vector: {}".format(test_vector))
-            # translate pin-order test vector to a port-order vector
-            test_vector_port = [
-                0 if not p else test_vector[p-1]
+            v_pin = self.part.vector_by_pins(v)
+            # translate pin-order test vector to a port-ordered vector
+            v_port = self.tf_to_bin([
+                0 if not p else v_pin[p-1]
                 for p in Tester.pin_map[self.part.package_name]
-            ]
-            test_vector_out = self.tf_to_bin(test_vector_port)
+            ])
             if self.debug:
-                print("Port vector: {}".format(test_vector_port))
-                print("Port vector (bin): {:024b}".format(test_vector_out))
+                print("Input vector: {}".format(v))
+                print("Pin-ordered vector: {}".format(v_pin))
+                print("Port-ordered vector: {:024b}".format(v_port))
             for shift in [16, 8, 0]:
-                self.write((test_vector_out >> shift) & 0xff)
+                self.send((v_port >> shift) & 0xff)
 
-        if self.read() != Tester.RES_OK:
+        if self.recv() != Tester.RES_OK:
             raise RuntimeError("Upload failed")
 
     def run(self, test_name, loop_pow):
         assert loop_pow < 16
         self.upload(test_name)
-        self.write(Tester.CMD_RUN)
-        self.write(loop_pow)
-        return self.read()
+        self.send(Tester.CMD_RUN)
+        self.send(loop_pow)
+        return self.recv()
