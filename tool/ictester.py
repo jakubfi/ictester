@@ -31,14 +31,15 @@ except KeyError:
     print("Use --list to list all supported parts")
     sys.exit(1)
 
-tester = Tester(args.device, args.speed, debug=args.debug)
-print("Loading {}-pin part {}: {}, package {}...".format(part.pincount, part.name, part.desc, part.package_name))
-tester.load_part(part)
-for t in tester.tests_available():
-    print("Running test: {}... ".format(t), end='', flush=True)
-    res = tester.run(t, args.loop_pow)
+print("Testing {}-pin part {}: {}, package {}...".format(part.pincount, part.name, part.desc, part.package_name))
+tester = Tester(part, args.device, args.speed, debug=args.debug)
+for test_name in tester.tests_available():
+    if not args.debug:
+        print("Running test: {}... ".format(test_name), end='', flush=True)
+    else:
+        print("Running test: {}... ".format(test_name))
+    res = tester.run(test_name, args.loop_pow)
     if res == Tester.RES_PASS:
         print("PASS")
     else:
         print("FAIL")
-    tester.deconfigure()

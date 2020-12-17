@@ -18,21 +18,14 @@ class Part:
     name = None
     package_name = None
 
-    def vector_by_pins(self, vector):
-        """
-        translate given test vector [[inputs], [outputs]] in user order
-        to a test vector [i/o] in pin order
-        """
-        v_positions = self.vector_in + self.vector_out
-        v = vector[0] + vector[1]
-        v_out = []
-        for p in self.pins:
-            if p.role in [Pin.INPUT, Pin.OUTPUT, Pin.OC]:
-                val = v[v_positions.index(p.pin)]
-                v_out.append(val)
-            else:
-                v_out.append(0)
-        return v_out
+    def __init__(self):
+        assert self.name
+        assert self.desc
+        assert self.tests
+        assert self.package_name
+        assert len(self.pins) == self.pincount
+        for i in range(0, self.pincount):
+            assert self.pins[i].pin-1 == i
 
     def get_test(self, name):
         return next(t for t in self.tests if t.name == name)
@@ -61,10 +54,17 @@ class Test():
     COMB = 0
     SEQ = 1
 
-    def __init__(self, name, ttype, body):
+    def __init__(self, name, ttype, inputs, outputs, body):
         assert name
         assert ttype in [Test.COMB, Test.SEQ]
+        assert inputs
+        assert outputs
         assert body
+        for v in body:
+            assert len(inputs) == len(v[0])
+            assert len(outputs) == len(v[1])
         self.name = name
         self.type = ttype
         self.body = body
+        self.inputs = inputs
+        self.outputs = outputs
