@@ -46,16 +46,31 @@ void reply(uint8_t res)
 }
 
 // -----------------------------------------------------------------------
-void setup(uint8_t cmd)
+void deconfigure(void)
+{
+	DDRA = 0;
+	DDRB = 0;
+	DDRC = 0;
+	PORTA = 0;
+	PORTB = 0;
+	PORTC = 0;
+}
+
+// -----------------------------------------------------------------------
+void setup(void)
+{
+	DDRA = port_conf[0].dut_inputs & port_conf[0].dut_used;
+	DDRB = port_conf[1].dut_inputs & port_conf[1].dut_used;
+	DDRC = port_conf[2].dut_inputs & port_conf[2].dut_used;
+}
+
+// -----------------------------------------------------------------------
+void read_setup(uint8_t cmd)
 {
 	for (int i=0 ; i<3 ; i++) {
 		port_conf[i].dut_used = serial_rx_char();
 		port_conf[i].dut_inputs = serial_rx_char();
 	}
-
-	DDRA = port_conf[0].dut_inputs & port_conf[0].dut_used;
-	DDRB = port_conf[1].dut_inputs & port_conf[1].dut_used;
-	DDRC = port_conf[2].dut_inputs & port_conf[2].dut_used;
 
 	reply(RES_OK);
 }
@@ -121,19 +136,22 @@ void run(uint8_t cmd)
 // -----------------------------------------------------------------------
 int main(void)
 {
+	deconfigure();
 	serial_init();
 
 	while (1) {
 		int cmd = serial_rx_char();
 		switch (cmd >> 5) {
 			case CMD_SETUP:
-				setup(cmd);
+				read_setup(cmd);
 				break;
 			case CMD_UPLOAD:
 				upload(cmd);
 				break;
 			case CMD_RUN:
+				setup();
 				run(cmd);
+				deconfigure();
 				break;
 			default:
 				reply(RES_ERR);
