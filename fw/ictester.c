@@ -9,7 +9,7 @@
 #include <avr/cpufunc.h>
 #include "serial.h"
 
-#define MAX_TEST_SIZE 100
+#define MAX_TEST_SIZE 3*1024
 
 enum cmd {
 	CMD_SETUP	= 0,
@@ -36,7 +36,7 @@ struct port_conf {
 } port_conf[3];
 
 uint8_t test_type;
-uint8_t test_len;
+uint16_t test_len;
 uint8_t test_data[MAX_TEST_SIZE];
 
 // -----------------------------------------------------------------------
@@ -79,7 +79,8 @@ void read_setup(uint8_t cmd)
 void upload(uint8_t cmd)
 {
 	test_type = serial_rx_char();
-	test_len = serial_rx_char();
+	test_len = (uint16_t) serial_rx_char() << 8;
+	test_len += serial_rx_char();
 
 	for (int pos=0 ; pos<test_len*3 ; pos++) {
 		test_data[pos] = serial_rx_char();

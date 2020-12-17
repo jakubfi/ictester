@@ -107,7 +107,8 @@ class Tester:
     def upload(self, test):
         self.send(Tester.CMD_UPLOAD)
         self.send(test.type)
-        self.send(len(test.body))
+        self.send(len(test.body) >> 8)
+        self.send(len(test.body) & 0xff)
 
         all_pins = test.inputs + test.outputs
         for v in test.body:

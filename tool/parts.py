@@ -253,8 +253,8 @@ class Part7430(PartDIP14):
         Pin(13, "NC", Pin.NC),
         Pin(14, "VCC", Pin.POWER),
     ]
-    test_1 = Test(
-        name="Complete logic 1/2",
+    test_all = Test(
+        name="Complete logic",
         inputs=[1, 2, 3, 4, 5, 6, 11, 12],
         outputs=[8],
         ttype=Test.COMB,
@@ -387,14 +387,6 @@ class Part7430(PartDIP14):
             [[0, 1, 1, 1, 1, 1, 0, 1], [1]],
             [[0, 1, 1, 1, 1, 1, 1, 0], [1]],
             [[0, 1, 1, 1, 1, 1, 1, 1], [1]],
-        ]
-    )
-    test_2 = Test(
-        name="Complete logic 2/2",
-        inputs=[1, 2, 3, 4, 5, 6, 11, 12],
-        outputs=[8],
-        ttype=Test.COMB,
-        body=[
             [[1, 0, 0, 0, 0, 0, 0, 0], [1]],
             [[1, 0, 0, 0, 0, 0, 0, 1], [1]],
             [[1, 0, 0, 0, 0, 0, 1, 0], [1]],
@@ -525,7 +517,7 @@ class Part7430(PartDIP14):
             [[1, 1, 1, 1, 1, 1, 1, 1], [0]],
         ]
     )
-    tests = [test_1, test_2]
+    tests = [test_all]
 
 
 # ------------------------------------------------------------------------
