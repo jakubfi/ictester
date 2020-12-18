@@ -30,6 +30,12 @@ class Tester:
 
     def __init__(self, part_class, port, speed, debug=False):
         self.part = part_class()
+        # accept either test list or gen_tests() method
+        try:
+            self.part.gen_tests()
+        except AttributeError:
+            assert self.part.tests
+
         self.debug = debug
         self.s = serial.Serial(
             port,

@@ -21,7 +21,6 @@ class Part:
     def __init__(self):
         assert self.name
         assert self.desc
-        assert self.tests
         assert self.package_name
         assert len(self.pins) == self.pincount
         for i in range(0, self.pincount):
