@@ -9,6 +9,7 @@ class Tester:
     RES_ERR = 1
     RES_PASS = 2
     RES_FAIL = 3
+    MAX_LEN = 1024
 
     pin_map = {
         "DIP14": [
@@ -111,6 +112,9 @@ class Tester:
         ]
 
     def upload(self, test):
+        if self.debug:
+            print("Test len: {}".format(len(test.body)))
+        assert len(test.body) <= Tester.MAX_LEN
         self.send(Tester.CMD_UPLOAD)
         self.send(test.type)
         self.send(len(test.body) >> 8)
