@@ -3,12 +3,14 @@ import inspect
 from functools import reduce
 from prototypes import (Test, Pin, PartDIP14, PartDIP16, PartDIP24)
 
+
 # ------------------------------------------------------------------------
 def bin2vec(val, bitlen):
     return [
-        (val>>(bitlen-pos-1)) & 1
+        (val >> (bitlen-pos-1)) & 1
         for pos in range(0, bitlen)
     ]
+
 
 # ------------------------------------------------------------------------
 def binary_combinator(bitlen):
@@ -17,12 +19,14 @@ def binary_combinator(bitlen):
         for v in range(0, 2**bitlen)
     ]
 
+
 # ------------------------------------------------------------------------
 def binary_fun_gen(unit_count, vector_len, fun, ofun):
     return [
         [unit_count*v, unit_count*[ofun(reduce(fun, v))]]
         for v in binary_combinator(vector_len)
     ]
+
 
 # ------------------------------------------------------------------------
 class Part7400(PartDIP14):
