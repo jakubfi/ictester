@@ -20,16 +20,15 @@
 
 #include "serial.h"
 
-#define BAUD    19200
-#define UBRR	(F_CPU / (16UL*BAUD) - 1)
-
 // -----------------------------------------------------------------------
-void serial_init(void)
+void serial_init(unsigned long baud)
 {
-	UBRR0H = (unsigned char) UBRR >> 8;
-	UBRR0L = (unsigned char) UBRR;
+	UCSR0A = 1 << U2X0;
+	uint16_t speed = F_CPU / 8 / baud-1;
+	UBRR0H = speed >> 8;
+	UBRR0L = speed;
 	UCSR0B = (1 << TXEN0) | (1 << RXEN0);
-	UCSR0C = (1 << UCSZ01) | (1 << UCSZ00);
+	UCSR0C = (1 << UCSZ01) | (1 << UCSZ00); // 8N1
 }
 
 // -----------------------------------------------------------------------
@@ -45,7 +44,7 @@ void serial_tx_string(char *data)
 	while ((*data != '\0')) {
 		serial_tx_char(*data);
 		data++;
-	}   
+	}
 }
 
 // -----------------------------------------------------------------------

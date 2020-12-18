@@ -138,7 +138,7 @@ void run(uint8_t cmd)
 int main(void)
 {
 	deconfigure();
-	serial_init();
+	serial_init(500000);
 
 	while (1) {
 		int cmd = serial_rx_char();
