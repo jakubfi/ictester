@@ -21,7 +21,12 @@ def binary_combinator(bitlen):
 
 
 # ------------------------------------------------------------------------
-def binary_fun_gen(unit_count, vector_len, fun, ofun):
+def binary_fun_gen(unit_count, vector_len, fun, inverted=False):
+    if inverted:
+        ofun = lambda x: not x
+    else:
+        ofun = lambda x: x
+
     return [
         [unit_count*v, unit_count*[ofun(reduce(fun, v))]]
         for v in binary_combinator(vector_len)
@@ -54,7 +59,7 @@ class Part7400(PartDIP14):
             inputs=[1, 2, 4, 5, 10, 9, 13, 12],
             outputs=[3, 6, 8, 11],
             ttype=Test.COMB,
-            body=binary_fun_gen(4, 2, lambda a, b: a & b, lambda a: not a)
+            body=binary_fun_gen(4, 2, lambda a, b: a & b, inverted=True)
         )
     ]
 
@@ -85,7 +90,7 @@ class Part7402(PartDIP14):
             inputs=[2, 3, 5, 6, 8, 9, 11, 12],
             outputs=[1, 4, 10, 13],
             ttype=Test.COMB,
-            body=binary_fun_gen(4, 2, lambda a, b: a | b, lambda a: not a)
+            body=binary_fun_gen(4, 2, lambda a, b: a | b, inverted=True)
         )
     ]
 
@@ -150,7 +155,7 @@ class Part7408(PartDIP14):
             inputs=[1, 2, 4, 5, 10, 9, 13, 12],
             outputs=[3, 6, 8, 11],
             ttype=Test.COMB,
-            body=binary_fun_gen(4, 2, lambda a, b: a & b, lambda a: a)
+            body=binary_fun_gen(4, 2, lambda a, b: a & b)
         )
     ]
 
@@ -182,7 +187,7 @@ class Part7410(PartDIP14):
             inputs=[1, 2, 13, 3, 4, 5, 9, 10, 11],
             outputs=[12, 6, 8],
             ttype=Test.COMB,
-            body=binary_fun_gen(3, 3, lambda a, b: a & b, lambda a: not a)
+            body=binary_fun_gen(3, 3, lambda a, b: a & b, inverted=True)
         )
     ]
 
@@ -214,7 +219,7 @@ class Part7413(PartDIP14):
             inputs=[1, 2, 4, 5, 13, 12, 10, 9],
             outputs=[6, 8],
             ttype=Test.COMB,
-            body=binary_fun_gen(2, 4, lambda a, b: a & b, lambda a: not a)
+            body=binary_fun_gen(2, 4, lambda a, b: a & b, inverted=True)
         )
     ]
 
@@ -252,7 +257,7 @@ class Part7430(PartDIP14):
             inputs=[1, 2, 3, 4, 5, 6, 11, 12],
             outputs=[8],
             ttype=Test.COMB,
-            body=binary_fun_gen(1, 8, lambda a, b: a & b, lambda a: not a)
+            body=binary_fun_gen(1, 8, lambda a, b: a & b, inverted=True)
         )
     ]
 
@@ -283,7 +288,7 @@ class Part7432(PartDIP14):
             inputs=[1, 2, 4, 5, 10, 9, 13, 12],
             outputs=[3, 6, 8, 11],
             ttype=Test.COMB,
-            body=binary_fun_gen(4, 2, lambda a, b: a | b, lambda a: a)
+            body=binary_fun_gen(4, 2, lambda a, b: a | b)
         )
     ]
 
@@ -364,7 +369,7 @@ class Part7486(PartDIP14):
         inputs=[1, 2, 4, 5, 10, 9, 13, 12],
         outputs=[3, 6, 8, 11],
         ttype=Test.COMB,
-        body=binary_fun_gen(4, 2, lambda a, b: a ^ b, lambda a: a)
+        body=binary_fun_gen(4, 2, lambda a, b: a ^ b)
     )
     tests = [test_all]
 
