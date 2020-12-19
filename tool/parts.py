@@ -614,6 +614,49 @@ class Part74181(PartDIP24):
     ]
 
 
+# ------------------------------------------------------------------------
+class Part74198(PartDIP24):
+    name = "74198"
+    desc = "8-bit shift registers"
+    pins = [
+        Pin(1, "S0", Pin.INPUT),
+        Pin(2, "SR SER", Pin.INPUT),
+        Pin(3, "A", Pin.INPUT),
+        Pin(4, "QA", Pin.OUTPUT),
+        Pin(5, "B", Pin.INPUT),
+        Pin(6, "QB", Pin.OUTPUT),
+        Pin(7, "C", Pin.INPUT),
+        Pin(8, "QC", Pin.OUTPUT),
+        Pin(9, "D", Pin.INPUT),
+        Pin(10, "QD", Pin.OUTPUT),
+        Pin(11, "CLK", Pin.INPUT),
+        Pin(12, "GND", Pin.POWER),
+        Pin(13, "~CLR", Pin.INPUT),
+        Pin(14, "QE", Pin.OUTPUT),
+        Pin(15, "E", Pin.INPUT),
+        Pin(16, "QF", Pin.OUTPUT),
+        Pin(17, "F", Pin.INPUT),
+        Pin(18, "QG", Pin.OUTPUT),
+        Pin(19, "G", Pin.INPUT),
+        Pin(20, "QH", Pin.OUTPUT),
+        Pin(21, "H", Pin.INPUT),
+        Pin(22, "SL SER", Pin.INPUT),
+        Pin(23, "S1", Pin.INPUT),
+        Pin(24, "VCC", Pin.POWER),
+    ]
+    test_load = Test(
+        name="Parallel load",
+        inputs=[13,  23, 1,  11,  22, 2,  3, 5, 7, 9, 15, 17, 19, 21],
+        outputs=[4, 6, 8, 10, 14, 16, 18, 20],
+        ttype=Test.COMB,
+        body=[
+            [[0,  1, 1,  0,  0, 0,  0, 0, 0, 0, 0, 0, 0, 1], [0, 0, 0, 0, 0, 0, 0, 0]],
+#            [[1,  1, 1,  1,  0, 0,  0, 0, 0, 0, 0, 0, 0, 1], [0, 0, 0, 0, 0, 0, 0, 1]],
+        ]
+    )
+    tests = [test_load]
+
+
 # build parts catalog
 catalog = {}
 for i in inspect.getmembers(sys.modules[__name__]):
