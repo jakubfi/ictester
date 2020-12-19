@@ -1,6 +1,7 @@
 import sys
 import inspect
 from functools import reduce
+from collections import namedtuple
 from prototypes import (Test, Pin, PartDIP14, PartDIP16, PartDIP24)
 
 
@@ -22,13 +23,8 @@ def binary_combinator(bitlen):
 
 # ------------------------------------------------------------------------
 def binary_fun_gen(unit_count, vector_len, fun, inverted=False):
-    if inverted:
-        ofun = lambda x: not x
-    else:
-        ofun = lambda x: x
-
     return [
-        [unit_count*v, unit_count*[ofun(reduce(fun, v))]]
+        [unit_count*v, unit_count*[reduce(fun, v) if not inverted else not reduce(fun, v)]]
         for v in binary_combinator(vector_len)
     ]
 
@@ -527,156 +523,94 @@ class Part74181(PartDIP24):
 
     # ------------------------------------------------------------------------
     def logic_test_gen(s, name, fun):
+        Vector = namedtuple('Vector', ['a', 'b', 'f'])
+
+        # raw, numerical test data
         data = [
-            [x, y, fun(x, y)]
-            for x in range(0, 16)
-            for y in range(0, 16)
+            Vector(a, b, fun(a, b))
+            for a in range(0, 16)
+            for b in range(0, 16)
         ]
+
+        # test vectors in [[inputs], [outputs]] order:
+        # [[1, s3, s2, s1, s0,  a3, a2, a1, a1,  b3, b2, b1, b0], [f3, f2, f1, f0]]
         body = [
-            [[1] + bin2vec(s, 4) + bin2vec(d[0], 4) + bin2vec(d[1], 4), bin2vec(d[2], 4)]
-            for d in data
+            [[1] + bin2vec(s, 4) + bin2vec(v.a, 4) + bin2vec(v.b, 4), bin2vec(v.f, 4)]
+            for v in data
         ]
+
         return Test(
             name=name,
-            inputs=[8, 3, 4, 5, 6,  19, 21, 23, 2,  18, 20, 22, 1],
+            inputs=[8,  3, 4, 5, 6,  19, 21, 23, 2,  18, 20, 22, 1],
             outputs=[13, 11, 10, 9],
             ttype=Test.COMB,
             body=body
         )
 
-    test_a0 = Test(
-        name="Arithmetic: F=A",
-        inputs=[8, 3, 4, 5, 6,  7,  19, 21, 23, 2,  18, 20, 22, 1],
-        outputs=[13, 11, 10, 9,  16],
-        ttype=Test.COMB,
-        body=[
-            # M  S3 S2 S1 S0  ~C  A            B             F           ~Cn+4
-            [[0, 0, 0, 0, 0,  1,  0, 0, 0, 0,  0, 0, 0, 0], [0, 0, 0, 0,  1]],
-            [[0, 0, 0, 0, 0,  1,  0, 0, 0, 1,  0, 0, 0, 0], [0, 0, 0, 1,  1]],
-            [[0, 0, 0, 0, 0,  1,  0, 0, 1, 0,  0, 0, 0, 0], [0, 0, 1, 0,  1]],
-            [[0, 0, 0, 0, 0,  1,  0, 0, 1, 1,  0, 0, 0, 0], [0, 0, 1, 1,  1]],
-            [[0, 0, 0, 0, 0,  1,  0, 1, 0, 0,  0, 0, 0, 0], [0, 1, 0, 0,  1]],
-            [[0, 0, 0, 0, 0,  1,  0, 1, 0, 1,  0, 0, 0, 0], [0, 1, 0, 1,  1]],
-            [[0, 0, 0, 0, 0,  1,  0, 1, 1, 0,  0, 0, 0, 0], [0, 1, 1, 0,  1]],
-            [[0, 0, 0, 0, 0,  1,  0, 1, 1, 1,  0, 0, 0, 0], [0, 1, 1, 1,  1]],
-            [[0, 0, 0, 0, 0,  1,  1, 0, 0, 0,  0, 0, 0, 0], [1, 0, 0, 0,  1]],
-            [[0, 0, 0, 0, 0,  1,  1, 0, 0, 1,  0, 0, 0, 0], [1, 0, 0, 1,  1]],
-            [[0, 0, 0, 0, 0,  1,  1, 0, 1, 0,  0, 0, 0, 0], [1, 0, 1, 0,  1]],
-            [[0, 0, 0, 0, 0,  1,  1, 0, 1, 1,  0, 0, 0, 0], [1, 0, 1, 1,  1]],
-            [[0, 0, 0, 0, 0,  1,  1, 1, 0, 0,  0, 0, 0, 0], [1, 1, 0, 0,  1]],
-            [[0, 0, 0, 0, 0,  1,  1, 1, 0, 1,  0, 0, 0, 0], [1, 1, 0, 1,  1]],
-            [[0, 0, 0, 0, 0,  1,  1, 1, 1, 0,  0, 0, 0, 0], [1, 1, 1, 0,  1]],
-            [[0, 0, 0, 0, 0,  1,  1, 1, 1, 1,  0, 0, 0, 0], [1, 1, 1, 1,  1]],
+    # ------------------------------------------------------------------------
+    def arith_test_gen(s, name, fun):
+        Vector = namedtuple('Vector', ['a', 'b', 'c', 'f'])
 
-            [[0, 0, 0, 0, 0,  0,  0, 0, 0, 0,  0, 0, 0, 0], [0, 0, 0, 1,  1]],
-            [[0, 0, 0, 0, 0,  0,  0, 0, 0, 1,  0, 0, 0, 0], [0, 0, 1, 0,  1]],
-            [[0, 0, 0, 0, 0,  0,  0, 0, 1, 0,  0, 0, 0, 0], [0, 0, 1, 1,  1]],
-            [[0, 0, 0, 0, 0,  0,  0, 0, 1, 1,  0, 0, 0, 0], [0, 1, 0, 0,  1]],
-            [[0, 0, 0, 0, 0,  0,  0, 1, 0, 0,  0, 0, 0, 0], [0, 1, 0, 1,  1]],
-            [[0, 0, 0, 0, 0,  0,  0, 1, 0, 1,  0, 0, 0, 0], [0, 1, 1, 0,  1]],
-            [[0, 0, 0, 0, 0,  0,  0, 1, 1, 0,  0, 0, 0, 0], [0, 1, 1, 1,  1]],
-            [[0, 0, 0, 0, 0,  0,  0, 1, 1, 1,  0, 0, 0, 0], [1, 0, 0, 0,  1]],
-            [[0, 0, 0, 0, 0,  0,  1, 0, 0, 0,  0, 0, 0, 0], [1, 0, 0, 1,  1]],
-            [[0, 0, 0, 0, 0,  0,  1, 0, 0, 1,  0, 0, 0, 0], [1, 0, 1, 0,  1]],
-            [[0, 0, 0, 0, 0,  0,  1, 0, 1, 0,  0, 0, 0, 0], [1, 0, 1, 1,  1]],
-            [[0, 0, 0, 0, 0,  0,  1, 0, 1, 1,  0, 0, 0, 0], [1, 1, 0, 0,  1]],
-            [[0, 0, 0, 0, 0,  0,  1, 1, 0, 0,  0, 0, 0, 0], [1, 1, 0, 1,  1]],
-            [[0, 0, 0, 0, 0,  0,  1, 1, 0, 1,  0, 0, 0, 0], [1, 1, 1, 0,  1]],
-            [[0, 0, 0, 0, 0,  0,  1, 1, 1, 0,  0, 0, 0, 0], [1, 1, 1, 1,  1]],
-            [[0, 0, 0, 0, 0,  0,  1, 1, 1, 1,  0, 0, 0, 0], [0, 0, 0, 0,  0]],
-
+        # raw, numerical test data
+        data = [
+            Vector(a, b, c, fun(a, b) + (not c))
+            for a in range(0, 16)
+            for b in range(0, 16)
+            for c in range(0, 2)
         ]
-    )
-    test_a1 = Test(
-        name="Arithmetic: F=A|B",
-        inputs=[8, 3, 4, 5, 6,  7,  19, 21, 23, 2,  18, 20, 22, 1],
-        outputs=[13, 11, 10, 9,  16],
-        ttype=Test.COMB,
-        body=[
-            # M  S3 S2 S1 S0  ~C  A            B             F           ~Cn+4
-            [[0, 0, 0, 0, 1,  1,  0, 0, 0, 0,  0, 0, 0, 0], [0, 0, 0, 0,  1]],
-            [[0, 0, 0, 0, 1,  1,  0, 0, 0, 0,  1, 1, 1, 1], [1, 1, 1, 1,  1]],
-            [[0, 0, 0, 0, 1,  1,  1, 1, 1, 1,  0, 0, 0, 0], [1, 1, 1, 1,  1]],
-            [[0, 0, 0, 0, 1,  1,  1, 1, 1, 1,  1, 1, 1, 1], [1, 1, 1, 1,  1]],
 
-            [[0, 0, 0, 0, 1,  0,  0, 0, 0, 0,  0, 0, 0, 0], [0, 0, 0, 1,  1]],
-            [[0, 0, 0, 0, 1,  0,  0, 0, 0, 0,  0, 0, 0, 1], [0, 0, 1, 0,  1]],
-            [[0, 0, 0, 0, 1,  0,  0, 0, 0, 0,  0, 0, 1, 0], [0, 0, 1, 1,  1]],
-            [[0, 0, 0, 0, 1,  0,  0, 0, 0, 0,  0, 1, 0, 0], [0, 1, 0, 1,  1]],
-            [[0, 0, 0, 0, 1,  0,  0, 0, 0, 0,  1, 0, 0, 0], [1, 0, 0, 1,  1]],
-            [[0, 0, 0, 0, 1,  0,  0, 0, 0, 1,  0, 0, 0, 0], [0, 0, 1, 0,  1]],
-            [[0, 0, 0, 0, 1,  0,  0, 0, 1, 0,  0, 0, 0, 0], [0, 0, 1, 1,  1]],
-            [[0, 0, 0, 0, 1,  0,  0, 1, 0, 0,  0, 0, 0, 0], [0, 1, 0, 1,  1]],
-            [[0, 0, 0, 0, 1,  0,  1, 0, 0, 0,  0, 0, 0, 0], [1, 0, 0, 1,  1]],
-
-            [[0, 0, 0, 0, 1,  0,  0, 0, 0, 0,  1, 1, 1, 1], [0, 0, 0, 0,  0]],
-            [[0, 0, 0, 0, 1,  0,  1, 1, 1, 1,  0, 0, 0, 0], [0, 0, 0, 0,  0]],
-            [[0, 0, 0, 0, 1,  0,  1, 1, 1, 1,  1, 1, 1, 1], [0, 0, 0, 0,  0]],
+        # test vectors in [[inputs], [outputs]] order:
+        # [[0, s3, s2, s1, s0,  cin,  a3, a2, a1, a1,  b3, b2, b1, b0], [f3, f2, f1, f0,  cout]]
+        body = [
+            [
+                [0] + bin2vec(s, 4) + [v.c] + bin2vec(v.a, 4) + bin2vec(v.b, 4),
+                bin2vec(v.f & 0b1111, 4) + [not v.f & 0b10000]
+            ]
+            for v in data
         ]
-    )
-    test_a2 = Test(
-        name="Arithmetic: F=A|~B",
-        inputs=[8, 3, 4, 5, 6,  7,  19, 21, 23, 2,  18, 20, 22, 1],
-        outputs=[13, 11, 10, 9,  16],
-        ttype=Test.COMB,
-        body=[
-            # M  S3 S2 S1 S0  ~C  A            B             F           ~Cn+4
-            [[0, 0, 0, 1, 0,  1,  0, 0, 0, 0,  0, 0, 0, 0], [1, 1, 1, 1,  1]],
-            [[0, 0, 0, 1, 0,  1,  0, 0, 0, 0,  1, 1, 1, 1], [0, 0, 0, 0,  1]],
-            [[0, 0, 0, 1, 0,  1,  1, 1, 1, 1,  0, 0, 0, 0], [1, 1, 1, 1,  1]],
-            [[0, 0, 0, 1, 0,  1,  1, 1, 1, 1,  1, 1, 1, 1], [1, 1, 1, 1,  1]],
-
-            [[0, 0, 0, 1, 0,  0,  0, 0, 0, 0,  0, 0, 0, 1], [1, 1, 1, 1,  1]],
-            [[0, 0, 0, 1, 0,  0,  0, 0, 0, 0,  0, 0, 1, 0], [1, 1, 1, 0,  1]],
-            [[0, 0, 0, 1, 0,  0,  0, 0, 0, 0,  0, 1, 0, 0], [1, 1, 0, 0,  1]],
-            [[0, 0, 0, 1, 0,  0,  0, 0, 0, 0,  1, 0, 0, 0], [1, 0, 0, 0,  1]],
-
-            [[0, 0, 0, 1, 0,  0,  0, 0, 0, 0,  0, 0, 0, 0], [0, 0, 0, 0,  0]],
-            [[0, 0, 0, 1, 0,  0,  0, 0, 0, 0,  1, 1, 1, 1], [0, 0, 0, 1,  1]],
-            [[0, 0, 0, 1, 0,  0,  1, 1, 1, 1,  0, 0, 0, 0], [0, 0, 0, 0,  0]],
-            [[0, 0, 0, 1, 0,  0,  1, 1, 1, 1,  1, 1, 1, 1], [0, 0, 0, 0,  0]],
-        ]
-    )
-    test_a3 = Test(
-        name="Arithmetic: F=-1",
-        inputs=[8, 3, 4, 5, 6,  7,  19, 21, 23, 2,  18, 20, 22, 1],
-        outputs=[13, 11, 10, 9,  16],
-        ttype=Test.COMB,
-        body=[
-            # M  S3 S2 S1 S0  ~C  A            B             F           ~Cn+4
-            [[0, 0, 0, 1, 1,  1,  0, 0, 0, 0,  0, 0, 0, 0], [1, 1, 1, 1,  1]],
-            [[0, 0, 0, 1, 1,  1,  0, 0, 0, 0,  0, 0, 0, 1], [1, 1, 1, 1,  1]],
-            [[0, 0, 0, 1, 1,  1,  0, 0, 0, 0,  1, 1, 1, 1], [1, 1, 1, 1,  1]],
-            [[0, 0, 0, 1, 1,  1,  1, 1, 1, 1,  0, 0, 0, 0], [1, 1, 1, 1,  1]],
-            [[0, 0, 0, 1, 1,  1,  1, 1, 1, 1,  1, 1, 1, 1], [1, 1, 1, 1,  1]],
-
-            [[0, 0, 0, 1, 1,  0,  0, 0, 0, 0,  0, 0, 0, 0], [0, 0, 0, 0,  0]],
-            [[0, 0, 0, 1, 1,  0,  0, 0, 0, 0,  0, 0, 0, 1], [0, 0, 0, 0,  0]],
-            [[0, 0, 0, 1, 1,  0,  0, 0, 0, 0,  1, 1, 1, 1], [0, 0, 0, 0,  0]],
-            [[0, 0, 0, 1, 1,  0,  1, 1, 1, 1,  0, 0, 0, 0], [0, 0, 0, 0,  0]],
-            [[0, 0, 0, 1, 1,  0,  1, 1, 1, 1,  1, 1, 1, 1], [0, 0, 0, 0,  0]],
-        ]
-    )
+        return Test(
+            name=name,
+            inputs=[8,  3, 4, 5, 6,  7,  19, 21, 23, 2,  18, 20, 22, 1],
+            outputs=[13, 11, 10, 9, 16],
+            ttype=Test.COMB,
+            body=body
+        )
 
     tests = [
-        logic_test_gen(0, "Logic: F=~A", lambda a, b: ~a),
-        logic_test_gen(1, "Logic: F=~(A|B)", lambda a, b: ~(a | b)),
-        logic_test_gen(2, "Logic: F=~A&B", lambda a, b: ~a & b),
-        logic_test_gen(3, "Logic: F=0", lambda a, b: 0),
-        logic_test_gen(4, "Logic: F=~(A&B)", lambda a, b: ~(a & b)),
-        logic_test_gen(5, "Logic: F=~B", lambda a, b: ~b),
-        logic_test_gen(6, "Logic: F=A^B", lambda a, b: a ^ b),
-        logic_test_gen(7, "Logic: F=A&~B", lambda a, b: a & ~b),
-        logic_test_gen(8, "Logic: F=~A|B", lambda a, b: ~a | b),
-        logic_test_gen(9, "Logic: F=~(A^B)", lambda a, b: ~(a ^ b)),
-        logic_test_gen(10, "Logic: F=B", lambda a, b: b),
-        logic_test_gen(11, "Logic: F=A&B", lambda a, b: a & b),
-        logic_test_gen(12, "Logic: F=1", lambda a, b: 0xf),
-        logic_test_gen(13, "Logic: F=A|~B", lambda a, b: a | ~b),
-        logic_test_gen(14, "Logic: F=A|B", lambda a, b: a | b),
-        logic_test_gen(15, "Logic: F=A", lambda a, b: a),
-
-        test_a0, test_a1, test_a2, test_a3
+        logic_test_gen(0, "Logic: F = ~A", lambda a, b: ~a),
+        logic_test_gen(1, "Logic: F = ~(A|B)", lambda a, b: ~(a | b)),
+        logic_test_gen(2, "Logic: F = ~A&B", lambda a, b: ~a & b),
+        logic_test_gen(3, "Logic: F = 0", lambda a, b: 0),
+        logic_test_gen(4, "Logic: F = ~(A&B)", lambda a, b: ~(a & b)),
+        logic_test_gen(5, "Logic: F = ~B", lambda a, b: ~b),
+        logic_test_gen(6, "Logic: F = A^B", lambda a, b: a ^ b),
+        logic_test_gen(7, "Logic: F = A&~B", lambda a, b: a & ~b),
+        logic_test_gen(8, "Logic: F = ~A|B", lambda a, b: ~a | b),
+        logic_test_gen(9, "Logic: F = ~(A^B)", lambda a, b: ~(a ^ b)),
+        logic_test_gen(10, "Logic: F = B", lambda a, b: b),
+        logic_test_gen(11, "Logic: F = A&B", lambda a, b: a & b),
+        logic_test_gen(12, "Logic: F = 1", lambda a, b: 0xf),
+        logic_test_gen(13, "Logic: F = A|~B", lambda a, b: a | ~b),
+        logic_test_gen(14, "Logic: F = A|B", lambda a, b: a | b),
+        logic_test_gen(15, "Logic: F = A", lambda a, b: a),
+        arith_test_gen(0, "Arithmetic: F = A", lambda a, b: a),
+        arith_test_gen(1, "Arithmetic: F = A|B", lambda a, b: a | b),
+        arith_test_gen(2, "Arithmetic: F = A|~B", lambda a, b: a | (~b & 15)),
+        arith_test_gen(3, "Arithmetic: F = -1", lambda a, b: 15),
+        arith_test_gen(4, "Arithmetic: F = A+(A&~B)", lambda a, b: a + (a & (~b & 15))),
+        arith_test_gen(5, "Arithmetic: F = (A|B)+(A&~B)", lambda a, b: (a | b) + (a & (~b & 15))),
+        arith_test_gen(6, "Arithmetic: F = A-B-1", lambda a, b: (a - b) + 15),
+        arith_test_gen(7, "Arithmetic: F = A&~B-1", lambda a, b: (a & (~b & 15)) + 15),
+        arith_test_gen(8, "Arithmetic: F = A+(A&B)", lambda a, b: a + (a & b)),
+        arith_test_gen(9, "Arithmetic: F = A+B", lambda a, b: a + b),
+        arith_test_gen(10, "Arithmetic: F = (A|~B)+(A&B)", lambda a, b: (a | (~b & 15)) + (a & b)),
+        arith_test_gen(11, "Arithmetic: F = (A&B)-1", lambda a, b: (a & b) + 15),
+        arith_test_gen(12, "Arithmetic: F = A+A", lambda a, b: a + a),
+        arith_test_gen(13, "Arithmetic: F = (A|B)+A", lambda a, b: (a | b) + a),
+        arith_test_gen(14, "Arithmetic: F = (A|~B)+A", lambda a, b: (a | (~b & 15)) + a),
+        arith_test_gen(15, "Arithmetic: F = A-1", lambda a, b: a + 15),
+        # TODO: A=B
+        # TODO: G, P (X, Y)
     ]
 
 
