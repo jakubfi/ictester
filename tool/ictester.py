@@ -15,7 +15,9 @@ OK = '\033[92m\033[1m'
 ENDC = '\033[0m'
 
 if '--list' in sys.argv:
-    for name, p in parts.catalog.items():
+    names = sorted(parts.catalog.keys(), key=int)
+    for name in names:
+        p = parts.catalog[name]
         print("{} ({}): {}".format(p.name, p.package_name, p.desc))
     sys.exit(0)
 
