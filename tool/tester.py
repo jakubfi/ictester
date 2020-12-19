@@ -37,6 +37,9 @@ class Tester:
         except AttributeError:
             assert self.part.tests
 
+        # no duplicate names allowed
+        assert len(self.tests_available()) == len(set(self.tests_available()))
+
         self.debug = debug
         self.s = serial.Serial(
             port,
