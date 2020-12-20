@@ -9,7 +9,7 @@
 #include <avr/cpufunc.h>
 #include "serial.h"
 
-#define MAX_TEST_SIZE 3*1024
+#define MAX_TEST_SIZE 1024
 
 enum cmd {
 	CMD_SETUP	= 0,
@@ -30,14 +30,17 @@ enum type {
 	TYPE_MAX	= TYPE_SEQ,
 };
 
-struct port_conf {
-	uint8_t dut_inputs;
+struct port {
+	volatile uint8_t *port;
+	volatile uint8_t *pin;
 	uint8_t dut_used;
-} port_conf[3];
+	uint8_t dut_input;
+	uint8_t dut_pullup;
+} port[3];
 
 uint8_t test_type;
 uint16_t test_len;
-uint8_t test_data[MAX_TEST_SIZE];
+uint8_t test[MAX_TEST_SIZE][3];
 
 // -----------------------------------------------------------------------
 void reply(uint8_t res)
@@ -59,17 +62,18 @@ void deconfigure(void)
 // -----------------------------------------------------------------------
 void setup(void)
 {
-	DDRA = port_conf[0].dut_inputs & port_conf[0].dut_used;
-	DDRB = port_conf[1].dut_inputs & port_conf[1].dut_used;
-	DDRC = port_conf[2].dut_inputs & port_conf[2].dut_used;
+	DDRA = port[0].dut_input & port[0].dut_used;
+	DDRB = port[1].dut_input & port[1].dut_used;
+	DDRC = port[2].dut_input & port[2].dut_used;
 }
 
 // -----------------------------------------------------------------------
 void read_setup(uint8_t cmd)
 {
 	for (int i=0 ; i<3 ; i++) {
-		port_conf[i].dut_used = serial_rx_char();
-		port_conf[i].dut_inputs = serial_rx_char();
+		port[i].dut_used = serial_rx_char();
+		port[i].dut_input = serial_rx_char();
+		port[i].dut_pullup = serial_rx_char();
 	}
 
 	reply(RES_OK);
@@ -82,8 +86,10 @@ void upload(uint8_t cmd)
 	test_len = (uint16_t) serial_rx_char() << 8;
 	test_len += serial_rx_char();
 
-	for (int pos=0 ; pos<test_len*3 ; pos++) {
-		test_data[pos] = serial_rx_char();
+	for (int pos=0 ; pos<test_len ; pos++) {
+		for (int i=0 ; i<3 ; i++) {
+			test[pos][i] = serial_rx_char();
+		}
 	}
 
 	reply(RES_OK);
@@ -92,23 +98,27 @@ void upload(uint8_t cmd)
 // -----------------------------------------------------------------------
 uint8_t run_single(void)
 {
-	uint8_t dA, dB, dC;
+	uint8_t i;
+	uint8_t data;
+	uint8_t pullup;
+	uint8_t expected;
 
 	uint8_t res = RES_PASS;
 	for (int pos=0 ; pos<test_len ; pos++) {
-		PORTA = test_data[pos*3+0] & port_conf[0].dut_inputs & port_conf[0].dut_used;
-		PORTB = test_data[pos*3+1] & port_conf[1].dut_inputs & port_conf[1].dut_used;
-		PORTC = test_data[pos*3+2] & port_conf[2].dut_inputs & port_conf[2].dut_used;
+		for (i=0 ; i<3 ; i++) {
+			data = test[pos][i] & port[i].dut_input;
+			pullup = port[i].dut_pullup & ~port[i].dut_input;
+			*port[i].port = port[i].dut_used & (data | pullup);
+		}
 		_NOP();
 		if ((test_type == TYPE_COMB) || ((test_type == TYPE_SEQ) && (pos%2))) {
-			dA = PINA & ~port_conf[0].dut_inputs & port_conf[0].dut_used;
-			dB = PINB & ~port_conf[1].dut_inputs & port_conf[1].dut_used;
-			dC = PINC & ~port_conf[2].dut_inputs & port_conf[2].dut_used;
-			if ((dA != (test_data[pos*3+0] & ~port_conf[0].dut_inputs & port_conf[0].dut_used))
-			| (dB != (test_data[pos*3+1] & ~port_conf[1].dut_inputs & port_conf[1].dut_used))
-			| (dC != (test_data[pos*3+2] & ~port_conf[2].dut_inputs & port_conf[2].dut_used))) {
-				res = RES_FAIL;
-				break;
+			for (i=0 ; i<3 ; i++) {
+				data = *port[i].pin & ~port[i].dut_input & port[i].dut_used;
+				expected = test[pos][i] & ~port[i].dut_input & port[i].dut_used;
+				if (data != expected) {
+					res = RES_FAIL;
+					break;
+				}
 			}
 		}
 	}
@@ -140,6 +150,13 @@ int main(void)
 	deconfigure();
 	serial_init(500000);
 
+	port[0].port = &PORTA;
+	port[1].port = &PORTB;
+	port[2].port = &PORTC;
+	port[0].pin = &PINA;
+	port[1].pin = &PINB;
+	port[2].pin = &PINC;
+
 	while (1) {
 		int cmd = serial_rx_char();
 		switch (cmd >> 5) {
@@ -161,3 +178,5 @@ int main(void)
 
 	return 0;
 }
+
+// vim: tabstop=4 shiftwidth=4 autoindent

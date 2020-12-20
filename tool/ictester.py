@@ -26,6 +26,7 @@ parser.add_argument('--device', default="/dev/ttyUSB1", help='Serial port where 
 parser.add_argument('--loop_pow', default=10, type=int, choices=range(0, 16), help='Loop count power (2^loop_pow)')
 parser.add_argument('--list', action="store_true", help='List all supported parts')
 parser.add_argument('--debug', action="store_true", help='Enable debug output')
+parser.add_argument('--serial_debug', action="store_true", help='Enable serial debug output')
 parser.add_argument('part', help='Part symbol')
 args = parser.parse_args()
 
@@ -38,7 +39,7 @@ except KeyError:
 
 print("Testing {}-pin part {}: {}, package {}...".format(part.pincount, part.name, part.desc, part.package_name))
 
-tester = Tester(part, args.device, 500000, debug=args.debug)
+tester = Tester(part, args.device, 500000, debug=args.debug, serial_debug=args.serial_debug)
 all_tests = tester.tests_available()
 longest_desc = len(max(all_tests, key=len))
 failed = False

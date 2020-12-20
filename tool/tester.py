@@ -1,5 +1,5 @@
 import serial
-
+from prototypes import Pin
 
 class Tester:
     CMD_SETUP = 0b00000000
@@ -29,7 +29,7 @@ class Tester:
         ],
     }
 
-    def __init__(self, part_class, port, speed, debug=False):
+    def __init__(self, part_class, port, speed, debug=False, serial_debug=False):
         self.part = part_class()
         # accept either test list or gen_tests() method
         try:
@@ -41,6 +41,7 @@ class Tester:
         assert len(self.tests_available()) == len(set(self.tests_available()))
 
         self.debug = debug
+        self.serial_debug = serial_debug
         self.s = serial.Serial(
             port,
             baudrate=speed,
@@ -54,14 +55,14 @@ class Tester:
         )
 
     def send(self, b):
-        if self.debug:
+        if self.serial_debug:
             print("<- {:08b} {}".format(b, b))
         data = bytes([b])
         self.s.write(data)
 
     def recv(self):
         b = ord(self.s.read(1))
-        if self.debug:
+        if self.serial_debug:
             print("-> {:08b} {}".format(b, b))
         return b
 
@@ -91,17 +92,26 @@ class Tester:
             for p in Tester.pin_map[self.part.package_name]
         ]
 
+    def get_pullup_pins(self, test):
+        return [
+            0 if not p else (1 if self.part.pins[p-1].role == Pin.OC else 0)
+            for p in Tester.pin_map[self.part.package_name]
+        ]
+
     def setup(self, test):
         used = self.v2bin(self.get_used_pins(test))
         inputs = self.v2bin(self.get_input_pins(test))
+        pullup = self.v2bin(self.get_pullup_pins(test))
         if self.debug:
-            print("Used  pins: {:024b}".format(used))
-            print("Input pins: {:024b}".format(inputs))
+            print("  Used pins: {:024b}".format(used))
+            print(" Input pins: {:024b}".format(inputs))
+            print("Pullup pins: {:024b}".format(pullup))
 
         self.send(Tester.CMD_SETUP)
         for shift in [16, 8, 0]:
             self.send((used >> shift) & 0xff)
             self.send((inputs >> shift) & 0xff)
+            self.send((pullup >> shift) & 0xff)
         if self.recv() != Tester.RES_OK:
             raise RuntimeError("Setup failed")
 
