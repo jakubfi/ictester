@@ -148,6 +148,52 @@ class Part7404(PartDIP14):
 
 
 # ------------------------------------------------------------------------
+class Part7405(Part7404):
+    name = "7405"
+    desc = "Hex inverters with open collector outputs"
+    pins = [
+        Pin(1, "1A", Pin.INPUT),
+        Pin(2, "1Y", Pin.OC),
+        Pin(3, "2A", Pin.INPUT),
+        Pin(4, "2Y", Pin.OC),
+        Pin(5, "3A", Pin.INPUT),
+        Pin(6, "3Y", Pin.OC),
+        Pin(7, "GND", Pin.POWER),
+        Pin(8, "6Y", Pin.OC),
+        Pin(9, "6A", Pin.INPUT),
+        Pin(10, "5Y", Pin.OC),
+        Pin(11, "5A", Pin.INPUT),
+        Pin(12, "4Y", Pin.OC),
+        Pin(13, "4A", Pin.INPUT),
+        Pin(14, "VCC", Pin.POWER),
+    ]
+
+
+# ------------------------------------------------------------------------
+class Part7406(Part7405):
+    name = "7406"
+    desc = "Hex inverter buffers / drivers with high-voltage outputs"
+
+
+# ------------------------------------------------------------------------
+class Part7407(Part7405):
+    name = "7407"
+    desc = "Hex Buffers/Drivers With Open-Collector High-Voltage Outputs"
+    tests = [
+        Test(
+            name="Complete logic",
+            inputs=[1, 3, 5, 9, 11, 13],
+            outputs=[2, 4, 6, 8, 10, 12],
+            ttype=Test.COMB,
+            body=[
+                [[0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0]],
+                [[1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1]]
+            ]
+        )
+    ]
+
+
+# ------------------------------------------------------------------------
 class Part7408(PartDIP14):
     name = "7408"
     desc = "Quad 2-input positive-AND gates"
@@ -315,6 +361,28 @@ class Part7432(PartDIP14):
 class Part7437(Part7400):
     name = "7437"
     desc = "Quad 2-input positive-NAND buffers"
+
+
+# ------------------------------------------------------------------------
+class Part7438(Part7400):
+    name = "7438"
+    desc = "Quad 2-input positive-NAND buffers with open collector outputs"
+    pins = [
+        Pin(1, "1A", Pin.INPUT),
+        Pin(2, "1B", Pin.INPUT),
+        Pin(3, "1Y", Pin.OC),
+        Pin(4, "2A", Pin.INPUT),
+        Pin(5, "2B", Pin.INPUT),
+        Pin(6, "2Y", Pin.OC),
+        Pin(7, "GND", Pin.POWER),
+        Pin(8, "3Y", Pin.OC),
+        Pin(9, "3A", Pin.INPUT),
+        Pin(10, "3B", Pin.INPUT),
+        Pin(11, "4Y", Pin.OC),
+        Pin(12, "4A", Pin.INPUT),
+        Pin(13, "4B", Pin.INPUT),
+        Pin(14, "VCC", Pin.POWER),
+    ]
 
 
 # ------------------------------------------------------------------------
