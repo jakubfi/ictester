@@ -257,6 +257,28 @@ class Part7410(PartDIP14):
 
 
 # ------------------------------------------------------------------------
+class Part7412(Part7410):
+    name = "7412"
+    desc = "Triple 3-input positive-NAND gates with open-collector outputs"
+    pins = [
+        Pin(1, "1A", Pin.INPUT),
+        Pin(2, "1B", Pin.INPUT),
+        Pin(3, "2A", Pin.INPUT),
+        Pin(4, "2B", Pin.INPUT),
+        Pin(5, "2C", Pin.INPUT),
+        Pin(6, "2Y", Pin.OC),
+        Pin(7, "GND", Pin.POWER),
+        Pin(8, "3Y", Pin.OC),
+        Pin(9, "3A", Pin.INPUT),
+        Pin(10, "3B", Pin.INPUT),
+        Pin(11, "3C", Pin.INPUT),
+        Pin(12, "1Y", Pin.OC),
+        Pin(13, "1C", Pin.INPUT),
+        Pin(14, "VCC", Pin.POWER),
+    ]
+
+
+# ------------------------------------------------------------------------
 class Part7413(PartDIP14):
     name = "7413"
     desc = "Dual 4-input positive-NAND Schmitt triggers"
