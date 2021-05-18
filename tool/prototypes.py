@@ -37,6 +37,12 @@ class PartDIP14(Part):
 
 
 # ------------------------------------------------------------------------
+class PartDIP14x(Part):
+    package_name = "DIP14x"
+    pincount = 14
+
+
+# ------------------------------------------------------------------------
 class PartDIP16(Part):
     package_name = "DIP16"
     pincount = 16
