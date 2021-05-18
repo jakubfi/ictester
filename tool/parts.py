@@ -2,7 +2,7 @@ import sys
 import inspect
 from functools import reduce
 from collections import namedtuple
-from prototypes import (Test, Pin, PartDIP14, PartDIP16, PartDIP24)
+from prototypes import (Test, Pin, PartDIP14, PartDIP16, PartDIP16x, PartDIP24)
 
 
 # ------------------------------------------------------------------------
@@ -450,6 +450,62 @@ class Part7474(PartDIP14):
         ]
     )
     tests = [test_sync, test_async]
+
+
+# ------------------------------------------------------------------------
+class Part7483(PartDIP16x):
+    name = "7483"
+    desc = "4-bit binary full adder with fast carry"
+    pins = [
+        Pin(1, "A4", Pin.INPUT),
+        Pin(2, "S3", Pin.OUTPUT),
+        Pin(3, "A3", Pin.INPUT),
+        Pin(4, "B3", Pin.INPUT),
+        Pin(5, "VCC", Pin.POWER),
+        Pin(6, "S2", Pin.OUTPUT),
+        Pin(7, "B2", Pin.INPUT),
+        Pin(8, "A2", Pin.INPUT),
+        Pin(9, "S1", Pin.OUTPUT),
+        Pin(10, "A1", Pin.INPUT),
+        Pin(11, "B1", Pin.INPUT),
+        Pin(12, "GND", Pin.POWER),
+        Pin(13, "C0", Pin.INPUT),
+        Pin(14, "C4", Pin.OUTPUT),
+        Pin(15, "S4", Pin.OUTPUT),
+        Pin(16, "B4", Pin.INPUT),
+    ]
+
+    # ------------------------------------------------------------------------
+    def add_test_gen():
+        Vector = namedtuple('Vector', ['a', 'b', 'c', 'f'])
+
+        # raw, numerical test data
+        data = [
+            Vector(a, b, c, a + b + c)
+            for a in range(0, 16)
+            for b in range(0, 16)
+            for c in range(0, 2)
+        ]
+
+        # test vectors in [[inputs], [outputs]] order:
+        # [[cin, a4, a3, a2, a1,  b4, b3, b2, b1], [f4, f3, f2, f1,  cout]]
+        body = [
+            [
+                [v.c] + bin2vec(v.a, 4) + bin2vec(v.b, 4),
+                bin2vec(v.f & 0b1111, 4) + [True if v.f & 0b10000 else False]
+            ]
+            for v in data
+        ]
+        return body
+
+    test_all = Test(
+        name="Complete logic",
+        inputs=[13,  1, 3, 8, 10,  16, 4, 7, 11],
+        outputs=[15, 2, 6, 9,  14],
+        ttype=Test.COMB,
+        body=add_test_gen()
+    )
+    tests = [test_all]
 
 
 # ------------------------------------------------------------------------
