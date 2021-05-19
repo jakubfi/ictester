@@ -1,6 +1,7 @@
 import serial
 from prototypes import Pin
 
+
 class Tester:
     CMD_SETUP = 0b00000000
     CMD_UPLOAD = 0b00100000
