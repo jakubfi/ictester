@@ -134,17 +134,34 @@ class Tester:
             for pin in Tester.pin_map[self.part.package_name]
         ]
 
+    def sequentialize(self, v):
+        i = v[0]
+        o = v[1]
+        return [
+            [[x if x in [0, 1] else 0 if x == '+' else 1 for x in i], o],
+            [[x if x in [0, 1] else 1 if x == '+' else 0 for x in i], o],
+        ]
+
     def upload(self, test):
+        if test.type == test.COMB:
+            body = test.body
+        else:
+            body = []
+            for t in test.body:
+                body.extend(self.sequentialize(t))
+
         if self.debug:
-            print("Test len: {}".format(len(test.body)))
-        assert len(test.body) <= Tester.MAX_LEN
+            print("Test len: {}".format(len(body)))
+
+        assert len(body) <= Tester.MAX_LEN
+
         self.send(Tester.CMD_UPLOAD)
         self.send(test.type)
-        self.send(len(test.body) >> 8)
-        self.send(len(test.body) & 0xff)
+        self.send(len(body) >> 8)
+        self.send(len(body) & 0xff)
 
         all_pins = test.inputs + test.outputs
-        for v in test.body:
+        for v in body:
             v_port = self.vector_by_port(all_pins, v[0] + v[1])
             v_port_bin = self.v2bin(v_port)
             if self.debug:
