@@ -6,6 +6,8 @@ from prototypes import (Test, Pin, PartDIP14, PartDIP14x, PartDIP16, PartDIP16x,
 
 
 # ------------------------------------------------------------------------
+# Translate integer value into a binary vector
+# bin2vec(9, 7) -> [0, 0, 0, 1, 0, 0, 1]
 def bin2vec(val, bitlen):
     return [
         (val >> (bitlen-pos-1)) & 1
@@ -14,6 +16,8 @@ def bin2vec(val, bitlen):
 
 
 # ------------------------------------------------------------------------
+# Get all bit combinations for given bit length
+# binary_combinator(2) -> [[0, 0], [0, 1], [1, 0], [1, 1]]
 def binary_combinator(bitlen):
     return [
         bin2vec(v, bitlen)
@@ -22,10 +26,13 @@ def binary_combinator(bitlen):
 
 
 # ------------------------------------------------------------------------
-def binary_fun_gen(unit_count, vector_len, fun, inverted=False):
+# Prepare test vectors for unit_cnt separate units with input_cnt inputs doing fun
+# Units are tested inm parallel
+# Four 3-input OR gates: binary_fun_gen(4, 3, lambda a, b: a|b)
+def binary_fun_gen(unit_cnt, input_cnt, fun, inverted=False):
     return [
-        [unit_count*v, unit_count*[reduce(fun, v) if not inverted else not reduce(fun, v)]]
-        for v in binary_combinator(vector_len)
+        [unit_cnt*v, unit_cnt*[reduce(fun, v) if not inverted else not reduce(fun, v)]]
+        for v in binary_combinator(input_cnt)
     ]
 
 
@@ -139,10 +146,7 @@ class Part7404(PartDIP14):
             inputs=[1, 3, 5, 9, 11, 13],
             outputs=[2, 4, 6, 8, 10, 12],
             ttype=Test.COMB,
-            body=[
-                [[0, 0, 0, 0, 0, 0], [1, 1, 1, 1, 1, 1]],
-                [[1, 1, 1, 1, 1, 1], [0, 0, 0, 0, 0, 0]]
-            ]
+            body=binary_fun_gen(6, 1, lambda a: a, inverted=True)
         )
     ]
 
@@ -185,10 +189,7 @@ class Part7407(Part7405):
             inputs=[1, 3, 5, 9, 11, 13],
             outputs=[2, 4, 6, 8, 10, 12],
             ttype=Test.COMB,
-            body=[
-                [[0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0]],
-                [[1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1]]
-            ]
+            body=binary_fun_gen(6, 1, lambda a: a)
         )
     ]
 
