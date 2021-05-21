@@ -49,6 +49,12 @@ class PartDIP16(Part):
 
 
 # ------------------------------------------------------------------------
+class PartDIP16r(Part):
+    package_name = "DIP16r"
+    pincount = 16
+
+
+# ------------------------------------------------------------------------
 class PartDIP16x(Part):
     package_name = "DIP16x"
     pincount = 16
@@ -64,16 +70,18 @@ class PartDIP24(Part):
 class Test():
     COMB = 0
     SEQ = 1
+    MEM = 2
 
     def __init__(self, name, ttype, inputs, outputs, body):
         assert name
-        assert ttype in [Test.COMB, Test.SEQ]
+        assert ttype in [Test.COMB, Test.SEQ, Test.MEM]
         assert inputs
         assert outputs
-        assert body
-        for v in body:
-            assert len(inputs) == len(v[0])
-            assert len(outputs) == len(v[1])
+        if ttype in [Test.COMB, Test.SEQ]:
+            assert body
+            for v in body:
+                assert len(inputs) == len(v[0])
+                assert len(outputs) == len(v[1])
         self.name = name
         self.type = ttype
         self.body = body

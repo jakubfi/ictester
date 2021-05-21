@@ -27,7 +27,8 @@ enum result {
 enum type {
 	TYPE_COMB	= 0,
 	TYPE_SEQ	= 1,
-	TYPE_MAX	= TYPE_SEQ,
+	TYPE_MEM	= 2,
+	TYPE_MAX	= TYPE_MEM,
 };
 
 struct port {
@@ -125,6 +126,187 @@ uint8_t run_single(void)
 	return res;
 }
 
+//    pin:  7   6   5   4    3  2  1    0
+// port A:  -  NC Din ~WE ~RAS A0 A2   A1
+// port C: NC  a7  a5  a4   a3 a6 Do ~CAS 
+
+#define PORT_RAS PORTA
+#define PORT_WE  PORTA
+#define PORT_DIN PORTA
+#define PORT_CAS PORTC
+#define IN_DOUT  PINC
+#define PORT_AL  PORTA
+#define PORT_AH  PORTC
+
+// -----------------------------------------------------------------------
+void mem_setup(void)
+{
+	DDRA  = 0b11111111;
+	PORTA = 0b00011000;
+
+	DDRC  = 0b11111101;
+	PORTC = 0b00000001;
+
+	// wait 100us after initialization
+	_delay_us(100);
+	// blink RAS 8 times before using the chip
+	for (uint8_t i=0 ; i<8 ; i++) {
+		PORTA = 0b00010000;
+		PORTA = 0b00010000; // repeated twice, because 120ns min pulse
+		PORTA = 0b00011000;
+	}
+}
+
+#define ADDR_LOW(addr) (((addr) & 0b111))
+#define ADDR_HIGH(addr) (((addr) & 0b11111000) >> 1)
+#define DATA(data) (((data) & 1) << 5)
+#define WE_OFF (1 << 4)
+#define WE_ON 0
+#define RAS_OFF (1 << 3)
+#define RAS_ON
+#define CAS_OFF (1 << 0)
+#define CAS_ON 0
+
+// -----------------------------------------------------------------------
+uint8_t mem_test_bit(uint16_t addr, uint8_t data)
+{
+	uint8_t addr_col = addr & 0xff;
+	uint8_t addr_row = addr >> 8;
+	uint8_t dout;
+
+	// write:
+
+	// set row addr
+	PORT_AL = ADDR_LOW(addr_row) | WE_OFF | RAS_OFF;
+	PORT_AH = ADDR_HIGH(addr_row) | CAS_OFF;
+	// RAS low
+	PORT_AL &= ~RAS_OFF;
+	// WE low
+	PORT_AL &= ~WE_OFF;
+	// data
+	PORT_AL = (data & 1) << 5;
+	// set column addr
+	PORT_AL |= ADDR_LOW(addr_col);
+	PORT_AH = ADDR_HIGH(addr_col) | CAS_OFF;
+	// CAS low
+	PORT_AH &= ~CAS_OFF;
+	// WE high
+	PORT_AL |= WE_OFF;
+	// CAS high
+	PORT_AH |= CAS_OFF;
+	// RAS high
+	PORT_AL |= RAS_OFF;
+	// data 0
+	PORT_AL &= ~0b00100000;
+
+	// read:
+
+	// set row addr
+	PORT_AL = ADDR_LOW(addr_row) | WE_OFF | RAS_OFF;
+	PORT_AH = ADDR_HIGH(addr_row) | CAS_OFF;
+	// RAS low
+	PORT_AL &= ~RAS_OFF;
+	// set column addr
+	PORT_AL = ADDR_LOW(addr_col) | WE_OFF;
+	PORT_AH = ADDR_HIGH(addr_col) | CAS_OFF;
+	// CAS low
+	PORT_AH &= ~CAS_OFF;
+	__asm__ __volatile__ ("nop");
+	__asm__ __volatile__ ("nop");
+	// wait for valid data
+	dout = (IN_DOUT >> 1) & 1;
+	// CAS high
+	PORT_AH |= CAS_OFF;
+	// RAS high
+	PORT_AL |= RAS_OFF;
+
+	if (dout == data) return RES_PASS;
+
+	return RES_FAIL;
+}
+
+// -----------------------------------------------------------------------
+uint8_t mem_test_page(uint16_t addr, uint8_t data)
+{
+	uint8_t res = RES_PASS;
+	uint16_t addr_col;
+	uint8_t addr_row = addr;
+	uint8_t dout;
+
+	// write:
+
+	// set row addr
+	PORT_AL = ADDR_LOW(addr_row) | WE_OFF | RAS_OFF;
+	PORT_AH = ADDR_HIGH(addr_row) | CAS_OFF;
+	// RAS low
+	PORT_AL &= ~RAS_OFF;
+	for (addr_col=0 ; addr_col<256 ; addr_col++) {
+		// WE low
+		PORT_AL &= ~WE_OFF;
+		// data
+		PORT_AL = (data & 1) << 5;
+		// set column addr
+		PORT_AL |= ADDR_LOW(addr_col);
+		PORT_AH = ADDR_HIGH(addr_col) | CAS_OFF;
+		// CAS low
+		PORT_AH &= ~CAS_OFF;
+		// WE high
+		PORT_AL |= WE_OFF;
+		// CAS high
+		PORT_AH |= CAS_OFF;
+	}
+	// RAS high
+	PORT_AL |= RAS_OFF;
+	// data 0
+	PORT_AL &= ~0b00100000;
+
+	// read:
+
+	// set row addr
+	PORT_AL = ADDR_LOW(addr_row) | WE_OFF | RAS_OFF;
+	PORT_AH = ADDR_HIGH(addr_row) | CAS_OFF;
+	// RAS low
+	PORT_AL &= ~RAS_OFF;
+	for (addr_col=0 ; addr_col<256 ; addr_col++) {
+		// set column addr
+		PORT_AL = ADDR_LOW(addr_col) | WE_OFF;
+		PORT_AH = ADDR_HIGH(addr_col) | CAS_OFF;
+		// CAS low
+		PORT_AH &= ~CAS_OFF;
+		__asm__ __volatile__ ("nop");
+		__asm__ __volatile__ ("nop");
+		// wait for valid data
+		dout = (IN_DOUT >> 1) & 1;
+		// CAS high
+		PORT_AH |= CAS_OFF;
+		if (dout != data) {
+			res = RES_FAIL;
+			break;
+		}
+	}
+	// RAS high
+	PORT_AL |= RAS_OFF;
+
+	return res;
+}
+
+// -----------------------------------------------------------------------
+uint8_t run_mem(void)
+{
+	uint8_t res = RES_PASS;
+
+	mem_setup();
+
+	for (uint32_t addr=0 ; addr<256; addr++) {
+		res = mem_test_page(addr, 0);
+		if (res != RES_PASS) break;
+		res = mem_test_page(addr, 1);
+		if (res != RES_PASS) break;
+	}
+
+	return res;
+}
+
 // -----------------------------------------------------------------------
 void run(uint8_t cmd)
 {
@@ -134,7 +316,11 @@ void run(uint8_t cmd)
 	int test_loops = pow(2, test_pow);
 
 	for (int rep=0 ; rep<test_loops ; rep++) {
-		res = run_single();
+		if (test_type == TYPE_MEM) {
+			res = run_mem();
+		} else {
+			res = run_single();
+		}
 		if (res != RES_PASS) {
 			reply(RES_FAIL);
 			return;

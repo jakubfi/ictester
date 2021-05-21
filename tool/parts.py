@@ -2,7 +2,7 @@ import sys
 import inspect
 from functools import reduce
 from collections import namedtuple
-from prototypes import (Test, Pin, PartDIP14, PartDIP14x, PartDIP16, PartDIP16x, PartDIP24)
+from prototypes import (Test, Pin, PartDIP14, PartDIP14x, PartDIP16, PartDIP16x, PartDIP16r, PartDIP24)
 
 
 # ------------------------------------------------------------------------
@@ -1169,6 +1169,40 @@ class Part74198(PartDIP24):
     tests = [test_load, test_clear, test_rshift, test_lshift, test_clk_inhibit]
 
 
+# ------------------------------------------------------------------------
+class PartMH4864(PartDIP16r):
+    name = "4164"
+    desc = "(also HM4864, ...) (REVERSE CHIP ORIENTATION!) 65536 x 1bit DRAM memory"
+    pins = [
+        Pin(1, "NC", Pin.NC),
+        Pin(2, "Din", Pin.INPUT),
+        Pin(3, "~WE", Pin.INPUT),
+        Pin(4, "~RAS", Pin.INPUT),
+        Pin(5, "A0", Pin.INPUT),
+        Pin(6, "A2", Pin.INPUT),
+        Pin(7, "A1", Pin.INPUT),
+        Pin(8, "VCC", Pin.POWER),
+        Pin(9, "A7", Pin.INPUT),
+        Pin(10, "A5", Pin.INPUT),
+        Pin(11, "A4", Pin.INPUT),
+        Pin(12, "A3", Pin.INPUT),
+        Pin(13, "A6", Pin.INPUT),
+        Pin(14, "Dout", Pin.OUTPUT),
+        Pin(15, "~CAS", Pin.INPUT),
+        Pin(16, "GND", Pin.POWER),
+    ]
+    test_mem = Test(
+        name="Test mem",
+        inputs=[2, 3, 4, 5, 6, 7, 9, 10, 11, 12, 13, 15],
+        outputs=[14],
+        ttype=Test.MEM,
+        body=[]
+    )
+ 
+    tests = [test_mem]
+
+
+# ------------------------------------------------------------------------
 # build parts catalog
 catalog = {}
 for i in inspect.getmembers(sys.modules[__name__]):
