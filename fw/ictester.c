@@ -130,13 +130,46 @@ uint8_t run_single(void)
 // port A:  -  NC Din ~WE ~RAS A0 A2   A1
 // port C: NC  a7  a5  a4   a3 a6 Do ~CAS 
 
-#define PORT_RAS PORTA
-#define PORT_WE  PORTA
-#define PORT_DIN PORTA
-#define PORT_CAS PORTC
-#define IN_DOUT  PINC
-#define PORT_AL  PORTA
-#define PORT_AH  PORTC
+#define PORT_RAS	PORTA
+#define PORT_WE		PORTA
+#define PORT_DIN	PORTA
+#define PORT_CAS	PORTC
+#define PIN_DOUT	PINC
+#define PORT_AL		PORTA
+#define PORT_AH		PORTC
+
+#define BIT_WE		4
+#define BIT_RAS		3
+#define BIT_CAS		0
+#define BIT_DO		1
+#define BIT_DI		5
+
+#define VAL_WE		(1 << BIT_WE)
+#define VAL_RAS		(1 << BIT_RAS)
+#define VAL_CAS		(1 << BIT_CAS)
+#define VAL_DO		(1 << BIT_DO)
+#define VAL_DI		(1 << BIT_DI)
+
+#define WE_OFF		PORT_WE |= VAL_WE
+#define WE_ON		PORT_WE &= ~VAL_WE
+#define RAS_OFF		PORT_RAS |= VAL_RAS
+#define RAS_ON		PORT_RAS &= ~VAL_RAS
+#define CAS_OFF		PORT_CAS |= VAL_CAS
+#define CAS_ON		PORT_CAS &= ~VAL_CAS
+#define DATA		(PIN_DOUT >> 1) & 1;
+
+#define ADDR_LOW(addr)	(((addr) & 0b111))
+#define ADDR_HIGH(addr)	(((addr) & 0b11111000) >> 1)
+
+#define SET_ROW_ADDR(addr)							\
+	PORT_AL = ADDR_LOW(addr) | VAL_WE | VAL_RAS;	\
+	PORT_AH = ADDR_HIGH(addr) | VAL_CAS;			\
+	RAS_ON;
+
+#define SET_COL_ADDR(addr)					\
+	PORT_AL |= ADDR_LOW(addr);				\
+	PORT_AH = ADDR_HIGH(addr) | VAL_CAS;	\
+	CAS_ON;
 
 // -----------------------------------------------------------------------
 void mem_setup(void)
@@ -151,21 +184,11 @@ void mem_setup(void)
 	_delay_us(100);
 	// blink RAS 8 times before using the chip
 	for (uint8_t i=0 ; i<8 ; i++) {
-		PORTA = 0b00010000;
-		PORTA = 0b00010000; // repeated twice, because 120ns min pulse
-		PORTA = 0b00011000;
+		RAS_ON;
+		RAS_ON; // repeated twice, because 120ns min pulse
+		RAS_OFF;
 	}
 }
-
-#define ADDR_LOW(addr) (((addr) & 0b111))
-#define ADDR_HIGH(addr) (((addr) & 0b11111000) >> 1)
-#define DATA(data) (((data) & 1) << 5)
-#define WE_OFF (1 << 4)
-#define WE_ON 0
-#define RAS_OFF (1 << 3)
-#define RAS_ON
-#define CAS_OFF (1 << 0)
-#define CAS_ON 0
 
 // -----------------------------------------------------------------------
 uint8_t mem_test_bit(uint16_t addr, uint8_t data)
@@ -174,55 +197,34 @@ uint8_t mem_test_bit(uint16_t addr, uint8_t data)
 	uint8_t addr_row = addr >> 8;
 	uint8_t dout;
 
-	// write:
+	// --- WRITE ---
 
-	// set row addr
-	PORT_AL = ADDR_LOW(addr_row) | WE_OFF | RAS_OFF;
-	PORT_AH = ADDR_HIGH(addr_row) | CAS_OFF;
-	// RAS low
-	PORT_AL &= ~RAS_OFF;
-	// WE low
-	PORT_AL &= ~WE_OFF;
-	// data
-	PORT_AL = (data & 1) << 5;
-	// set column addr
-	PORT_AL |= ADDR_LOW(addr_col);
-	PORT_AH = ADDR_HIGH(addr_col) | CAS_OFF;
-	// CAS low
-	PORT_AH &= ~CAS_OFF;
-	// WE high
-	PORT_AL |= WE_OFF;
-	// CAS high
-	PORT_AH |= CAS_OFF;
-	// RAS high
-	PORT_AL |= RAS_OFF;
-	// data 0
-	PORT_AL &= ~0b00100000;
+	SET_ROW_ADDR(addr_row);
+	// early data
+	WE_ON;
+	PORT_DIN = (data & 1) << 5;
+	SET_COL_ADDR(addr_col);
+	// close
+	WE_OFF;
+	CAS_OFF;
+	RAS_OFF;
 
-	// read:
+	// --- READ ---
 
-	// set row addr
-	PORT_AL = ADDR_LOW(addr_row) | WE_OFF | RAS_OFF;
-	PORT_AH = ADDR_HIGH(addr_row) | CAS_OFF;
-	// RAS low
-	PORT_AL &= ~RAS_OFF;
-	// set column addr
-	PORT_AL = ADDR_LOW(addr_col) | WE_OFF;
-	PORT_AH = ADDR_HIGH(addr_col) | CAS_OFF;
-	// CAS low
-	PORT_AH &= ~CAS_OFF;
-	__asm__ __volatile__ ("nop");
-	__asm__ __volatile__ ("nop");
-	// wait for valid data
-	dout = (IN_DOUT >> 1) & 1;
-	// CAS high
-	PORT_AH |= CAS_OFF;
-	// RAS high
-	PORT_AL |= RAS_OFF;
+	SET_ROW_ADDR(addr_row);
+	PORT_AL = VAL_WE;
+	SET_COL_ADDR(addr_col);
+	// wait for data and read
+	_NOP();
+	_NOP();
+	dout = DATA;
+	// close
+	CAS_OFF;
+	RAS_OFF;
 
-	if (dout == data) return RES_PASS;
+	if (dout != data) return RES_FAIL;
 
-	return RES_FAIL;
+	return RES_PASS;
 }
 
 // -----------------------------------------------------------------------
@@ -233,59 +235,41 @@ uint8_t mem_test_page(uint16_t addr, uint8_t data)
 	uint8_t addr_row = addr;
 	uint8_t dout;
 
-	// write:
+	// --- WRITE ---
 
-	// set row addr
-	PORT_AL = ADDR_LOW(addr_row) | WE_OFF | RAS_OFF;
-	PORT_AH = ADDR_HIGH(addr_row) | CAS_OFF;
-	// RAS low
-	PORT_AL &= ~RAS_OFF;
+	SET_ROW_ADDR(addr_row);
 	for (addr_col=0 ; addr_col<256 ; addr_col++) {
-		// WE low
-		PORT_AL &= ~WE_OFF;
 		// data
-		PORT_AL = (data & 1) << 5;
-		// set column addr
-		PORT_AL |= ADDR_LOW(addr_col);
-		PORT_AH = ADDR_HIGH(addr_col) | CAS_OFF;
-		// CAS low
-		PORT_AH &= ~CAS_OFF;
-		// WE high
-		PORT_AL |= WE_OFF;
-		// CAS high
-		PORT_AH |= CAS_OFF;
+		WE_ON;
+		PORT_DIN = (data & 1) << 5;
+		SET_COL_ADDR(addr_col);
+		// close column
+		WE_OFF;
+		CAS_OFF;
 	}
-	// RAS high
-	PORT_AL |= RAS_OFF;
-	// data 0
-	PORT_AL &= ~0b00100000;
+	// close row
+	RAS_OFF;
 
-	// read:
+	// --- READ ---
 
-	// set row addr
-	PORT_AL = ADDR_LOW(addr_row) | WE_OFF | RAS_OFF;
-	PORT_AH = ADDR_HIGH(addr_row) | CAS_OFF;
-	// RAS low
-	PORT_AL &= ~RAS_OFF;
+	SET_ROW_ADDR(addr_row);
 	for (addr_col=0 ; addr_col<256 ; addr_col++) {
-		// set column addr
-		PORT_AL = ADDR_LOW(addr_col) | WE_OFF;
-		PORT_AH = ADDR_HIGH(addr_col) | CAS_OFF;
-		// CAS low
-		PORT_AH &= ~CAS_OFF;
-		__asm__ __volatile__ ("nop");
-		__asm__ __volatile__ ("nop");
-		// wait for valid data
-		dout = (IN_DOUT >> 1) & 1;
-		// CAS high
-		PORT_AH |= CAS_OFF;
+		PORT_AL = VAL_WE;
+		SET_COL_ADDR(addr_col);
+		// wait and read data
+		_NOP();
+		_NOP();
+		dout = DATA;
+		// close column
+		CAS_OFF;
+		// check data
 		if (dout != data) {
 			res = RES_FAIL;
 			break;
 		}
 	}
-	// RAS high
-	PORT_AL |= RAS_OFF;
+	// close row
+	RAS_OFF;
 
 	return res;
 }
@@ -294,10 +278,18 @@ uint8_t mem_test_page(uint16_t addr, uint8_t data)
 uint8_t run_mem(void)
 {
 	uint8_t res = RES_PASS;
+	uint32_t addr;
 
 	mem_setup();
 
-	for (uint32_t addr=0 ; addr<256; addr++) {
+	for (addr=0 ; addr<65536; addr++) {
+		res = mem_test_bit(addr, 0);
+		if (res != RES_PASS) break;
+		res = mem_test_bit(addr, 1);
+		if (res != RES_PASS) break;
+	}
+
+	for (addr=0 ; addr<256; addr++) {
 		res = mem_test_page(addr, 0);
 		if (res != RES_PASS) break;
 		res = mem_test_page(addr, 1);
