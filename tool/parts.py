@@ -1057,6 +1057,86 @@ class Part74181(PartDIP24):
         # TODO: G, P (X, Y)
     ]
 
+# ------------------------------------------------------------------------
+class Part74182(PartDIP16):
+    name = "74182"
+    desc = "Look-ahead carry generator"
+    pins = [
+        Pin(1, "~G1", Pin.INPUT),
+        Pin(2, "~P1", Pin.INPUT),
+        Pin(3, "~G0", Pin.INPUT),
+        Pin(4, "~P0", Pin.INPUT),
+        Pin(5, "~G3", Pin.INPUT),
+        Pin(6, "~P3", Pin.INPUT),
+        Pin(7, "~P", Pin.OUTPUT),
+        Pin(8, "GND", Pin.POWER),
+        Pin(9, "Cn+z", Pin.OUTPUT),
+        Pin(10, "~G", Pin.OUTPUT),
+        Pin(11, "Cn+y", Pin.OUTPUT),
+        Pin(12, "Cn+x", Pin.OUTPUT),
+        Pin(13, "Cn", Pin.INPUT),
+        Pin(14, "~G2", Pin.INPUT),
+        Pin(15, "~P2", Pin.INPUT),
+        Pin(16, "VCC", Pin.POWER),
+    ]
+    test_g = Test(
+        name="~G",
+        inputs=[5, 14, 1, 3, 6, 15, 2],
+        outputs=[10],
+        ttype=Test.SEQ,
+        loops=64,
+        body=[
+            [v, [0] if not v[0] or (not v[1] and not v[4]) or (not v[2] and v[4:6]==[0,0]) or v[3:]==[0,0,0,0] else [1]]
+            for v in binary_combinator(7)
+        ]
+    )
+    test_p = Test(
+        name="~P",
+        inputs=[2, 4, 6, 15],
+        outputs=[7],
+        ttype=Test.SEQ,
+        loops=64,
+        body=[
+            [v, [0] if v == [0, 0, 0, 0] else [1]]
+            for v in binary_combinator(4)
+        ]
+    )
+    test_cnx = Test(
+        name="Cn+x",
+        inputs=[3, 4, 13],
+        outputs=[12],
+        ttype=Test.SEQ,
+        loops=64,
+        body=[
+            [v, [1] if not v[0] or v[1:3]==[0,1] else [0]]
+            for v in binary_combinator(3)
+        ]
+    )
+    test_cny = Test(
+        name="Cn+y",
+        inputs=[1, 3, 2, 4, 13],
+        outputs=[11],
+        ttype=Test.SEQ,
+        loops=64,
+        body=[
+            [v, [1] if not v[0] or v[1:3]==[0,0] or v[2:5]==[0,0,1] else [0]]
+            for v in binary_combinator(5)
+        ]
+    )
+    test_cnz = Test(
+        name="Cn+z",
+        inputs=[14, 1, 3, 15, 2, 4, 13],
+        outputs=[9],
+        ttype=Test.SEQ,
+        loops=64,
+        body=[
+            [v, [1] if not v[0] or (not v[1] and not v[3]) or v[2:5]==[0,0,0] or v[3:]==[0,0,0,1] else [0]]
+            for v in binary_combinator(7)
+        ]
+    )
+
+    tests = [test_g, test_p, test_cnx, test_cny, test_cnz]
+
 
 # ------------------------------------------------------------------------
 class Part74198(PartDIP24):
