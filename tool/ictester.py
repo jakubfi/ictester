@@ -53,9 +53,17 @@ for test_name in all_tests:
     loops = 2 ** loops_pow
 
     if not args.debug:
-        print(" * {:{}s}  ({} loop{}) ".format(test_name, longest_desc, loops, "s" if loops != 1 else ""), end='', flush=True)
+        print(" * {:{}s}  ({} loop{}) ".format(
+            test_name,
+            longest_desc,
+            loops,
+            "s" if loops != 1 else ""
+        ), end='', flush=True)
     else:
-        print(" * {} ({} loop{})".format(test_name, loops, "s" if loops != 1 else ""))
+        print(" * {} ({} loop{})".format(
+            test_name, loops,
+            "s" if loops != 1 else ""
+        ))
 
     res = tester.run(test, loops_pow)
 

@@ -1057,6 +1057,7 @@ class Part74181(PartDIP24):
         # TODO: G, P (X, Y)
     ]
 
+
 # ------------------------------------------------------------------------
 class Part74182(PartDIP16):
     name = "74182"
@@ -1086,7 +1087,13 @@ class Part74182(PartDIP16):
         ttype=Test.SEQ,
         loops=64,
         body=[
-            [v, [0] if not v[0] or (not v[1] and not v[4]) or (not v[2] and v[4:6]==[0,0]) or v[3:]==[0,0,0,0] else [1]]
+            [
+                v, [0] if not v[0]
+                or (not v[1] and not v[4])
+                or (not v[2] and v[4:6] == [0, 0])
+                or v[3:] == [0, 0, 0, 0]
+                else [1]
+            ]
             for v in binary_combinator(7)
         ]
     )
@@ -1108,7 +1115,7 @@ class Part74182(PartDIP16):
         ttype=Test.SEQ,
         loops=64,
         body=[
-            [v, [1] if not v[0] or v[1:3]==[0,1] else [0]]
+            [v, [1] if not v[0] or v[1:3] == [0, 1] else [0]]
             for v in binary_combinator(3)
         ]
     )
@@ -1119,7 +1126,7 @@ class Part74182(PartDIP16):
         ttype=Test.SEQ,
         loops=64,
         body=[
-            [v, [1] if not v[0] or v[1:3]==[0,0] or v[2:5]==[0,0,1] else [0]]
+            [v, [1] if not v[0] or v[1:3] == [0, 0] or v[2:5] == [0, 0, 1] else [0]]
             for v in binary_combinator(5)
         ]
     )
@@ -1130,7 +1137,7 @@ class Part74182(PartDIP16):
         ttype=Test.SEQ,
         loops=64,
         body=[
-            [v, [1] if not v[0] or (not v[1] and not v[3]) or v[2:5]==[0,0,0] or v[3:]==[0,0,0,1] else [0]]
+            [v, [1] if not v[0] or (not v[1] and not v[3]) or v[2:5] == [0, 0, 0] or v[3:] == [0, 0, 0, 1] else [0]]
             for v in binary_combinator(7)
         ]
     )
@@ -1334,8 +1341,12 @@ class Part4164(PartDIP16r):
         loops=1,
         body=[],
     )
- 
-    tests = [test_bit_all_0, test_bit_all_1, test_row_all_0, test_row_all_1, test_row_alternate_01, test_row_alternate_10]
+
+    tests = [
+        test_bit_all_0, test_bit_all_1,
+        test_row_all_0, test_row_all_1,
+        test_row_alternate_01, test_row_alternate_10
+    ]
 
 
 # ------------------------------------------------------------------------
