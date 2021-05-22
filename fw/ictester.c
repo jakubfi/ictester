@@ -40,6 +40,7 @@ struct port {
 } port[3];
 
 uint8_t test_type;
+uint8_t test_subtype;
 uint16_t test_len;
 uint8_t test[MAX_TEST_SIZE][3];
 
@@ -69,7 +70,7 @@ void setup(void)
 }
 
 // -----------------------------------------------------------------------
-void read_setup(uint8_t cmd)
+void read_setup(void)
 {
 	for (int i=0 ; i<3 ; i++) {
 		port[i].dut_used = serial_rx_char();
@@ -81,9 +82,10 @@ void read_setup(uint8_t cmd)
 }
 
 // -----------------------------------------------------------------------
-void upload(uint8_t cmd)
+void upload(void)
 {
 	test_type = serial_rx_char();
+	test_subtype = serial_rx_char();
 	test_len = (uint16_t) serial_rx_char() << 8;
 	test_len += serial_rx_char();
 
@@ -97,7 +99,7 @@ void upload(uint8_t cmd)
 }
 
 // -----------------------------------------------------------------------
-uint8_t run_single(void)
+uint8_t run_logic(void)
 {
 	uint8_t i;
 	uint8_t data;
@@ -228,7 +230,7 @@ uint8_t mem_test_bit(uint16_t addr, uint8_t data)
 }
 
 // -----------------------------------------------------------------------
-uint8_t mem_test_page(uint16_t addr, uint8_t data)
+uint8_t mem_test_page(uint16_t addr, uint8_t data, uint8_t alternate)
 {
 	uint8_t res = RES_PASS;
 	uint16_t addr_col;
@@ -246,6 +248,7 @@ uint8_t mem_test_page(uint16_t addr, uint8_t data)
 		// close column
 		WE_OFF;
 		CAS_OFF;
+		data ^= alternate;
 	}
 	// close row
 	RAS_OFF;
@@ -267,6 +270,7 @@ uint8_t mem_test_page(uint16_t addr, uint8_t data)
 			res = RES_FAIL;
 			break;
 		}
+		data ^= alternate;
 	}
 	// close row
 	RAS_OFF;
@@ -274,52 +278,75 @@ uint8_t mem_test_page(uint16_t addr, uint8_t data)
 	return res;
 }
 
+#define MEM_TEST_BIT_ALL_0 0
+#define MEM_TEST_BIT_ALL_1 1
+#define MEM_TEST_ROW_ALL_0 2
+#define MEM_TEST_ROW_ALL_1 3
+#define MEM_TEST_ROW_ALTERNATE_01 4
+#define MEM_TEST_ROW_ALTERNATE_10 5
+
 // -----------------------------------------------------------------------
 uint8_t run_mem(void)
 {
 	uint8_t res = RES_PASS;
 	uint32_t addr;
+	uint8_t alternate = 0;
+	uint8_t data = 0;
 
-	mem_setup();
-
-	for (addr=0 ; addr<65536; addr++) {
-		res = mem_test_bit(addr, 0);
-		if (res != RES_PASS) break;
-		res = mem_test_bit(addr, 1);
-		if (res != RES_PASS) break;
+	if ((test_subtype == MEM_TEST_BIT_ALL_1) || (test_subtype == MEM_TEST_ROW_ALL_1) || (test_subtype == MEM_TEST_ROW_ALTERNATE_10)) {
+		data = 1;
 	}
 
-	for (addr=0 ; addr<256; addr++) {
-		res = mem_test_page(addr, 0);
-		if (res != RES_PASS) break;
-		res = mem_test_page(addr, 1);
-		if (res != RES_PASS) break;
+	switch (test_subtype) {
+		case MEM_TEST_BIT_ALL_0:
+		case MEM_TEST_BIT_ALL_1:
+			for (addr=0 ; addr<65536; addr++) {
+				res = mem_test_bit(addr, data);
+				if (res != RES_PASS) break;
+			}
+			break;
+		case MEM_TEST_ROW_ALL_0:
+		case MEM_TEST_ROW_ALL_1:
+		case MEM_TEST_ROW_ALTERNATE_01:
+		case MEM_TEST_ROW_ALTERNATE_10:
+			if ((test_subtype == MEM_TEST_ROW_ALTERNATE_01) || (test_subtype == MEM_TEST_ROW_ALTERNATE_10)) {
+				alternate = 1;
+			}
+			for (addr=0 ; addr<256; addr++) {
+				res = mem_test_page(addr, data, alternate);
+				if (res != RES_PASS) break;
+			}
+			break;
 	}
-
 	return res;
 }
 
 // -----------------------------------------------------------------------
-void run(uint8_t cmd)
+void run(void)
 {
-	uint8_t res;
+	uint8_t res = RES_PASS;
 
 	uint8_t test_pow = serial_rx_char();
 	int test_loops = pow(2, test_pow);
+
+	if (test_type == TYPE_MEM) {
+		mem_setup();
+	} else {
+		setup();
+	}
 
 	for (int rep=0 ; rep<test_loops ; rep++) {
 		if (test_type == TYPE_MEM) {
 			res = run_mem();
 		} else {
-			res = run_single();
+			res = run_logic();
 		}
-		if (res != RES_PASS) {
-			reply(RES_FAIL);
-			return;
-		}
+		if (res != RES_PASS) break;
 	}
 
-	reply(RES_PASS);
+	deconfigure();
+
+	reply(res);
 }
 
 // -----------------------------------------------------------------------
@@ -337,17 +364,15 @@ int main(void)
 
 	while (1) {
 		int cmd = serial_rx_char();
-		switch (cmd >> 5) {
+		switch (cmd) {
 			case CMD_SETUP:
-				read_setup(cmd);
+				read_setup();
 				break;
 			case CMD_UPLOAD:
-				upload(cmd);
+				upload();
 				break;
 			case CMD_RUN:
-				setup();
-				run(cmd);
-				deconfigure();
+				run();
 				break;
 			default:
 				reply(RES_ERR);

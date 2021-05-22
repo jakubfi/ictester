@@ -1170,7 +1170,14 @@ class Part74198(PartDIP24):
 
 
 # ------------------------------------------------------------------------
-class PartMH4864(PartDIP16r):
+class Part4164(PartDIP16r):
+    TEST_BIT_ALL_0 = 0
+    TEST_BIT_ALL_1 = 1
+    TEST_ROW_ALL_0 = 2
+    TEST_ROW_ALL_1 = 3
+    TEST_ROW_ALTERNATE_01 = 4
+    TEST_ROW_ALTERNATE_10 = 5
+
     name = "4164"
     desc = "(also HM4864, ...) (REVERSE CHIP ORIENTATION!) 65536 x 1bit DRAM memory"
     pins = [
@@ -1191,15 +1198,56 @@ class PartMH4864(PartDIP16r):
         Pin(15, "~CAS", Pin.INPUT),
         Pin(16, "GND", Pin.POWER),
     ]
-    test_mem = Test(
-        name="Test mem",
+    test_bit_all_0 = Test(
+        name="Single bit: all 0s",
         inputs=[2, 3, 4, 5, 6, 7, 9, 10, 11, 12, 13, 15],
         outputs=[14],
         ttype=Test.MEM,
-        body=[]
+        tsubtype=TEST_BIT_ALL_0,
+        body=[],
+    )
+    test_bit_all_1 = Test(
+        name="Single bit: all 1s",
+        inputs=[2, 3, 4, 5, 6, 7, 9, 10, 11, 12, 13, 15],
+        outputs=[14],
+        ttype=Test.MEM,
+        tsubtype=TEST_BIT_ALL_1,
+        body=[],
+    )
+    test_row_all_0 = Test(
+        name="Page mode: all 0s",
+        inputs=[2, 3, 4, 5, 6, 7, 9, 10, 11, 12, 13, 15],
+        outputs=[14],
+        ttype=Test.MEM,
+        tsubtype=TEST_ROW_ALL_0,
+        body=[],
+    )
+    test_row_all_1 = Test(
+        name="Page mode: all 1s",
+        inputs=[2, 3, 4, 5, 6, 7, 9, 10, 11, 12, 13, 15],
+        outputs=[14],
+        ttype=Test.MEM,
+        tsubtype=TEST_ROW_ALL_1,
+        body=[],
+    )
+    test_row_alternate_01 = Test(
+        name="Page mode: alternating 0/1",
+        inputs=[2, 3, 4, 5, 6, 7, 9, 10, 11, 12, 13, 15],
+        outputs=[14],
+        ttype=Test.MEM,
+        tsubtype=TEST_ROW_ALTERNATE_01,
+        body=[],
+    )
+    test_row_alternate_10 = Test(
+        name="Page mode: alternating 1/0",
+        inputs=[2, 3, 4, 5, 6, 7, 9, 10, 11, 12, 13, 15],
+        outputs=[14],
+        ttype=Test.MEM,
+        tsubtype=TEST_ROW_ALTERNATE_10,
+        body=[],
     )
  
-    tests = [test_mem]
+    tests = [test_bit_all_0, test_bit_all_1, test_row_all_0, test_row_all_1, test_row_alternate_01, test_row_alternate_10]
 
 
 # ------------------------------------------------------------------------

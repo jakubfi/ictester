@@ -72,7 +72,7 @@ class Test():
     SEQ = 1
     MEM = 2
 
-    def __init__(self, name, ttype, inputs, outputs, body):
+    def __init__(self, name, ttype, inputs, outputs, body, tsubtype=0):
         assert name
         assert ttype in [Test.COMB, Test.SEQ, Test.MEM]
         assert inputs
@@ -84,6 +84,7 @@ class Test():
                 assert len(outputs) == len(v[1])
         self.name = name
         self.type = ttype
+        self.subtype = tsubtype
         self.body = body
         self.inputs = inputs
         self.outputs = outputs

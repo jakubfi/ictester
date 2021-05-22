@@ -3,9 +3,9 @@ from prototypes import Pin
 
 
 class Tester:
-    CMD_SETUP = 0b00000000
-    CMD_UPLOAD = 0b00100000
-    CMD_RUN = 0b01000000
+    CMD_SETUP = 0
+    CMD_UPLOAD = 1
+    CMD_RUN = 2
     RES_OK = 0
     RES_ERR = 1
     RES_PASS = 2
@@ -163,6 +163,7 @@ class Tester:
 
         self.send(Tester.CMD_UPLOAD)
         self.send(test.type)
+        self.send(test.subtype)
         self.send(len(body) >> 8)
         self.send(len(body) & 0xff)
 
