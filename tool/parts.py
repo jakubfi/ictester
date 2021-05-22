@@ -986,7 +986,8 @@ class Part74181(PartDIP24):
             inputs=[8,  3, 4, 5, 6,  19, 21, 23, 2,  18, 20, 22, 1],
             outputs=[13, 11, 10, 9],
             ttype=Test.COMB,
-            body=body
+            loops=32,
+            body=body,
         )
 
     # ------------------------------------------------------------------------
@@ -1015,6 +1016,7 @@ class Part74181(PartDIP24):
             inputs=[8,  3, 4, 5, 6,  7,  19, 21, 23, 2,  18, 20, 22, 1],
             outputs=[13, 11, 10, 9, 16],
             ttype=Test.COMB,
+            loops=32,
             body=body
         )
 
@@ -1204,6 +1206,7 @@ class Part4164(PartDIP16r):
         outputs=[14],
         ttype=Test.MEM,
         tsubtype=TEST_BIT_ALL_0,
+        loops=1,
         body=[],
     )
     test_bit_all_1 = Test(
@@ -1212,6 +1215,7 @@ class Part4164(PartDIP16r):
         outputs=[14],
         ttype=Test.MEM,
         tsubtype=TEST_BIT_ALL_1,
+        loops=1,
         body=[],
     )
     test_row_all_0 = Test(
@@ -1220,6 +1224,7 @@ class Part4164(PartDIP16r):
         outputs=[14],
         ttype=Test.MEM,
         tsubtype=TEST_ROW_ALL_0,
+        loops=1,
         body=[],
     )
     test_row_all_1 = Test(
@@ -1228,6 +1233,7 @@ class Part4164(PartDIP16r):
         outputs=[14],
         ttype=Test.MEM,
         tsubtype=TEST_ROW_ALL_1,
+        loops=1,
         body=[],
     )
     test_row_alternate_01 = Test(
@@ -1236,6 +1242,7 @@ class Part4164(PartDIP16r):
         outputs=[14],
         ttype=Test.MEM,
         tsubtype=TEST_ROW_ALTERNATE_01,
+        loops=1,
         body=[],
     )
     test_row_alternate_10 = Test(
@@ -1244,6 +1251,7 @@ class Part4164(PartDIP16r):
         outputs=[14],
         ttype=Test.MEM,
         tsubtype=TEST_ROW_ALTERNATE_10,
+        loops=1,
         body=[],
     )
  

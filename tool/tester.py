@@ -181,11 +181,9 @@ class Tester:
         if self.recv() != Tester.RES_OK:
             raise RuntimeError("Upload failed")
 
-    def run(self, test_name, loop_pow):
-        assert test_name
+    def run(self, test, loop_pow):
         assert loop_pow < 16
 
-        test = self.part.get_test(test_name)
         self.setup(test)
         self.upload(test)
         self.send(Tester.CMD_RUN)

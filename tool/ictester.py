@@ -2,6 +2,7 @@
 
 import sys
 import argparse
+import math
 
 from tester import Tester
 import parts
@@ -23,7 +24,7 @@ if '--list' in sys.argv:
 
 parser = argparse.ArgumentParser(description='IC tester controller')
 parser.add_argument('--device', default="/dev/ttyUSB1", help='Serial port where the IC tester is connected')
-parser.add_argument('--loop_pow', default=10, type=int, choices=range(0, 16), help='Loop count power (2^loop_pow)')
+parser.add_argument('--loops', type=int, help='Loop count (<65536, will be rounded to the nearest power of 2)')
 parser.add_argument('--list', action="store_true", help='List all supported parts')
 parser.add_argument('--debug', action="store_true", help='Enable debug output')
 parser.add_argument('--serial_debug', action="store_true", help='Enable serial debug output')
@@ -46,11 +47,18 @@ failed = False
 tests_passed = 0
 
 for test_name in all_tests:
+    test = tester.part.get_test(test_name)
+    loops = args.loops if args.loops is not None else test.loops
+    loops_pow = round((math.log2(loops)))
+    loops = 2 ** loops_pow
+
     if not args.debug:
-        print(" * {:{n}s}".format(test_name, n=longest_desc+2), end='', flush=True)
+        print(" * {:{}s}  ({} loop{}) ".format(test_name, longest_desc, loops, "s" if loops != 1 else ""), end='', flush=True)
     else:
-        print(" * {} ".format(test_name))
-    res = tester.run(test_name, args.loop_pow)
+        print(" * {} ({} loop{})".format(test_name, loops, "s" if loops != 1 else ""))
+
+    res = tester.run(test, loops_pow)
+
     if res == Tester.RES_PASS:
         tests_passed += 1
         print("{}PASS{}".format(OK, ENDC))
@@ -61,8 +69,12 @@ for test_name in all_tests:
 if tests_passed != len(tester.tests_available()):
     color = FAIL
     result = "FAILED"
+    ret = 1
 else:
     color = OK
     result = "OK"
+    ret = 0
 
 print("{}{}: {} of {} tests passed{}".format(color, result, tests_passed, len(tester.tests_available()), ENDC))
+
+sys.exit(ret)
