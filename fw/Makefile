@@ -2,7 +2,7 @@ MCU=atmega644
 DEFINES=-DF_CPU=16000000UL
 PROGRAMMER_MCU=m644
 PROJECTNAME=ictester
-PRJSRC=ictester.c serial.c
+PRJSRC=ictester.c serial.c mem.c
 INC=
 LIBS=
 OPTLEVEL=s
