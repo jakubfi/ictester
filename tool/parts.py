@@ -258,6 +258,38 @@ class Part7410(PartDIP14):
 
 
 # ------------------------------------------------------------------------
+class Part7411(PartDIP14):
+    name = "7411"
+    desc = "Triple 3-input positive-AND gates"
+    pins = [
+        Pin(1, "1A", Pin.INPUT),
+        Pin(2, "1B", Pin.INPUT),
+        Pin(3, "2A", Pin.INPUT),
+        Pin(4, "2B", Pin.INPUT),
+        Pin(5, "2C", Pin.INPUT),
+        Pin(6, "2Y", Pin.OUTPUT),
+        Pin(7, "GND", Pin.POWER),
+        Pin(8, "3Y", Pin.OUTPUT),
+        Pin(9, "3A", Pin.INPUT),
+        Pin(10, "3B", Pin.INPUT),
+        Pin(11, "3C", Pin.INPUT),
+        Pin(12, "1Y", Pin.OUTPUT),
+        Pin(13, "1C", Pin.INPUT),
+        Pin(14, "VCC", Pin.POWER),
+    ]
+
+    tests = [
+        Test(
+            name="Complete logic",
+            inputs=[1, 2, 13, 3, 4, 5, 9, 10, 11],
+            outputs=[12, 6, 8],
+            ttype=Test.COMB,
+            body=binary_fun_gen(3, 3, lambda a, b: a & b)
+        )
+    ]
+
+
+# ------------------------------------------------------------------------
 class Part7412(Part7410):
     name = "7412"
     desc = "Triple 3-input positive-NAND gates with open-collector outputs"
@@ -804,6 +836,12 @@ class Part7496(PartDIP16x):
 
 
 # ------------------------------------------------------------------------
+class Part74132(Part7400):
+    name = "74132"
+    desc = "Quad 2-input positive-NAND Shmitt triggers"
+
+
+# ------------------------------------------------------------------------
 class Part74150(PartDIP24):
     name = "74150"
     desc = "Data selectors/multiplexers"
@@ -930,6 +968,60 @@ class Part74153(PartDIP16):
         ]
     )
     tests = [test_all]
+
+
+# ------------------------------------------------------------------------
+class Part74175(PartDIP16):
+    name = "74175"
+    desc = "Quad D-type filp-flops"
+    pins = [
+        Pin(1, "~CLR", Pin.INPUT),
+        Pin(2, "1Q", Pin.OUTPUT),
+        Pin(3, "~1Q", Pin.OUTPUT),
+        Pin(4, "1D", Pin.INPUT),
+        Pin(5, "2D", Pin.INPUT),
+        Pin(6, "~2Q", Pin.OUTPUT),
+        Pin(7, "2Q", Pin.OUTPUT),
+        Pin(8, "GND", Pin.POWER),
+        Pin(9, "CLK", Pin.INPUT),
+        Pin(10, "3Q", Pin.OUTPUT),
+        Pin(11, "~3Q", Pin.OUTPUT),
+        Pin(12, "3D", Pin.INPUT),
+        Pin(13, "4D", Pin.INPUT),
+        Pin(14, "~4Q", Pin.OUTPUT),
+        Pin(15, "4Q", Pin.OUTPUT),
+        Pin(16, "VCC", Pin.POWER),
+    ]
+    test_sync = Test(
+        name="Synchronous operation",
+        inputs=[1, 9,  4, 5, 12, 13],
+        outputs=[2, 3,  7, 6,  10, 11,  15, 14],
+        ttype=Test.SEQ,
+        body=[
+            [[1, '+',  0, 0, 0, 0], [0, 1,  0, 1,  0, 1,  0, 1]],
+            [[1, '+',  1, 1, 1, 1], [1, 0,  1, 0,  1, 0,  1, 0]],
+            [[1, '+',  0, 0, 0, 0], [0, 1,  0, 1,  0, 1,  0, 1]],
+            [[1, '+',  1, 1, 1, 1], [1, 0,  1, 0,  1, 0,  1, 0]],
+        ]
+    )
+    test_async = Test(
+        name="Asynchronous operation",
+        inputs=[1, 9,  4, 5, 12, 13],
+        outputs=[2, 3,  7, 6,  10, 11,  15, 14],
+        ttype=Test.COMB,
+        body=[
+            # clear
+            [[0, 0,  1, 1, 1, 1], [0, 1,  0, 1,  0, 1,  0, 1]],
+            [[1, 0,  1, 1, 1, 1], [0, 1,  0, 1,  0, 1,  0, 1]],
+            # load 1s
+            [[1, 1,  1, 1, 1, 1], [1, 0,  1, 0,  1, 0,  1, 0]],
+            [[1, 0,  1, 1, 1, 1], [1, 0,  1, 0,  1, 0,  1, 0]],
+            # clear
+            [[0, 0,  1, 1, 1, 1], [0, 1,  0, 1,  0, 1,  0, 1]],
+            [[1, 0,  1, 1, 1, 1], [0, 1,  0, 1,  0, 1,  0, 1]],
+        ]
+    )
+    tests = [test_sync, test_async]
 
 
 # ------------------------------------------------------------------------
