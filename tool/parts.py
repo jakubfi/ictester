@@ -441,6 +441,12 @@ class Part7438(Part7400):
 
 
 # ------------------------------------------------------------------------
+class Part7440(Part7413):
+    name = "7440"
+    desc = "Dual 4-input positive-NAND Buffer"
+
+
+# ------------------------------------------------------------------------
 class Part7445(PartDIP16):
     name = "7445"
     desc = "BCD-to-decimal decoders/drivers"
