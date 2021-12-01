@@ -496,6 +496,90 @@ class Part7445(PartDIP16):
 
 
 # ------------------------------------------------------------------------
+class Part74H53(PartDIP14):
+    name = "74H53"
+    desc = "Expandable 4-wide, 2-2-3-2 And-Or-Invert gate"
+    pins = [
+        Pin(1, "A1", Pin.INPUT),
+        Pin(2, "B1", Pin.INPUT),
+        Pin(3, "B2", Pin.INPUT),
+        Pin(4, "C1", Pin.INPUT),
+        Pin(5, "C2", Pin.INPUT),
+        Pin(6, "C3", Pin.INPUT),
+        Pin(7, "GND", Pin.POWER),
+        Pin(8, "~Y", Pin.OUTPUT),
+        Pin(9, "D1", Pin.INPUT),
+        Pin(10, "D2", Pin.INPUT),
+        Pin(11, "X", Pin.NC),
+        Pin(12, "~X", Pin.NC),
+        Pin(13, "A2", Pin.INPUT),
+        Pin(14, "VCC", Pin.POWER),
+    ]
+    test_async = Test(
+        name="Asynchronous operation",
+        inputs=[1, 13, 2, 3, 4, 5, 6, 9, 10],
+        outputs=[8],
+        ttype=Test.COMB,
+        body=[
+            [[0, 0,  0, 0,  0, 0, 0,  0, 0], [1]],
+            [[1, 0,  1, 0,  1, 0, 0,  1, 0], [1]],
+            [[0, 1,  0, 1,  0, 1, 0,  0, 1], [1]],
+            [[0, 1,  0, 1,  0, 0, 1,  0, 1], [1]],
+            [[0, 1,  0, 1,  0, 1, 1,  0, 1], [1]],
+            [[0, 1,  0, 1,  1, 0, 1,  0, 1], [1]],
+            [[0, 1,  0, 1,  1, 1, 0,  0, 1], [1]],
+
+            [[1, 1,  0, 0,  0, 0, 0,  0, 0], [0]],
+            [[0, 0,  1, 1,  0, 0, 0,  0, 0], [0]],
+            [[0, 0,  0, 0,  1, 1, 1,  0, 0], [0]],
+            [[0, 0,  0, 0,  0, 0, 0,  1, 1], [0]],
+            [[1, 1,  1, 1,  1, 1, 1,  1, 1], [0]],
+        ]
+    )
+    tests = [test_async]
+
+
+# ------------------------------------------------------------------------
+class Part7453(PartDIP14):
+    name = "7453"
+    desc = "Expandable 4-wide, 2-input And-Or-Invert gate"
+    pins = [
+        Pin(1, "A1", Pin.INPUT),
+        Pin(2, "B1", Pin.INPUT),
+        Pin(3, "B2", Pin.INPUT),
+        Pin(4, "C1", Pin.INPUT),
+        Pin(5, "C2", Pin.INPUT),
+        Pin(6, "NC", Pin.INPUT), # this is to not confuse it with 3-input version
+        Pin(7, "GND", Pin.POWER),
+        Pin(8, "~Y", Pin.OUTPUT),
+        Pin(9, "D1", Pin.INPUT),
+        Pin(10, "D2", Pin.INPUT),
+        Pin(11, "X", Pin.NC),
+        Pin(12, "~X", Pin.NC),
+        Pin(13, "A2", Pin.INPUT),
+        Pin(14, "VCC", Pin.POWER),
+    ]
+    test_async = Test(
+        name="Asynchronous operation",
+        inputs=[1, 13, 2, 3, 4, 5, 6, 9, 10],
+        outputs=[8],
+        ttype=Test.COMB,
+        body=[
+            [[0, 0,  0, 0,  0, 0, 0,  0, 0], [1]],
+            [[1, 0,  1, 0,  1, 0, 0,  1, 0], [1]],
+            [[0, 1,  0, 1,  0, 1, 0,  0, 1], [1]],
+
+            [[1, 1,  0, 0,  0, 0, 0,  0, 0], [0]],
+            [[0, 0,  1, 1,  0, 0, 0,  0, 0], [0]],
+            [[0, 0,  0, 0,  1, 1, 0,  0, 0], [0]],
+            [[0, 0,  0, 0,  0, 0, 0,  1, 1], [0]],
+            [[1, 1,  1, 1,  1, 1, 0,  1, 1], [0]],
+        ]
+    )
+    tests = [test_async]
+
+
+# ------------------------------------------------------------------------
 class Part7474(PartDIP14):
     name = "7474"
     desc = "Dual D-type positive-edge-triggered flip-flops with preset and clear"
