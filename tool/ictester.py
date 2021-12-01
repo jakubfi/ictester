@@ -3,6 +3,7 @@
 import sys
 import argparse
 import math
+import re
 
 from tester import Tester
 import parts
@@ -16,7 +17,7 @@ OK = '\033[92m\033[1m'
 ENDC = '\033[0m'
 
 if '--list' in sys.argv:
-    names = sorted(parts.catalog.keys(), key=int)
+    names = sorted(parts.catalog.keys(), key=lambda x: int(re.sub("74[HS]", "74", x)))
     for name in names:
         p = parts.catalog[name]
         print("{} ({}): {}".format(p.name, p.package_name, p.desc))
