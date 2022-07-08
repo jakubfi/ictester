@@ -1061,6 +1061,60 @@ class Part74153(PartDIP16):
 
 
 # ------------------------------------------------------------------------
+class Part74174(PartDIP16):
+    name = "74174"
+    desc = "Hex D-type filp-flops with clear"
+    pins = [
+        Pin(1, "~CLR", Pin.INPUT),
+        Pin(2, "1Q", Pin.OUTPUT),
+        Pin(3, "1D", Pin.INPUT),
+        Pin(4, "2D", Pin.INPUT),
+        Pin(5, "2Q", Pin.OUTPUT),
+        Pin(6, "3D", Pin.INPUT),
+        Pin(7, "3Q", Pin.OUTPUT),
+        Pin(8, "GND", Pin.POWER),
+        Pin(9, "CLK", Pin.INPUT),
+        Pin(10, "4Q", Pin.OUTPUT),
+        Pin(11, "4D", Pin.INPUT),
+        Pin(12, "5Q", Pin.OUTPUT),
+        Pin(13, "5D", Pin.INPUT),
+        Pin(14, "6D", Pin.INPUT),
+        Pin(15, "6Q", Pin.OUTPUT),
+        Pin(16, "VCC", Pin.POWER),
+    ]
+    test_sync = Test(
+        name="Synchronous operation",
+        inputs=[1, 9,  3, 4, 6, 11, 13, 14],
+        outputs=[2, 5, 7, 10, 12, 15],
+        ttype=Test.SEQ,
+        body=[
+            [[1, '+',  0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0]],
+            [[1, '+',  1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1]],
+            [[1, '+',  0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0]],
+            [[1, '+',  1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1]],
+        ]
+    )
+    test_async = Test(
+        name="Asynchronous operation",
+        inputs=[1, 9,  3, 4, 6, 11, 13, 14],
+        outputs=[2, 5, 7, 10, 12, 15],
+        ttype=Test.COMB,
+        body=[
+            # clear
+            [[0, 0,  1, 1, 1, 1, 1, 1], [0, 0, 0, 0, 0, 0]],
+            [[1, 0,  1, 1, 1, 1, 1, 1], [0, 0, 0, 0, 0, 0]],
+            # load 1s
+            [[1, 1,  1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1]],
+            [[1, 0,  1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1]],
+            # clear
+            [[0, 0,  1, 1, 1, 1, 1, 1], [0, 0, 0, 0, 0, 0]],
+            [[1, 0,  1, 1, 1, 1, 1, 1], [0, 0, 0, 0, 0, 0]],
+        ]
+    )
+    tests = [test_sync, test_async]
+
+
+# ------------------------------------------------------------------------
 class Part74175(PartDIP16):
     name = "74175"
     desc = "Quad D-type filp-flops"
