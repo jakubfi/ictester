@@ -2,7 +2,7 @@ import sys
 import inspect
 from functools import reduce
 from collections import namedtuple
-from prototypes import (Test, Pin, PartDIP14, PartDIP14x, PartDIP14x2, PartDIP16, PartDIP16x, PartDIP16r, PartDIP24)
+from prototypes import (Test, Pin, PartDIP14, PartDIP14_vcc5, PartDIP14_vcc4, PartDIP16, PartDIP16_vcc5, PartDIP16_rotated, PartDIP24)
 
 
 # ------------------------------------------------------------------------
@@ -686,7 +686,7 @@ class Part7453(PartDIP14):
 
 
 # ------------------------------------------------------------------------
-class Part7473(PartDIP14x2):
+class Part7473(PartDIP14_vcc4):
     name = "7473"
     desc = "Dual J−K Flip−Flop with Clear"
     pins = [
@@ -785,7 +785,7 @@ class Part7474(PartDIP14):
 
 
 # ------------------------------------------------------------------------
-class Part7475(PartDIP16x):
+class Part7475(PartDIP16_vcc5):
     name = "7475"
     desc = "4-bit bistable latches"
     pins = [
@@ -829,7 +829,7 @@ class Part7475(PartDIP16x):
 
 
 # ------------------------------------------------------------------------
-class Part7483(PartDIP16x):
+class Part7483(PartDIP16_vcc5):
     name = "7483"
     desc = "4-bit binary full adder with fast carry"
     pins = [
@@ -915,7 +915,7 @@ class Part7486(PartDIP14):
 
 
 # ------------------------------------------------------------------------
-class Part7490(PartDIP14x):
+class Part7490(PartDIP14_vcc5):
     name = "7490"
     desc = "Decade counter"
     pins = [
@@ -987,7 +987,7 @@ class Part7490(PartDIP14x):
 
 
 # ------------------------------------------------------------------------
-class Part7493(PartDIP14x):
+class Part7493(PartDIP14_vcc5):
     name = "7493"
     desc = "4-bit binary counter"
     pins = [
@@ -1100,7 +1100,7 @@ class Part7495(PartDIP14):
 
 
 # ------------------------------------------------------------------------
-class Part7496(PartDIP16x):
+class Part7496(PartDIP16_vcc5):
     name = "7496"
     desc = "5-bit shift register"
     pins = [
@@ -1884,7 +1884,7 @@ class Part74198(PartDIP24):
 
 
 # ------------------------------------------------------------------------
-class Part4164(PartDIP16r):
+class Part4164(PartDIP16_rotated):
     TEST_BIT_ALL_0 = 0
     TEST_BIT_ALL_1 = 1
     TEST_ROW_ALL_0 = 2

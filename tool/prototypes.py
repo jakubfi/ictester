@@ -38,14 +38,14 @@ class PartDIP14(Part):
 
 
 # ------------------------------------------------------------------------
-class PartDIP14x(Part):
-    package_name = "DIP14x"
+class PartDIP14_vcc5(Part):
+    package_name = "DIP14, VCC@pin5"
     pincount = 14
 
 
 # ------------------------------------------------------------------------
-class PartDIP14x2(Part):
-    package_name = "DIP14x2"
+class PartDIP14_vcc4(Part):
+    package_name = "DIP14, VCC@pin4"
     pincount = 14
 
 
@@ -56,14 +56,14 @@ class PartDIP16(Part):
 
 
 # ------------------------------------------------------------------------
-class PartDIP16r(Part):
-    package_name = "DIP16r"
+class PartDIP16_rotated(Part):
+    package_name = "DIP16 rotated, VCC@pin8"
     pincount = 16
 
 
 # ------------------------------------------------------------------------
-class PartDIP16x(Part):
-    package_name = "DIP16x"
+class PartDIP16_vcc5(Part):
+    package_name = "DIP16, VCC@pin5"
     pincount = 16
 
 
