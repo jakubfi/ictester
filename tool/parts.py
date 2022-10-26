@@ -573,7 +573,7 @@ class Part7450(PartDIP14):
         Pin(13, "1B", Pin.INPUT),
         Pin(14, "VCC", Pin.POWER),
     ]
-    missing = "Expansion"
+    missing = "Gate expansion is not tested"
     test_async = Test(
         name="Asynchronous operation",
         inputs=[1, 13, 9, 10,  2, 3, 4, 5],
@@ -621,6 +621,7 @@ class Part74H53(PartDIP14):
         Pin(13, "A2", Pin.INPUT),
         Pin(14, "VCC", Pin.POWER),
     ]
+    missing = "Gate expansion is not tested"
     test_async = Test(
         name="Asynchronous operation",
         inputs=[1, 13, 2, 3, 4, 5, 6, 9, 10],
@@ -665,6 +666,7 @@ class Part7453(PartDIP14):
         Pin(13, "A2", Pin.INPUT),
         Pin(14, "VCC", Pin.POWER),
     ]
+    missing = "Gate expansion is not tested"
     test_async = Test(
         name="Asynchronous operation",
         inputs=[1, 13, 2, 3, 4, 5, 6, 9, 10],
@@ -1575,7 +1577,7 @@ class Part74181(PartDIP24):
         Pin(11, "F2", Pin.OUTPUT),
         Pin(12, "GND", Pin.POWER),
         Pin(13, "F3", Pin.OUTPUT),
-        Pin(14, "A=B", Pin.OUTPUT),
+        Pin(14, "A=B", Pin.OC),
         Pin(15, "X", Pin.OUTPUT),
         Pin(16, "~Cn+4", Pin.OUTPUT),
         Pin(17, "Y", Pin.OUTPUT),
@@ -1602,14 +1604,14 @@ class Part74181(PartDIP24):
         # test vectors in [[inputs], [outputs]] order:
         # [[1, s3, s2, s1, s0,  a3, a2, a1, a1,  b3, b2, b1, b0], [f3, f2, f1, f0]]
         body = [
-            [[1] + bin2vec(s, 4) + bin2vec(v.a, 4) + bin2vec(v.b, 4), bin2vec(v.f, 4)]
+            [[1] + bin2vec(s, 4) + bin2vec(v.a, 4) + bin2vec(v.b, 4), bin2vec(v.f, 4) + [v.f & 0b1111 == 0b1111]]
             for v in data
         ]
 
         return Test(
             name=name,
             inputs=[8,  3, 4, 5, 6,  19, 21, 23, 2,  18, 20, 22, 1],
-            outputs=[13, 11, 10, 9],
+            outputs=[13, 11, 10, 9, 14],
             ttype=Test.COMB,
             loops=32,
             body=body,
@@ -1632,19 +1634,19 @@ class Part74181(PartDIP24):
         body = [
             [
                 [0] + bin2vec(s, 4) + [v.c] + bin2vec(v.a, 4) + bin2vec(v.b, 4),
-                bin2vec(v.f & 0b1111, 4) + [not v.f & 0b10000]
+                bin2vec(v.f & 0b1111, 4) + [not v.f & 0b10000] + [v.f & 0b1111 == 0b1111]
             ]
             for v in data
         ]
         return Test(
             name=name,
             inputs=[8,  3, 4, 5, 6,  7,  19, 21, 23, 2,  18, 20, 22, 1],
-            outputs=[13, 11, 10, 9, 16],
+            outputs=[13, 11, 10, 9, 16, 14],
             ttype=Test.COMB,
             loops=32,
             body=body
         )
-
+    missing = "outputs G, P are not tested"
     tests = [
         logic_test_gen(0, "Logic: F = ~A", lambda a, b: ~a),
         logic_test_gen(1, "Logic: F = ~(A|B)", lambda a, b: ~(a | b)),
@@ -1678,7 +1680,6 @@ class Part74181(PartDIP24):
         arith_test_gen(13, "Arithmetic: F = (A|B)+A", lambda a, b: (a | b) + a),
         arith_test_gen(14, "Arithmetic: F = (A|~B)+A", lambda a, b: (a | (~b & 15)) + a),
         arith_test_gen(15, "Arithmetic: F = A-1", lambda a, b: a + 15),
-        # TODO: A=B
         # TODO: G, P (X, Y)
     ]
 
