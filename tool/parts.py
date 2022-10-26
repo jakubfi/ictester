@@ -2,7 +2,7 @@ import sys
 import inspect
 from functools import reduce
 from collections import namedtuple
-from prototypes import (Test, Pin, PartDIP14, PartDIP14x, PartDIP16, PartDIP16x, PartDIP16r, PartDIP24)
+from prototypes import (Test, Pin, PartDIP14, PartDIP14x, PartDIP14x2, PartDIP16, PartDIP16x, PartDIP16r, PartDIP24)
 
 
 # ------------------------------------------------------------------------
@@ -496,6 +496,112 @@ class Part7445(PartDIP16):
 
 
 # ------------------------------------------------------------------------
+class Part7447(PartDIP16):
+    name = "7447"
+    desc = "BCD-to-seven-segment decoders/drivers"
+    pins = [
+        Pin(1, "B", Pin.INPUT),
+        Pin(2, "C", Pin.INPUT),
+        Pin(3, "~LT", Pin.INPUT),
+        Pin(4, "~BI/~RBO", Pin.INPUT),
+        Pin(5, "~RBI", Pin.INPUT),
+        Pin(6, "D", Pin.INPUT),
+        Pin(7, "A", Pin.INPUT),
+        Pin(8, "GND", Pin.POWER),
+        Pin(9, "e", Pin.OC),
+        Pin(10, "d", Pin.OC),
+        Pin(11, "c", Pin.OC),
+        Pin(12, "b", Pin.OC),
+        Pin(13, "a", Pin.OC),
+        Pin(14, "g", Pin.OC),
+        Pin(15, "f", Pin.OC),
+        Pin(16, "VCC", Pin.POWER),
+    ]
+    test_async = Test(
+        name="Asynchronous operation",
+        inputs=[6, 2, 1, 7,  3, 5, 4],
+        outputs=[13, 12, 11, 10, 9, 15, 14],
+        ttype=Test.COMB,
+        body=[
+            # symbols
+            [[0, 0, 0, 0,  1, 1, 1], [0, 0, 0, 0, 0, 0, 1]],
+            [[0, 0, 0, 1,  1, 1, 1], [1, 0, 0, 1, 1, 1, 1]],
+            [[0, 0, 1, 0,  1, 1, 1], [0, 0, 1, 0, 0, 1, 0]],
+            [[0, 0, 1, 1,  1, 1, 1], [0, 0, 0, 0, 1, 1, 0]],
+            [[0, 1, 0, 0,  1, 1, 1], [1, 0, 0, 1, 1, 0, 0]],
+            [[0, 1, 0, 1,  1, 1, 1], [0, 1, 0, 0, 1, 0, 0]],
+            [[0, 1, 1, 0,  1, 1, 1], [1, 1, 0, 0, 0, 0, 0]],
+            [[0, 1, 1, 1,  1, 1, 1], [0, 0, 0, 1, 1, 1, 1]],
+            [[1, 0, 0, 0,  1, 1, 1], [0, 0, 0, 0, 0, 0, 0]],
+            [[1, 0, 0, 1,  1, 1, 1], [0, 0, 0, 1, 1, 0, 0]],
+            [[1, 0, 1, 0,  1, 1, 1], [1, 1, 1, 0, 0, 1, 0]],
+            [[1, 0, 1, 1,  1, 1, 1], [1, 1, 0, 0, 1, 1, 0]],
+            [[1, 1, 0, 0,  1, 1, 1], [1, 0, 1, 1, 1, 0, 0]],
+            [[1, 1, 0, 1,  1, 1, 1], [0, 1, 1, 0, 1, 0, 0]],
+            [[1, 1, 1, 0,  1, 1, 1], [1, 1, 1, 0, 0, 0, 0]],
+            [[1, 1, 1, 1,  1, 1, 1], [1, 1, 1, 1, 1, 1, 1]],
+            # BI/RBI
+            [[0, 0, 0, 0,  1, 1, 0], [1, 1, 1, 1, 1, 1, 1]],
+            [[0, 0, 0, 0,  1, 0, 0], [1, 1, 1, 1, 1, 1, 1]],
+            [[0, 0, 0, 0,  0, 1, 0], [1, 1, 1, 1, 1, 1, 1]],
+            [[0, 0, 0, 0,  0, 0, 0], [1, 1, 1, 1, 1, 1, 1]],
+            # LT
+            [[1, 1, 1, 1,  0, 0, 1], [0, 0, 0, 0, 0, 0, 0]],
+            [[1, 1, 1, 1,  0, 1, 1], [0, 0, 0, 0, 0, 0, 0]],
+        ]
+    )
+    tests = [test_async]
+
+
+# ------------------------------------------------------------------------
+class Part7450(PartDIP14):
+    name = "7450"
+    desc = "Dual 2−Wide 2−Input AND/OR Invert Gate (One Gate Expandable)"
+    pins = [
+        Pin(1, "1A", Pin.INPUT),
+        Pin(2, "2A", Pin.INPUT),
+        Pin(3, "2B", Pin.INPUT),
+        Pin(4, "2C", Pin.INPUT),
+        Pin(5, "2D", Pin.INPUT),
+        Pin(6, "2Y", Pin.OUTPUT),
+        Pin(7, "GND", Pin.POWER),
+        Pin(8, "1Y", Pin.OUTPUT),
+        Pin(9, "1C", Pin.INPUT),
+        Pin(10, "1D", Pin.INPUT),
+        Pin(11, "1X", Pin.NC),
+        Pin(12, "~1X", Pin.NC),
+        Pin(13, "1B", Pin.INPUT),
+        Pin(14, "VCC", Pin.POWER),
+    ]
+    missing = "Expansion"
+    test_async = Test(
+        name="Asynchronous operation",
+        inputs=[1, 13, 9, 10,  2, 3, 4, 5],
+        outputs=[8, 6],
+        ttype=Test.COMB,
+        body=[
+            [[0, 0, 0, 0,  0, 0, 0, 0], [1, 1]],
+            [[0, 0, 0, 1,  0, 0, 0, 1], [1, 1]],
+            [[0, 0, 1, 0,  0, 0, 1, 0], [1, 1]],
+            [[0, 0, 1, 1,  0, 0, 1, 1], [0, 0]],
+            [[0, 1, 0, 0,  0, 1, 0, 0], [1, 1]],
+            [[0, 1, 0, 1,  0, 1, 0, 1], [1, 1]],
+            [[0, 1, 1, 0,  0, 1, 1, 0], [1, 1]],
+            [[0, 1, 1, 1,  0, 1, 1, 1], [0, 0]],
+            [[1, 0, 0, 0,  1, 0, 0, 0], [1, 1]],
+            [[1, 0, 0, 1,  1, 0, 0, 1], [1, 1]],
+            [[1, 0, 1, 0,  1, 0, 1, 0], [1, 1]],
+            [[1, 0, 1, 1,  1, 0, 1, 1], [0, 0]],
+            [[1, 1, 0, 0,  1, 1, 0, 0], [0, 0]],
+            [[1, 1, 0, 1,  1, 1, 0, 1], [0, 0]],
+            [[1, 1, 1, 0,  1, 1, 1, 0], [0, 0]],
+            [[1, 1, 1, 1,  1, 1, 1, 1], [0, 0]],
+        ]
+    )
+    tests = [test_async]
+
+
+# ------------------------------------------------------------------------
 class Part74H53(PartDIP14):
     name = "74H53"
     desc = "Expandable 4-wide, 2-2-3-2 And-Or-Invert gate"
@@ -580,6 +686,62 @@ class Part7453(PartDIP14):
 
 
 # ------------------------------------------------------------------------
+class Part7473(PartDIP14x2):
+    name = "7473"
+    desc = "Dual J−K Flip−Flop with Clear"
+    pins = [
+        Pin(1, "1CLK", Pin.INPUT),
+        Pin(2, "~1CLR", Pin.INPUT),
+        Pin(3, "1K", Pin.INPUT),
+        Pin(4, "VCC", Pin.POWER),
+        Pin(5, "2CLK", Pin.INPUT),
+        Pin(6, "~2CLR", Pin.INPUT),
+        Pin(7, "2J", Pin.INPUT),
+        Pin(8, "~2Q", Pin.OUTPUT),
+        Pin(9, "2Q", Pin.OUTPUT),
+        Pin(10, "2K", Pin.INPUT),
+        Pin(11, "GND", Pin.POWER),
+        Pin(12, "1Q", Pin.OUTPUT),
+        Pin(13, "~1Q", Pin.OUTPUT),
+        Pin(14, "1J", Pin.INPUT),
+    ]
+    test_all = Test(
+        name="Sync/Async operation",
+        inputs=[14, 3, 2, 1,  7, 10, 6, 5],
+        outputs=[12, 13, 9, 8],
+        ttype=Test.SEQ,
+        body=[
+            # load 1
+            [[1, 0, 1, '-',  1, 0, 1, '-'], [1, 0,  1, 0]],
+            # keep
+            [[0, 0, 1, '-',  0, 0, 1, '-'], [1, 0,  1, 0]],
+            # load 0
+            [[0, 1, 1, '-',  0, 1, 1, '-'], [0, 1,  0, 1]],
+            # keep
+            [[0, 0, 1, '-',  0, 0, 1, '-'], [0, 1,  0, 1]],
+            # toggle
+            [[1, 1, 1, '-',  1, 1, 1, '-'], [1, 0,  1, 0]],
+            # keep
+            [[0, 0, 1, '-',  0, 0, 1, '-'], [1, 0,  1, 0]],
+
+            # clear with J=0, K=0
+            [[1, 0, 1, '-',  1, 0, 1, '-'], [1, 0,  1, 0]],
+            [[0, 0, 0, '-',  0, 0, 0, '-'], [0, 1,  0, 1]],
+            # clear with J=1, K=0
+            [[1, 0, 1, '-',  1, 0, 1, '-'], [1, 0,  1, 0]],
+            [[1, 0, 0, '-',  1, 0, 0, '-'], [0, 1,  0, 1]],
+            # clear with J=0, K=1
+            [[1, 0, 1, '-',  1, 0, 1, '-'], [1, 0,  1, 0]],
+            [[0, 1, 0, '-',  1, 0, 0, '-'], [0, 1,  0, 1]],
+            # clear with J=1, K=1
+            [[1, 0, 1, '-',  1, 0, 1, '-'], [1, 0,  1, 0]],
+            [[1, 1, 0, '-',  1, 0, 0, '-'], [0, 1,  0, 1]],
+        ]
+    )
+    tests = [test_all]
+
+
+# ------------------------------------------------------------------------
 class Part7474(PartDIP14):
     name = "7474"
     desc = "Dual D-type positive-edge-triggered flip-flops with preset and clear"
@@ -620,6 +782,50 @@ class Part7474(PartDIP14):
         ]
     )
     tests = [test_sync, test_async]
+
+
+# ------------------------------------------------------------------------
+class Part7475(PartDIP16x):
+    name = "7475"
+    desc = "4-bit bistable latches"
+    pins = [
+        Pin(1, "~1Q", Pin.INPUT),
+        Pin(2, "1D", Pin.INPUT),
+        Pin(3, "2D", Pin.INPUT),
+        Pin(4, "3C,4C", Pin.INPUT),
+        Pin(5, "VCC", Pin.POWER),
+        Pin(6, "3D", Pin.OUTPUT),
+        Pin(7, "4D", Pin.POWER),
+        Pin(8, "~4Q", Pin.OUTPUT),
+        Pin(9, "4Q", Pin.OUTPUT),
+        Pin(10, "3Q", Pin.INPUT),
+        Pin(11, "~3Q", Pin.INPUT),
+        Pin(12, "GND", Pin.POWER),
+        Pin(13, "1C,2C", Pin.INPUT),
+        Pin(14, "~2Q", Pin.POWER),
+        Pin(15, "2Q", Pin.POWER),
+        Pin(16, "1Q", Pin.POWER),
+    ]
+    test_async = Test(
+        name="Asynchronous operation",
+        inputs=[2, 3, 13,  6, 7, 4],
+        outputs=[16, 1,  15, 14,  10, 11,  9, 8],
+        ttype=Test.COMB,
+        body=[
+            [[0, 0, 1,  0, 0, 1], [0, 1,  0, 1,  0, 1,  0, 1]],
+            [[1, 1, 0,  1, 1, 0], [0, 1,  0, 1,  0, 1,  0, 1]],
+
+            [[0, 1, 1,  0, 1, 1], [0, 1,  1, 0,  0, 1,  1, 0]],
+            [[1, 0, 0,  1, 0, 0], [0, 1,  1, 0,  0, 1,  1, 0]],
+
+            [[1, 0, 1,  1, 0, 1], [1, 0,  0, 1,  1, 0,  0, 1]],
+            [[0, 1, 0,  0, 1, 0], [1, 0,  0, 1,  1, 0,  0, 1]],
+
+            [[1, 1, 1,  1, 1, 1], [1, 0,  1, 0,  1, 0,  1, 0]],
+            [[0, 0, 0,  0, 0, 0], [1, 0,  1, 0,  1, 0,  1, 0]],
+        ]
+    )
+    tests = [test_async]
 
 
 # ------------------------------------------------------------------------
@@ -709,9 +915,81 @@ class Part7486(PartDIP14):
 
 
 # ------------------------------------------------------------------------
+class Part7490(PartDIP14x):
+    name = "7490"
+    desc = "Decade counter"
+    pins = [
+        Pin(1, "CKB", Pin.INPUT),
+        Pin(2, "R0(1)", Pin.INPUT),
+        Pin(3, "R0(2)", Pin.INPUT),
+        Pin(4, "NC", Pin.NC),
+        Pin(5, "VCC", Pin.POWER),
+        Pin(6, "R9-1", Pin.INPUT),
+        Pin(7, "R9-2", Pin.INPUT),
+        Pin(8, "QC", Pin.OUTPUT),
+        Pin(9, "QB", Pin.OUTPUT),
+        Pin(10, "GND", Pin.POWER),
+        Pin(11, "QD", Pin.OUTPUT),
+        Pin(12, "QA", Pin.OUTPUT),
+        Pin(13, "NC", Pin.NC),
+        Pin(14, "CKA", Pin.INPUT),
+    ]
+    test_resets = Test(
+        name="Resets",
+        inputs=[2, 3,  6, 7,  14, 1],
+        outputs=[12, 9, 8, 11],
+        ttype=Test.COMB,
+        body=[
+            # resets
+            [[1, 1,  0, 0,  0, 0], [0, 0, 0, 0]],
+            [[1, 1,  0, 1,  0, 0], [0, 0, 0, 0]],
+            [[0, 0,  1, 1,  0, 0], [1, 0, 0, 1]],
+            [[0, 1,  1, 1,  0, 0], [1, 0, 0, 1]],
+            [[1, 0,  1, 1,  0, 0], [1, 0, 0, 1]],
+            [[1, 1,  1, 1,  0, 0], [1, 0, 0, 1]],
+        ]
+    )
+    test_count_cka = Test(
+        name="Count CKA",
+        inputs=[2, 3,  6, 7,  14, 1],
+        outputs=[12, 11, 8, 9],
+        ttype=Test.SEQ,
+        body=[
+            # reset
+            [[1, 1,  0, 0,  0, 0], [0, 0, 0, 0]],
+            # count CKA
+            [[0, 0,  0, 0,  '-', 0], [1, 0, 0, 0]],
+            [[0, 0,  0, 0,  '-', 0], [0, 0, 0, 0]],
+            [[0, 0,  0, 0,  '-', 0], [1, 0, 0, 0]],
+        ]
+    )
+    test_count_ckb = Test(
+        name="Count CKB",
+        inputs=[2, 3,  6, 7,  14, 1],
+        outputs=[12, 11, 8, 9],
+        ttype=Test.SEQ,
+        body=[
+            #reset
+            [[1, 1,  0, 0,  0, 0], [0, 0, 0, 0]],
+            # count CKB
+            [[0, 0,  0, 0,  0, '-'], [0, 0, 0, 1]],
+            [[0, 0,  0, 0,  0, '-'], [0, 0, 1, 0]],
+            [[0, 0,  0, 0,  0, '-'], [0, 0, 1, 1]],
+            [[0, 0,  0, 0,  0, '-'], [0, 1, 0, 0]],
+            [[0, 0,  0, 0,  0, '-'], [0, 0, 0, 0]],
+            # count CKB again to fill bits with 1s
+            [[0, 0,  0, 0,  0, '-'], [0, 0, 0, 1]],
+            [[0, 0,  0, 0,  0, '-'], [0, 0, 1, 0]],
+            [[0, 0,  0, 0,  0, '-'], [0, 0, 1, 1]],
+        ]
+    )
+    tests = [test_resets, test_count_cka, test_count_ckb]
+
+
+# ------------------------------------------------------------------------
 class Part7493(PartDIP14x):
     name = "7493"
-    desc = "4-bit binar counter"
+    desc = "4-bit binary counter"
     pins = [
         Pin(1, "CKB", Pin.INPUT),
         Pin(2, "R0(1)", Pin.INPUT),
@@ -926,6 +1204,51 @@ class Part7496(PartDIP16x):
 
 
 # ------------------------------------------------------------------------
+class Part74107(PartDIP14):
+    name = "74107"
+    desc = "Dual J-K flip-flops with clear"
+    pins = [
+        Pin(1, "1J", Pin.INPUT),
+        Pin(2, "~1Q", Pin.OUTPUT),
+        Pin(3, "1Q", Pin.OUTPUT),
+        Pin(4, "1K", Pin.INPUT),
+        Pin(5, "2Q", Pin.OUTPUT),
+        Pin(6, "~2Q", Pin.OUTPUT),
+        Pin(7, "GND", Pin.POWER),
+        Pin(8, "2J", Pin.INPUT),
+        Pin(9, "2CLK", Pin.INPUT),
+        Pin(10, "~2CLR", Pin.INPUT),
+        Pin(11, "2K", Pin.INPUT),
+        Pin(12, "1CLK", Pin.INPUT),
+        Pin(13, "~1CLR", Pin.INPUT),
+        Pin(14, "VCC", Pin.POWER),
+    ]
+    test_all = Test(
+        name="Complete logic",
+        inputs=[1, 4, 12, 13,  8, 11, 9, 10],
+        outputs=[3, 2,  5, 6],
+        ttype=Test.SEQ,
+        body=[
+            # reset
+            [[1, 1, '-', 0,  1, 1, '-', 0], [0, 1,  0, 1]],
+            # J
+            [[1, 0, '-', 1,  1, 0, '-', 1], [1, 0,  1, 0]],
+            # hold
+            [[0, 0, '-', 1,  0, 0, '-', 1], [1, 0,  1, 0]],
+            # toggle
+            [[1, 1, '-', 1,  1, 1, '-', 1], [0, 1,  0, 1]],
+            # toggle
+            [[1, 1, '-', 1,  1, 1, '-', 1], [1, 0,  1, 0]],
+            # K
+            [[0, 1, '-', 1,  0, 1, '-', 1], [0, 1,  0, 1]],
+            # toggle
+            [[1, 1, '-', 1,  1, 1, '-', 1], [1, 0,  1, 0]],
+        ]
+    )
+    tests = [test_all]
+
+
+# ------------------------------------------------------------------------
 class Part74132(Part7400):
     name = "74132"
     desc = "Quad 2-input positive-NAND Shmitt triggers"
@@ -1055,6 +1378,72 @@ class Part74153(PartDIP16):
             [[0, 1,  0,  0, 0, 1, 0,  0,  0, 0, 1, 0], [1, 1]],
             [[1, 0,  0,  0, 1, 0, 0,  0,  0, 1, 0, 0], [1, 1]],
             [[1, 1,  0,  1, 0, 0, 0,  0,  1, 0, 0, 0], [1, 1]],
+        ]
+    )
+    tests = [test_all]
+
+
+# ------------------------------------------------------------------------
+class Part74154(PartDIP24):
+    name = "74154"
+    desc = "4-Line-to-16-Line Decoders/Demultiplexers"
+    pins = [
+        Pin(1, "O0", Pin.OUTPUT),
+        Pin(2, "O1", Pin.OUTPUT),
+        Pin(3, "O2", Pin.OUTPUT),
+        Pin(4, "O3", Pin.OUTPUT),
+        Pin(5, "O4", Pin.OUTPUT),
+        Pin(6, "O5", Pin.OUTPUT),
+        Pin(7, "O6", Pin.OUTPUT),
+        Pin(8, "O7", Pin.OUTPUT),
+        Pin(9, "O8", Pin.OUTPUT),
+        Pin(10, "O9", Pin.OUTPUT),
+        Pin(11, "O10", Pin.OUTPUT),
+        Pin(12, "GND", Pin.POWER),
+        Pin(13, "O11", Pin.OUTPUT),
+        Pin(14, "O12", Pin.OUTPUT),
+        Pin(15, "O13", Pin.OUTPUT),
+        Pin(16, "O14", Pin.OUTPUT),
+        Pin(17, "O15", Pin.OUTPUT),
+        Pin(18, "G1", Pin.INPUT),
+        Pin(19, "G2", Pin.INPUT),
+        Pin(20, "D", Pin.INPUT),
+        Pin(21, "C", Pin.INPUT),
+        Pin(22, "B", Pin.INPUT),
+        Pin(23, "A", Pin.INPUT),
+        Pin(24, "VCC", Pin.POWER),
+    ]
+    test_all = Test(
+        name="Complete logic",
+        inputs=[18, 19, 20, 21, 22, 23],
+        outputs=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 14, 15, 16, 17],
+        ttype=Test.COMB,
+        body=[
+            # output is always "1" when any G input is high
+            [[0, 1,  0, 0, 0, 0], [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]],
+            [[1, 0,  0, 0, 0, 0], [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]],
+            [[1, 1,  0, 0, 0, 0], [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]],
+            [[0, 1,  1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]],
+            [[1, 0,  1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]],
+            [[1, 1,  1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]],
+
+            # selection
+            [[0, 0,  0, 0, 0, 0], [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]],
+            [[0, 0,  0, 0, 0, 1], [1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]],
+            [[0, 0,  0, 0, 1, 0], [1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]],
+            [[0, 0,  0, 0, 1, 1], [1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]],
+            [[0, 0,  0, 1, 0, 0], [1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]],
+            [[0, 0,  0, 1, 0, 1], [1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]],
+            [[0, 0,  0, 1, 1, 0], [1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1]],
+            [[0, 0,  0, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1]],
+            [[0, 0,  1, 0, 0, 0], [1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1]],
+            [[0, 0,  1, 0, 0, 1], [1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1]],
+            [[0, 0,  1, 0, 1, 0], [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1]],
+            [[0, 0,  1, 0, 1, 1], [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1]],
+            [[0, 0,  1, 1, 0, 0], [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1]],
+            [[0, 0,  1, 1, 0, 1], [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1]],
+            [[0, 0,  1, 1, 1, 0], [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1]],
+            [[0, 0,  1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0]],
         ]
     )
     tests = [test_all]

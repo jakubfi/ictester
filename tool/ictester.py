@@ -14,13 +14,14 @@ import parts
 
 FAIL = '\033[91m\033[1m'
 OK = '\033[92m\033[1m'
+WARN = '\033[95m\033[1m'
 ENDC = '\033[0m'
 
 if '--list' in sys.argv:
     names = sorted(parts.catalog.keys(), key=lambda x: int(re.sub("74[HS]", "74", x)))
     for name in names:
         p = parts.catalog[name]
-        print("{} ({}): {}".format(p.name, p.package_name, p.desc))
+        print(f"{p.name} ({p.package_name}): {p.desc}")
     sys.exit(0)
 
 parser = argparse.ArgumentParser(description='IC tester controller')
@@ -35,11 +36,13 @@ args = parser.parse_args()
 try:
     part = parts.catalog[args.part]
 except KeyError:
-    print("Part not found: {}".format(args.part))
+    print(f"Part not found: {args.part}")
     print("Use --list to list all supported parts")
     sys.exit(1)
 
-print("Testing {}-pin part {}: {}, package {}...".format(part.pincount, part.name, part.desc, part.package_name))
+print(f"Part: {part.name}, {part.package_name} - {part.desc}")
+if part.missing:
+    print(f"{WARN}Warning, missing tests: {part.missing}{ENDC}")
 
 tester = Tester(part, args.device, 500000, debug=args.debug, serial_debug=args.serial_debug)
 all_tests = tester.tests_available()
@@ -54,17 +57,15 @@ for test_name in all_tests:
     loops = 2 ** loops_pow
 
     if not args.debug:
-        print(" * {:{}s}  ({} loop{}) ".format(
+        print(" * Testing: {:{}s} ({} loop{}) ".format(
             test_name,
             longest_desc,
             loops,
             "s" if loops != 1 else ""
         ), end='', flush=True)
     else:
-        print(" * {} ({} loop{})".format(
-            test_name, loops,
-            "s" if loops != 1 else ""
-        ))
+        plural = "s" if loops != 1 else ""
+        print(f" * Testing: {test_name} ({loops} loop{plural})")
 
     res = tester.run(test, loops_pow)
 

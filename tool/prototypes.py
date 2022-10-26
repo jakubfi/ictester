@@ -17,6 +17,7 @@ class Part:
     pincount = 0
     name = None
     package_name = None
+    missing = ""
 
     def __init__(self):
         assert self.name
@@ -39,6 +40,12 @@ class PartDIP14(Part):
 # ------------------------------------------------------------------------
 class PartDIP14x(Part):
     package_name = "DIP14x"
+    pincount = 14
+
+
+# ------------------------------------------------------------------------
+class PartDIP14x2(Part):
+    package_name = "DIP14x2"
     pincount = 14
 
 
