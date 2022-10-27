@@ -1,39 +1,7 @@
 import sys
 import inspect
-from functools import reduce
 from collections import namedtuple
 from prototypes import (Test, Pin, PartDIP14, PartDIP14_vcc5, PartDIP14_vcc4, PartDIP16, PartDIP16_vcc5, PartDIP16_rotated, PartDIP24)
-
-
-# ------------------------------------------------------------------------
-# Translate integer value into a binary vector
-# bin2vec(9, 7) -> [0, 0, 0, 1, 0, 0, 1]
-def bin2vec(val, bitlen):
-    return [
-        (val >> (bitlen-pos-1)) & 1
-        for pos in range(0, bitlen)
-    ]
-
-
-# ------------------------------------------------------------------------
-# Get all bit combinations for given bit length
-# binary_combinator(2) -> [[0, 0], [0, 1], [1, 0], [1, 1]]
-def binary_combinator(bitlen):
-    return [
-        bin2vec(v, bitlen)
-        for v in range(0, 2**bitlen)
-    ]
-
-
-# ------------------------------------------------------------------------
-# Prepare test vectors for unit_cnt separate units with input_cnt inputs doing fun
-# Units are tested inm parallel
-# Four 3-input OR gates: binary_fun_gen(4, 3, lambda a, b: a|b)
-def binary_fun_gen(unit_cnt, input_cnt, fun, inverted=False):
-    return [
-        [unit_cnt*v, unit_cnt*[reduce(fun, v) if not inverted else not reduce(fun, v)]]
-        for v in binary_combinator(input_cnt)
-    ]
 
 
 # ------------------------------------------------------------------------
@@ -62,7 +30,7 @@ class Part7400(PartDIP14):
             inputs=[1, 2, 4, 5, 10, 9, 13, 12],
             outputs=[3, 6, 8, 11],
             ttype=Test.COMB,
-            body=binary_fun_gen(4, 2, lambda a, b: a & b, inverted=True)
+            body=Test.binary_fun_gen(4, 2, lambda a, b: a & b, inverted=True)
         )
     ]
 
@@ -93,7 +61,7 @@ class Part7402(PartDIP14):
             inputs=[2, 3, 5, 6, 8, 9, 11, 12],
             outputs=[1, 4, 10, 13],
             ttype=Test.COMB,
-            body=binary_fun_gen(4, 2, lambda a, b: a | b, inverted=True)
+            body=Test.binary_fun_gen(4, 2, lambda a, b: a | b, inverted=True)
         )
     ]
 
@@ -146,7 +114,7 @@ class Part7404(PartDIP14):
             inputs=[1, 3, 5, 9, 11, 13],
             outputs=[2, 4, 6, 8, 10, 12],
             ttype=Test.COMB,
-            body=binary_fun_gen(6, 1, lambda a: a, inverted=True)
+            body=Test.binary_fun_gen(6, 1, lambda a: a, inverted=True)
         )
     ]
 
@@ -189,7 +157,7 @@ class Part7407(Part7405):
             inputs=[1, 3, 5, 9, 11, 13],
             outputs=[2, 4, 6, 8, 10, 12],
             ttype=Test.COMB,
-            body=binary_fun_gen(6, 1, lambda a: a)
+            body=Test.binary_fun_gen(6, 1, lambda a: a)
         )
     ]
 
@@ -220,7 +188,7 @@ class Part7408(PartDIP14):
             inputs=[1, 2, 4, 5, 10, 9, 13, 12],
             outputs=[3, 6, 8, 11],
             ttype=Test.COMB,
-            body=binary_fun_gen(4, 2, lambda a, b: a & b)
+            body=Test.binary_fun_gen(4, 2, lambda a, b: a & b)
         )
     ]
 
@@ -252,7 +220,7 @@ class Part7410(PartDIP14):
             inputs=[1, 2, 13, 3, 4, 5, 9, 10, 11],
             outputs=[12, 6, 8],
             ttype=Test.COMB,
-            body=binary_fun_gen(3, 3, lambda a, b: a & b, inverted=True)
+            body=Test.binary_fun_gen(3, 3, lambda a, b: a & b, inverted=True)
         )
     ]
 
@@ -284,7 +252,7 @@ class Part7411(PartDIP14):
             inputs=[1, 2, 13, 3, 4, 5, 9, 10, 11],
             outputs=[12, 6, 8],
             ttype=Test.COMB,
-            body=binary_fun_gen(3, 3, lambda a, b: a & b)
+            body=Test.binary_fun_gen(3, 3, lambda a, b: a & b)
         )
     ]
 
@@ -338,7 +306,7 @@ class Part7413(PartDIP14):
             inputs=[1, 2, 4, 5, 13, 12, 10, 9],
             outputs=[6, 8],
             ttype=Test.COMB,
-            body=binary_fun_gen(2, 4, lambda a, b: a & b, inverted=True)
+            body=Test.binary_fun_gen(2, 4, lambda a, b: a & b, inverted=True)
         )
     ]
 
@@ -376,7 +344,7 @@ class Part7430(PartDIP14):
             inputs=[1, 2, 3, 4, 5, 6, 11, 12],
             outputs=[8],
             ttype=Test.COMB,
-            body=binary_fun_gen(1, 8, lambda a, b: a & b, inverted=True)
+            body=Test.binary_fun_gen(1, 8, lambda a, b: a & b, inverted=True)
         )
     ]
 
@@ -407,7 +375,7 @@ class Part7432(PartDIP14):
             inputs=[1, 2, 4, 5, 10, 9, 13, 12],
             outputs=[3, 6, 8, 11],
             ttype=Test.COMB,
-            body=binary_fun_gen(4, 2, lambda a, b: a | b)
+            body=Test.binary_fun_gen(4, 2, lambda a, b: a | b)
         )
     ]
 
@@ -869,8 +837,8 @@ class Part7483(PartDIP16_vcc5):
         # [[cin, a4, a3, a2, a1,  b4, b3, b2, b1], [f4, f3, f2, f1,  cout]]
         body = [
             [
-                [v.c] + bin2vec(v.a, 4) + bin2vec(v.b, 4),
-                bin2vec(v.f & 0b1111, 4) + [True if v.f & 0b10000 else False]
+                [v.c] + Test.bin2vec(v.a, 4) + Test.bin2vec(v.b, 4),
+                Test.bin2vec(v.f & 0b1111, 4) + [True if v.f & 0b10000 else False]
             ]
             for v in data
         ]
@@ -911,7 +879,7 @@ class Part7486(PartDIP14):
         inputs=[1, 2, 4, 5, 10, 9, 13, 12],
         outputs=[3, 6, 8, 11],
         ttype=Test.COMB,
-        body=binary_fun_gen(4, 2, lambda a, b: a ^ b)
+        body=Test.binary_fun_gen(4, 2, lambda a, b: a ^ b)
     )
     tests = [test_all]
 
@@ -1604,7 +1572,7 @@ class Part74181(PartDIP24):
         # test vectors in [[inputs], [outputs]] order:
         # [[1, s3, s2, s1, s0,  a3, a2, a1, a1,  b3, b2, b1, b0], [f3, f2, f1, f0]]
         body = [
-            [[1] + bin2vec(s, 4) + bin2vec(v.a, 4) + bin2vec(v.b, 4), bin2vec(v.f, 4) + [v.f & 0b1111 == 0b1111]]
+            [[1] + Test.bin2vec(s, 4) + Test.bin2vec(v.a, 4) + Test.bin2vec(v.b, 4), Test.bin2vec(v.f, 4) + [v.f & 0b1111 == 0b1111]]
             for v in data
         ]
 
@@ -1633,8 +1601,8 @@ class Part74181(PartDIP24):
         # [[0, s3, s2, s1, s0,  cin,  a3, a2, a1, a1,  b3, b2, b1, b0], [f3, f2, f1, f0,  cout]]
         body = [
             [
-                [0] + bin2vec(s, 4) + [v.c] + bin2vec(v.a, 4) + bin2vec(v.b, 4),
-                bin2vec(v.f & 0b1111, 4) + [not v.f & 0b10000] + [v.f & 0b1111 == 0b1111]
+                [0] + Test.bin2vec(s, 4) + [v.c] + Test.bin2vec(v.a, 4) + Test.bin2vec(v.b, 4),
+                Test.bin2vec(v.f & 0b1111, 4) + [not v.f & 0b10000] + [v.f & 0b1111 == 0b1111]
             ]
             for v in data
         ]
@@ -1720,7 +1688,7 @@ class Part74182(PartDIP16):
                 or v[3:] == [0, 0, 0, 0]
                 else [1]
             ]
-            for v in binary_combinator(7)
+            for v in Test.binary_combinator(7)
         ]
     )
     test_p = Test(
@@ -1731,7 +1699,7 @@ class Part74182(PartDIP16):
         loops=64,
         body=[
             [v, [0] if v == [0, 0, 0, 0] else [1]]
-            for v in binary_combinator(4)
+            for v in Test.binary_combinator(4)
         ]
     )
     test_cnx = Test(
@@ -1742,7 +1710,7 @@ class Part74182(PartDIP16):
         loops=64,
         body=[
             [v, [1] if not v[0] or v[1:3] == [0, 1] else [0]]
-            for v in binary_combinator(3)
+            for v in Test.binary_combinator(3)
         ]
     )
     test_cny = Test(
@@ -1753,7 +1721,7 @@ class Part74182(PartDIP16):
         loops=64,
         body=[
             [v, [1] if not v[0] or v[1:3] == [0, 0] or v[2:5] == [0, 0, 1] else [0]]
-            for v in binary_combinator(5)
+            for v in Test.binary_combinator(5)
         ]
     )
     test_cnz = Test(
@@ -1764,7 +1732,7 @@ class Part74182(PartDIP16):
         loops=64,
         body=[
             [v, [1] if not v[0] or (not v[1] and not v[3]) or v[2:5] == [0, 0, 0] or v[3:] == [0, 0, 0, 1] else [0]]
-            for v in binary_combinator(7)
+            for v in Test.binary_combinator(7)
         ]
     )
 
