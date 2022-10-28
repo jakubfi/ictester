@@ -20,8 +20,8 @@ ENDC = '\033[0m'
 if '--list' in sys.argv:
     names = sorted(parts.catalog.keys(), key=lambda x: int(re.sub("74[HS]", "74", x)))
     for name in names:
-        p = parts.catalog[name]
-        print(f"{p.name} ({p.package_name}): {p.desc}")
+        p = parts.catalog[name]()
+        print(f"{p.name} ({p.package_variant}): {p.desc}")
     sys.exit(0)
 
 parser = argparse.ArgumentParser(description='IC tester controller')

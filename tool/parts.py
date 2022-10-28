@@ -8,22 +8,20 @@ from prototypes import (Test, Pin, PartDIP14, PartDIP14_vcc5, PartDIP14_vcc4, Pa
 class Part7400(PartDIP14):
     name = "7400"
     desc = "Quad 2-input positive-NAND gates"
-    pins = [
-        Pin(1, "1A", Pin.INPUT),
-        Pin(2, "1B", Pin.INPUT),
-        Pin(3, "1Y", Pin.OUTPUT),
-        Pin(4, "2A", Pin.INPUT),
-        Pin(5, "2B", Pin.INPUT),
-        Pin(6, "2Y", Pin.OUTPUT),
-        Pin(7, "GND", Pin.POWER),
-        Pin(8, "3Y", Pin.OUTPUT),
-        Pin(9, "3A", Pin.INPUT),
-        Pin(10, "3B", Pin.INPUT),
-        Pin(11, "4Y", Pin.OUTPUT),
-        Pin(12, "4A", Pin.INPUT),
-        Pin(13, "4B", Pin.INPUT),
-        Pin(14, "VCC", Pin.POWER),
-    ]
+    pin_cfg = {
+        1: Pin("1A", Pin.INPUT),
+        2: Pin("1B", Pin.INPUT),
+        3: Pin("1Y", Pin.OUTPUT),
+        4: Pin("2A", Pin.INPUT),
+        5: Pin("2B", Pin.INPUT),
+        6: Pin("2Y", Pin.OUTPUT),
+        8: Pin("3Y", Pin.OUTPUT),
+        9: Pin("3A", Pin.INPUT),
+        10: Pin("3B", Pin.INPUT),
+        11: Pin("4Y", Pin.OUTPUT),
+        12: Pin("4A", Pin.INPUT),
+        13: Pin("4B", Pin.INPUT),
+    }
     tests = [
         Test(
             name="Complete logic",
@@ -39,22 +37,20 @@ class Part7400(PartDIP14):
 class Part7402(PartDIP14):
     name = "7402"
     desc = "Quad 2-input positive-NOR gates"
-    pins = [
-        Pin(1, "1Y", Pin.OUTPUT),
-        Pin(2, "1A", Pin.INPUT),
-        Pin(3, "1B", Pin.INPUT),
-        Pin(4, "2Y", Pin.OUTPUT),
-        Pin(5, "2A", Pin.INPUT),
-        Pin(6, "2B", Pin.INPUT),
-        Pin(7, "GND", Pin.POWER),
-        Pin(8, "3A", Pin.INPUT),
-        Pin(9, "3B", Pin.INPUT),
-        Pin(10, "3Y", Pin.OUTPUT),
-        Pin(11, "4A", Pin.INPUT),
-        Pin(12, "4B", Pin.INPUT),
-        Pin(13, "4Y", Pin.OUTPUT),
-        Pin(14, "VCC", Pin.POWER),
-    ]
+    pin_cfg = {
+        1: Pin("1Y", Pin.OUTPUT),
+        2: Pin("1A", Pin.INPUT),
+        3: Pin("1B", Pin.INPUT),
+        4: Pin("2Y", Pin.OUTPUT),
+        5: Pin("2A", Pin.INPUT),
+        6: Pin("2B", Pin.INPUT),
+        8: Pin("3A", Pin.INPUT),
+        9: Pin("3B", Pin.INPUT),
+        10: Pin("3Y", Pin.OUTPUT),
+        11: Pin("4A", Pin.INPUT),
+        12: Pin("4B", Pin.INPUT),
+        13: Pin("4Y", Pin.OUTPUT),
+    }
     tests = [
         Test(
             name="Complete logic",
@@ -70,44 +66,40 @@ class Part7402(PartDIP14):
 class Part7403(Part7400):
     name = "7403"
     desc = "Quad 2-input positive-NAND gates with open-collector outputs"
-    pins = [
-        Pin(1, "1A", Pin.INPUT),
-        Pin(2, "1B", Pin.INPUT),
-        Pin(3, "1Y", Pin.OC),
-        Pin(4, "2A", Pin.INPUT),
-        Pin(5, "2B", Pin.INPUT),
-        Pin(6, "2Y", Pin.OC),
-        Pin(7, "GND", Pin.POWER),
-        Pin(8, "3Y", Pin.OC),
-        Pin(9, "3A", Pin.INPUT),
-        Pin(10, "3B", Pin.INPUT),
-        Pin(11, "4Y", Pin.OC),
-        Pin(12, "4A", Pin.INPUT),
-        Pin(13, "4B", Pin.INPUT),
-        Pin(14, "VCC", Pin.POWER),
-    ]
+    pin_cfg = {
+        1: Pin("1A", Pin.INPUT),
+        2: Pin("1B", Pin.INPUT),
+        3: Pin("1Y", Pin.OC),
+        4: Pin("2A", Pin.INPUT),
+        5: Pin("2B", Pin.INPUT),
+        6: Pin("2Y", Pin.OC),
+        8: Pin("3Y", Pin.OC),
+        9: Pin("3A", Pin.INPUT),
+        10: Pin("3B", Pin.INPUT),
+        11: Pin("4Y", Pin.OC),
+        12: Pin("4A", Pin.INPUT),
+        13: Pin("4B", Pin.INPUT),
+    }
 
 
 # ------------------------------------------------------------------------
 class Part7404(PartDIP14):
     name = "7404"
     desc = "Hex inverters"
-    pins = [
-        Pin(1, "1A", Pin.INPUT),
-        Pin(2, "1Y", Pin.OUTPUT),
-        Pin(3, "2A", Pin.INPUT),
-        Pin(4, "2Y", Pin.OUTPUT),
-        Pin(5, "3A", Pin.INPUT),
-        Pin(6, "3Y", Pin.OUTPUT),
-        Pin(7, "GND", Pin.POWER),
-        Pin(8, "6Y", Pin.OUTPUT),
-        Pin(9, "6A", Pin.INPUT),
-        Pin(10, "5Y", Pin.OUTPUT),
-        Pin(11, "5A", Pin.INPUT),
-        Pin(12, "4Y", Pin.OUTPUT),
-        Pin(13, "4A", Pin.INPUT),
-        Pin(14, "VCC", Pin.POWER),
-    ]
+    pin_cfg = {
+        1: Pin("1A", Pin.INPUT),
+        2: Pin("1Y", Pin.OUTPUT),
+        3: Pin("2A", Pin.INPUT),
+        4: Pin("2Y", Pin.OUTPUT),
+        5: Pin("3A", Pin.INPUT),
+        6: Pin("3Y", Pin.OUTPUT),
+        8: Pin("6Y", Pin.OUTPUT),
+        9: Pin("6A", Pin.INPUT),
+        10: Pin("5Y", Pin.OUTPUT),
+        11: Pin("5A", Pin.INPUT),
+        12: Pin("4Y", Pin.OUTPUT),
+        13: Pin("4A", Pin.INPUT),
+    }
     tests = [
         Test(
             name="Complete logic",
@@ -123,22 +115,20 @@ class Part7404(PartDIP14):
 class Part7405(Part7404):
     name = "7405"
     desc = "Hex inverters with open collector outputs"
-    pins = [
-        Pin(1, "1A", Pin.INPUT),
-        Pin(2, "1Y", Pin.OC),
-        Pin(3, "2A", Pin.INPUT),
-        Pin(4, "2Y", Pin.OC),
-        Pin(5, "3A", Pin.INPUT),
-        Pin(6, "3Y", Pin.OC),
-        Pin(7, "GND", Pin.POWER),
-        Pin(8, "6Y", Pin.OC),
-        Pin(9, "6A", Pin.INPUT),
-        Pin(10, "5Y", Pin.OC),
-        Pin(11, "5A", Pin.INPUT),
-        Pin(12, "4Y", Pin.OC),
-        Pin(13, "4A", Pin.INPUT),
-        Pin(14, "VCC", Pin.POWER),
-    ]
+    pin_cfg = {
+        1: Pin("1A", Pin.INPUT),
+        2: Pin("1Y", Pin.OC),
+        3: Pin("2A", Pin.INPUT),
+        4: Pin("2Y", Pin.OC),
+        5: Pin("3A", Pin.INPUT),
+        6: Pin("3Y", Pin.OC),
+        8: Pin("6Y", Pin.OC),
+        9: Pin("6A", Pin.INPUT),
+        10: Pin("5Y", Pin.OC),
+        11: Pin("5A", Pin.INPUT),
+        12: Pin("4Y", Pin.OC),
+        13: Pin("4A", Pin.INPUT),
+    }
 
 
 # ------------------------------------------------------------------------
@@ -166,22 +156,20 @@ class Part7407(Part7405):
 class Part7408(PartDIP14):
     name = "7408"
     desc = "Quad 2-input positive-AND gates"
-    pins = [
-        Pin(1, "1A", Pin.INPUT),
-        Pin(2, "1B", Pin.INPUT),
-        Pin(3, "1Y", Pin.OUTPUT),
-        Pin(4, "2A", Pin.INPUT),
-        Pin(5, "2B", Pin.INPUT),
-        Pin(6, "2Y", Pin.OUTPUT),
-        Pin(7, "GND", Pin.POWER),
-        Pin(8, "3Y", Pin.OUTPUT),
-        Pin(9, "3A", Pin.INPUT),
-        Pin(10, "3B", Pin.INPUT),
-        Pin(11, "4Y", Pin.OUTPUT),
-        Pin(12, "4A", Pin.INPUT),
-        Pin(13, "4B", Pin.INPUT),
-        Pin(14, "VCC", Pin.POWER),
-    ]
+    pin_cfg = {
+        1: Pin("1A", Pin.INPUT),
+        2: Pin("1B", Pin.INPUT),
+        3: Pin("1Y", Pin.OUTPUT),
+        4: Pin("2A", Pin.INPUT),
+        5: Pin("2B", Pin.INPUT),
+        6: Pin("2Y", Pin.OUTPUT),
+        8: Pin("3Y", Pin.OUTPUT),
+        9: Pin("3A", Pin.INPUT),
+        10: Pin("3B", Pin.INPUT),
+        11: Pin("4Y", Pin.OUTPUT),
+        12: Pin("4A", Pin.INPUT),
+        13: Pin("4B", Pin.INPUT),
+    }
     tests = [
         Test(
             name="Complete logic",
@@ -197,22 +185,20 @@ class Part7408(PartDIP14):
 class Part7410(PartDIP14):
     name = "7410"
     desc = "Triple 3-input positive-NAND gates"
-    pins = [
-        Pin(1, "1A", Pin.INPUT),
-        Pin(2, "1B", Pin.INPUT),
-        Pin(3, "2A", Pin.INPUT),
-        Pin(4, "2B", Pin.INPUT),
-        Pin(5, "2C", Pin.INPUT),
-        Pin(6, "2Y", Pin.OUTPUT),
-        Pin(7, "GND", Pin.POWER),
-        Pin(8, "3Y", Pin.OUTPUT),
-        Pin(9, "3A", Pin.INPUT),
-        Pin(10, "3B", Pin.INPUT),
-        Pin(11, "3C", Pin.INPUT),
-        Pin(12, "1Y", Pin.OUTPUT),
-        Pin(13, "1C", Pin.INPUT),
-        Pin(14, "VCC", Pin.POWER),
-    ]
+    pin_cfg = {
+        1: Pin("1A", Pin.INPUT),
+        2: Pin("1B", Pin.INPUT),
+        3: Pin("2A", Pin.INPUT),
+        4: Pin("2B", Pin.INPUT),
+        5: Pin("2C", Pin.INPUT),
+        6: Pin("2Y", Pin.OUTPUT),
+        8: Pin("3Y", Pin.OUTPUT),
+        9: Pin("3A", Pin.INPUT),
+        10: Pin("3B", Pin.INPUT),
+        11: Pin("3C", Pin.INPUT),
+        12: Pin("1Y", Pin.OUTPUT),
+        13: Pin("1C", Pin.INPUT),
+    }
 
     tests = [
         Test(
@@ -229,22 +215,20 @@ class Part7410(PartDIP14):
 class Part7411(PartDIP14):
     name = "7411"
     desc = "Triple 3-input positive-AND gates"
-    pins = [
-        Pin(1, "1A", Pin.INPUT),
-        Pin(2, "1B", Pin.INPUT),
-        Pin(3, "2A", Pin.INPUT),
-        Pin(4, "2B", Pin.INPUT),
-        Pin(5, "2C", Pin.INPUT),
-        Pin(6, "2Y", Pin.OUTPUT),
-        Pin(7, "GND", Pin.POWER),
-        Pin(8, "3Y", Pin.OUTPUT),
-        Pin(9, "3A", Pin.INPUT),
-        Pin(10, "3B", Pin.INPUT),
-        Pin(11, "3C", Pin.INPUT),
-        Pin(12, "1Y", Pin.OUTPUT),
-        Pin(13, "1C", Pin.INPUT),
-        Pin(14, "VCC", Pin.POWER),
-    ]
+    pin_cfg = {
+        1: Pin("1A", Pin.INPUT),
+        2: Pin("1B", Pin.INPUT),
+        3: Pin("2A", Pin.INPUT),
+        4: Pin("2B", Pin.INPUT),
+        5: Pin("2C", Pin.INPUT),
+        6: Pin("2Y", Pin.OUTPUT),
+        8: Pin("3Y", Pin.OUTPUT),
+        9: Pin("3A", Pin.INPUT),
+        10: Pin("3B", Pin.INPUT),
+        11: Pin("3C", Pin.INPUT),
+        12: Pin("1Y", Pin.OUTPUT),
+        13: Pin("1C", Pin.INPUT),
+    }
 
     tests = [
         Test(
@@ -261,44 +245,40 @@ class Part7411(PartDIP14):
 class Part7412(Part7410):
     name = "7412"
     desc = "Triple 3-input positive-NAND gates with open-collector outputs"
-    pins = [
-        Pin(1, "1A", Pin.INPUT),
-        Pin(2, "1B", Pin.INPUT),
-        Pin(3, "2A", Pin.INPUT),
-        Pin(4, "2B", Pin.INPUT),
-        Pin(5, "2C", Pin.INPUT),
-        Pin(6, "2Y", Pin.OC),
-        Pin(7, "GND", Pin.POWER),
-        Pin(8, "3Y", Pin.OC),
-        Pin(9, "3A", Pin.INPUT),
-        Pin(10, "3B", Pin.INPUT),
-        Pin(11, "3C", Pin.INPUT),
-        Pin(12, "1Y", Pin.OC),
-        Pin(13, "1C", Pin.INPUT),
-        Pin(14, "VCC", Pin.POWER),
-    ]
+    pin_cfg = {
+        1: Pin("1A", Pin.INPUT),
+        2: Pin("1B", Pin.INPUT),
+        3: Pin("2A", Pin.INPUT),
+        4: Pin("2B", Pin.INPUT),
+        5: Pin("2C", Pin.INPUT),
+        6: Pin("2Y", Pin.OC),
+        8: Pin("3Y", Pin.OC),
+        9: Pin("3A", Pin.INPUT),
+        10: Pin("3B", Pin.INPUT),
+        11: Pin("3C", Pin.INPUT),
+        12: Pin("1Y", Pin.OC),
+        13: Pin("1C", Pin.INPUT),
+    }
 
 
 # ------------------------------------------------------------------------
 class Part7413(PartDIP14):
     name = "7413"
     desc = "Dual 4-input positive-NAND Schmitt triggers"
-    pins = [
-        Pin(1, "1A", Pin.INPUT),
-        Pin(2, "1B", Pin.INPUT),
-        Pin(3, "NC", Pin.NC),
-        Pin(4, "1C", Pin.INPUT),
-        Pin(5, "1D", Pin.INPUT),
-        Pin(6, "1Y", Pin.OUTPUT),
-        Pin(7, "GND", Pin.POWER),
-        Pin(8, "2Y", Pin.OUTPUT),
-        Pin(9, "2A", Pin.INPUT),
-        Pin(10, "2B", Pin.INPUT),
-        Pin(11, "NC", Pin.NC),
-        Pin(12, "2C", Pin.INPUT),
-        Pin(13, "2D", Pin.INPUT),
-        Pin(14, "VCC", Pin.POWER),
-    ]
+    pin_cfg = {
+        1: Pin("1A", Pin.INPUT),
+        2: Pin("1B", Pin.INPUT),
+        3: Pin("NC", Pin.NC),
+        4: Pin("1C", Pin.INPUT),
+        5: Pin("1D", Pin.INPUT),
+        6: Pin("1Y", Pin.OUTPUT),
+        8: Pin("2Y", Pin.OUTPUT),
+        9: Pin("2A", Pin.INPUT),
+        10: Pin("2B", Pin.INPUT),
+        11: Pin("NC", Pin.NC),
+        12: Pin("2C", Pin.INPUT),
+        13: Pin("2D", Pin.INPUT),
+    }
 
     tests = [
         Test(
@@ -321,22 +301,20 @@ class Part7420(Part7413):
 class Part7430(PartDIP14):
     name = "7430"
     desc = "8-input positive-NAND gate"
-    pins = [
-        Pin(1, "A", Pin.INPUT),
-        Pin(2, "B", Pin.INPUT),
-        Pin(3, "C", Pin.INPUT),
-        Pin(4, "D", Pin.INPUT),
-        Pin(5, "E", Pin.INPUT),
-        Pin(6, "F", Pin.INPUT),
-        Pin(7, "GND", Pin.POWER),
-        Pin(8, "Y", Pin.OUTPUT),
-        Pin(9, "NC", Pin.NC),
-        Pin(10, "NC", Pin.NC),
-        Pin(11, "G", Pin.INPUT),
-        Pin(12, "H", Pin.INPUT),
-        Pin(13, "NC", Pin.NC),
-        Pin(14, "VCC", Pin.POWER),
-    ]
+    pin_cfg = {
+        1: Pin("A", Pin.INPUT),
+        2: Pin("B", Pin.INPUT),
+        3: Pin("C", Pin.INPUT),
+        4: Pin("D", Pin.INPUT),
+        5: Pin("E", Pin.INPUT),
+        6: Pin("F", Pin.INPUT),
+        8: Pin("Y", Pin.OUTPUT),
+        9: Pin("NC", Pin.NC),
+        10: Pin("NC", Pin.NC),
+        11: Pin("G", Pin.INPUT),
+        12: Pin("H", Pin.INPUT),
+        13: Pin("NC", Pin.NC),
+    }
 
     tests = [
         Test(
@@ -353,22 +331,20 @@ class Part7430(PartDIP14):
 class Part7432(PartDIP14):
     name = "7432"
     desc = "Quad 2-input positive-OR gates"
-    pins = [
-        Pin(1, "1A", Pin.INPUT),
-        Pin(2, "1B", Pin.INPUT),
-        Pin(3, "1Y", Pin.OUTPUT),
-        Pin(4, "2A", Pin.INPUT),
-        Pin(5, "2B", Pin.INPUT),
-        Pin(6, "2Y", Pin.OUTPUT),
-        Pin(7, "GND", Pin.POWER),
-        Pin(8, "3Y", Pin.OUTPUT),
-        Pin(9, "3A", Pin.INPUT),
-        Pin(10, "3B", Pin.INPUT),
-        Pin(11, "4Y", Pin.OUTPUT),
-        Pin(12, "4A", Pin.INPUT),
-        Pin(13, "4B", Pin.INPUT),
-        Pin(14, "VCC", Pin.POWER),
-    ]
+    pin_cfg = {
+        1: Pin("1A", Pin.INPUT),
+        2: Pin("1B", Pin.INPUT),
+        3: Pin("1Y", Pin.OUTPUT),
+        4: Pin("2A", Pin.INPUT),
+        5: Pin("2B", Pin.INPUT),
+        6: Pin("2Y", Pin.OUTPUT),
+        8: Pin("3Y", Pin.OUTPUT),
+        9: Pin("3A", Pin.INPUT),
+        10: Pin("3B", Pin.INPUT),
+        11: Pin("4Y", Pin.OUTPUT),
+        12: Pin("4A", Pin.INPUT),
+        13: Pin("4B", Pin.INPUT),
+    }
     tests = [
         Test(
             name="Complete logic",
@@ -390,22 +366,20 @@ class Part7437(Part7400):
 class Part7438(Part7400):
     name = "7438"
     desc = "Quad 2-input positive-NAND buffers with open collector outputs"
-    pins = [
-        Pin(1, "1A", Pin.INPUT),
-        Pin(2, "1B", Pin.INPUT),
-        Pin(3, "1Y", Pin.OC),
-        Pin(4, "2A", Pin.INPUT),
-        Pin(5, "2B", Pin.INPUT),
-        Pin(6, "2Y", Pin.OC),
-        Pin(7, "GND", Pin.POWER),
-        Pin(8, "3Y", Pin.OC),
-        Pin(9, "3A", Pin.INPUT),
-        Pin(10, "3B", Pin.INPUT),
-        Pin(11, "4Y", Pin.OC),
-        Pin(12, "4A", Pin.INPUT),
-        Pin(13, "4B", Pin.INPUT),
-        Pin(14, "VCC", Pin.POWER),
-    ]
+    pin_cfg = {
+        1: Pin("1A", Pin.INPUT),
+        2: Pin("1B", Pin.INPUT),
+        3: Pin("1Y", Pin.OC),
+        4: Pin("2A", Pin.INPUT),
+        5: Pin("2B", Pin.INPUT),
+        6: Pin("2Y", Pin.OC),
+        8: Pin("3Y", Pin.OC),
+        9: Pin("3A", Pin.INPUT),
+        10: Pin("3B", Pin.INPUT),
+        11: Pin("4Y", Pin.OC),
+        12: Pin("4A", Pin.INPUT),
+        13: Pin("4B", Pin.INPUT),
+    }
 
 
 # ------------------------------------------------------------------------
@@ -418,24 +392,22 @@ class Part7440(Part7413):
 class Part7445(PartDIP16):
     name = "7445"
     desc = "BCD-to-decimal decoders/drivers"
-    pins = [
-        Pin(1, "0", Pin.OC),
-        Pin(2, "1", Pin.OC),
-        Pin(3, "2", Pin.OC),
-        Pin(4, "3", Pin.OC),
-        Pin(5, "4", Pin.OC),
-        Pin(6, "5", Pin.OC),
-        Pin(7, "6", Pin.OC),
-        Pin(8, "GND", Pin.POWER),
-        Pin(9, "7", Pin.OC),
-        Pin(10, "8", Pin.OC),
-        Pin(11, "9", Pin.OC),
-        Pin(12, "D", Pin.INPUT),
-        Pin(13, "C", Pin.INPUT),
-        Pin(14, "B", Pin.INPUT),
-        Pin(15, "A", Pin.INPUT),
-        Pin(16, "VCC", Pin.POWER),
-    ]
+    pin_cfg = {
+        1: Pin("0", Pin.OC),
+        2: Pin("1", Pin.OC),
+        3: Pin("2", Pin.OC),
+        4: Pin("3", Pin.OC),
+        5: Pin("4", Pin.OC),
+        6: Pin("5", Pin.OC),
+        7: Pin("6", Pin.OC),
+        9: Pin("7", Pin.OC),
+        10: Pin("8", Pin.OC),
+        11: Pin("9", Pin.OC),
+        12: Pin("D", Pin.INPUT),
+        13: Pin("C", Pin.INPUT),
+        14: Pin("B", Pin.INPUT),
+        15: Pin("A", Pin.INPUT),
+    }
     test_async = Test(
         name="Asynchronous operation",
         inputs=[12, 13, 14, 15],
@@ -467,24 +439,22 @@ class Part7445(PartDIP16):
 class Part7447(PartDIP16):
     name = "7447"
     desc = "BCD-to-seven-segment decoders/drivers"
-    pins = [
-        Pin(1, "B", Pin.INPUT),
-        Pin(2, "C", Pin.INPUT),
-        Pin(3, "~LT", Pin.INPUT),
-        Pin(4, "~BI/~RBO", Pin.INPUT),
-        Pin(5, "~RBI", Pin.INPUT),
-        Pin(6, "D", Pin.INPUT),
-        Pin(7, "A", Pin.INPUT),
-        Pin(8, "GND", Pin.POWER),
-        Pin(9, "e", Pin.OC),
-        Pin(10, "d", Pin.OC),
-        Pin(11, "c", Pin.OC),
-        Pin(12, "b", Pin.OC),
-        Pin(13, "a", Pin.OC),
-        Pin(14, "g", Pin.OC),
-        Pin(15, "f", Pin.OC),
-        Pin(16, "VCC", Pin.POWER),
-    ]
+    pin_cfg = {
+        1: Pin("B", Pin.INPUT),
+        2: Pin("C", Pin.INPUT),
+        3: Pin("~LT", Pin.INPUT),
+        4: Pin("~BI/~RBO", Pin.INPUT),
+        5: Pin("~RBI", Pin.INPUT),
+        6: Pin("D", Pin.INPUT),
+        7: Pin("A", Pin.INPUT),
+        9: Pin("e", Pin.OC),
+        10: Pin("d", Pin.OC),
+        11: Pin("c", Pin.OC),
+        12: Pin("b", Pin.OC),
+        13: Pin("a", Pin.OC),
+        14: Pin("g", Pin.OC),
+        15: Pin("f", Pin.OC),
+    }
     test_async = Test(
         name="Asynchronous operation",
         inputs=[6, 2, 1, 7,  3, 5, 4],
@@ -525,22 +495,20 @@ class Part7447(PartDIP16):
 class Part7450(PartDIP14):
     name = "7450"
     desc = "Dual 2−Wide 2−Input AND/OR Invert Gate (One Gate Expandable)"
-    pins = [
-        Pin(1, "1A", Pin.INPUT),
-        Pin(2, "2A", Pin.INPUT),
-        Pin(3, "2B", Pin.INPUT),
-        Pin(4, "2C", Pin.INPUT),
-        Pin(5, "2D", Pin.INPUT),
-        Pin(6, "2Y", Pin.OUTPUT),
-        Pin(7, "GND", Pin.POWER),
-        Pin(8, "1Y", Pin.OUTPUT),
-        Pin(9, "1C", Pin.INPUT),
-        Pin(10, "1D", Pin.INPUT),
-        Pin(11, "1X", Pin.NC),
-        Pin(12, "~1X", Pin.NC),
-        Pin(13, "1B", Pin.INPUT),
-        Pin(14, "VCC", Pin.POWER),
-    ]
+    pin_cfg = {
+        1: Pin("1A", Pin.INPUT),
+        2: Pin("2A", Pin.INPUT),
+        3: Pin("2B", Pin.INPUT),
+        4: Pin("2C", Pin.INPUT),
+        5: Pin("2D", Pin.INPUT),
+        6: Pin("2Y", Pin.OUTPUT),
+        8: Pin("1Y", Pin.OUTPUT),
+        9: Pin("1C", Pin.INPUT),
+        10: Pin("1D", Pin.INPUT),
+        11: Pin("1X", Pin.NC),
+        12: Pin("~1X", Pin.NC),
+        13: Pin("1B", Pin.INPUT),
+    }
     missing = "Gate expansion is not tested"
     test_async = Test(
         name="Asynchronous operation",
@@ -573,22 +541,20 @@ class Part7450(PartDIP14):
 class Part74H53(PartDIP14):
     name = "74H53"
     desc = "Expandable 4-wide, 2-2-3-2 And-Or-Invert gate"
-    pins = [
-        Pin(1, "A1", Pin.INPUT),
-        Pin(2, "B1", Pin.INPUT),
-        Pin(3, "B2", Pin.INPUT),
-        Pin(4, "C1", Pin.INPUT),
-        Pin(5, "C2", Pin.INPUT),
-        Pin(6, "C3", Pin.INPUT),
-        Pin(7, "GND", Pin.POWER),
-        Pin(8, "~Y", Pin.OUTPUT),
-        Pin(9, "D1", Pin.INPUT),
-        Pin(10, "D2", Pin.INPUT),
-        Pin(11, "X", Pin.NC),
-        Pin(12, "~X", Pin.NC),
-        Pin(13, "A2", Pin.INPUT),
-        Pin(14, "VCC", Pin.POWER),
-    ]
+    pin_cfg = {
+        1: Pin("A1", Pin.INPUT),
+        2: Pin("B1", Pin.INPUT),
+        3: Pin("B2", Pin.INPUT),
+        4: Pin("C1", Pin.INPUT),
+        5: Pin("C2", Pin.INPUT),
+        6: Pin("C3", Pin.INPUT),
+        8: Pin("~Y", Pin.OUTPUT),
+        9: Pin("D1", Pin.INPUT),
+        10: Pin("D2", Pin.INPUT),
+        11: Pin("X", Pin.NC),
+        12: Pin("~X", Pin.NC),
+        13: Pin("A2", Pin.INPUT),
+    }
     missing = "Gate expansion is not tested"
     test_async = Test(
         name="Asynchronous operation",
@@ -618,22 +584,20 @@ class Part74H53(PartDIP14):
 class Part7453(PartDIP14):
     name = "7453"
     desc = "Expandable 4-wide, 2-input And-Or-Invert gate"
-    pins = [
-        Pin(1, "A1", Pin.INPUT),
-        Pin(2, "B1", Pin.INPUT),
-        Pin(3, "B2", Pin.INPUT),
-        Pin(4, "C1", Pin.INPUT),
-        Pin(5, "C2", Pin.INPUT),
-        Pin(6, "NC", Pin.INPUT), # this is to not confuse it with 3-input version
-        Pin(7, "GND", Pin.POWER),
-        Pin(8, "~Y", Pin.OUTPUT),
-        Pin(9, "D1", Pin.INPUT),
-        Pin(10, "D2", Pin.INPUT),
-        Pin(11, "X", Pin.NC),
-        Pin(12, "~X", Pin.NC),
-        Pin(13, "A2", Pin.INPUT),
-        Pin(14, "VCC", Pin.POWER),
-    ]
+    pin_cfg = {
+        1: Pin("A1", Pin.INPUT),
+        2: Pin("B1", Pin.INPUT),
+        3: Pin("B2", Pin.INPUT),
+        4: Pin("C1", Pin.INPUT),
+        5: Pin("C2", Pin.INPUT),
+        6: Pin("NC", Pin.INPUT), # this is to not confuse it with 3-input version
+        8: Pin("~Y", Pin.OUTPUT),
+        9: Pin("D1", Pin.INPUT),
+        10: Pin("D2", Pin.INPUT),
+        11: Pin("X", Pin.NC),
+        12: Pin("~X", Pin.NC),
+        13: Pin("A2", Pin.INPUT),
+    }
     missing = "Gate expansion is not tested"
     test_async = Test(
         name="Asynchronous operation",
@@ -659,22 +623,20 @@ class Part7453(PartDIP14):
 class Part7473(PartDIP14_vcc4):
     name = "7473"
     desc = "Dual J−K Flip−Flop with Clear"
-    pins = [
-        Pin(1, "1CLK", Pin.INPUT),
-        Pin(2, "~1CLR", Pin.INPUT),
-        Pin(3, "1K", Pin.INPUT),
-        Pin(4, "VCC", Pin.POWER),
-        Pin(5, "2CLK", Pin.INPUT),
-        Pin(6, "~2CLR", Pin.INPUT),
-        Pin(7, "2J", Pin.INPUT),
-        Pin(8, "~2Q", Pin.OUTPUT),
-        Pin(9, "2Q", Pin.OUTPUT),
-        Pin(10, "2K", Pin.INPUT),
-        Pin(11, "GND", Pin.POWER),
-        Pin(12, "1Q", Pin.OUTPUT),
-        Pin(13, "~1Q", Pin.OUTPUT),
-        Pin(14, "1J", Pin.INPUT),
-    ]
+    pin_cfg = {
+        1: Pin("1CLK", Pin.INPUT),
+        2: Pin("~1CLR", Pin.INPUT),
+        3: Pin("1K", Pin.INPUT),
+        5: Pin("2CLK", Pin.INPUT),
+        6: Pin("~2CLR", Pin.INPUT),
+        7: Pin("2J", Pin.INPUT),
+        8: Pin("~2Q", Pin.OUTPUT),
+        9: Pin("2Q", Pin.OUTPUT),
+        10: Pin("2K", Pin.INPUT),
+        12: Pin("1Q", Pin.OUTPUT),
+        13: Pin("~1Q", Pin.OUTPUT),
+        14: Pin("1J", Pin.INPUT),
+    }
     test_all = Test(
         name="Sync/Async operation",
         inputs=[14, 3, 2, 1,  7, 10, 6, 5],
@@ -715,22 +677,20 @@ class Part7473(PartDIP14_vcc4):
 class Part7474(PartDIP14):
     name = "7474"
     desc = "Dual D-type positive-edge-triggered flip-flops with preset and clear"
-    pins = [
-        Pin(1, "~1CLR", Pin.INPUT),
-        Pin(2, "1D", Pin.INPUT),
-        Pin(3, "1CLK", Pin.INPUT),
-        Pin(4, "~1PRE", Pin.INPUT),
-        Pin(5, "1Q", Pin.OUTPUT),
-        Pin(6, "~1Q", Pin.OUTPUT),
-        Pin(7, "GND", Pin.POWER),
-        Pin(8, "~2Q", Pin.OUTPUT),
-        Pin(9, "2Q", Pin.OUTPUT),
-        Pin(10, "~2PRE", Pin.INPUT),
-        Pin(11, "2CLK", Pin.INPUT),
-        Pin(12, "2D", Pin.INPUT),
-        Pin(13, "~2CLR", Pin.INPUT),
-        Pin(14, "VCC", Pin.POWER),
-    ]
+    pin_cfg = {
+        1: Pin("~1CLR", Pin.INPUT),
+        2: Pin("1D", Pin.INPUT),
+        3: Pin("1CLK", Pin.INPUT),
+        4: Pin("~1PRE", Pin.INPUT),
+        5: Pin("1Q", Pin.OUTPUT),
+        6: Pin("~1Q", Pin.OUTPUT),
+        8: Pin("~2Q", Pin.OUTPUT),
+        9: Pin("2Q", Pin.OUTPUT),
+        10: Pin("~2PRE", Pin.INPUT),
+        11: Pin("2CLK", Pin.INPUT),
+        12: Pin("2D", Pin.INPUT),
+        13: Pin("~2CLR", Pin.INPUT),
+    }
     test_sync = Test(
         name="Synchronous operation",
         inputs=[1, 4, 2, 3, 13, 10, 12, 11],
@@ -758,24 +718,22 @@ class Part7474(PartDIP14):
 class Part7475(PartDIP16_vcc5):
     name = "7475"
     desc = "4-bit bistable latches"
-    pins = [
-        Pin(1, "~1Q", Pin.INPUT),
-        Pin(2, "1D", Pin.INPUT),
-        Pin(3, "2D", Pin.INPUT),
-        Pin(4, "3C,4C", Pin.INPUT),
-        Pin(5, "VCC", Pin.POWER),
-        Pin(6, "3D", Pin.OUTPUT),
-        Pin(7, "4D", Pin.POWER),
-        Pin(8, "~4Q", Pin.OUTPUT),
-        Pin(9, "4Q", Pin.OUTPUT),
-        Pin(10, "3Q", Pin.INPUT),
-        Pin(11, "~3Q", Pin.INPUT),
-        Pin(12, "GND", Pin.POWER),
-        Pin(13, "1C,2C", Pin.INPUT),
-        Pin(14, "~2Q", Pin.POWER),
-        Pin(15, "2Q", Pin.POWER),
-        Pin(16, "1Q", Pin.POWER),
-    ]
+    pin_cfg = {
+        1: Pin("~1Q", Pin.OUTPUT),
+        2: Pin("1D", Pin.INPUT),
+        3: Pin("2D", Pin.INPUT),
+        4: Pin("3C,4C", Pin.INPUT),
+        6: Pin("3D", Pin.INPUT),
+        7: Pin("4D", Pin.INPUT),
+        8: Pin("~4Q", Pin.OUTPUT),
+        9: Pin("4Q", Pin.OUTPUT),
+        10: Pin("3Q", Pin.OUTPUT),
+        11: Pin("~3Q", Pin.OUTPUT),
+        13: Pin("1C,2C", Pin.INPUT),
+        14: Pin("~2Q", Pin.OUTPUT),
+        15: Pin("2Q", Pin.OUTPUT),
+        16: Pin("1Q", Pin.OUTPUT),
+    }
     test_async = Test(
         name="Asynchronous operation",
         inputs=[2, 3, 13,  6, 7, 4],
@@ -802,24 +760,22 @@ class Part7475(PartDIP16_vcc5):
 class Part7483(PartDIP16_vcc5):
     name = "7483"
     desc = "4-bit binary full adder with fast carry"
-    pins = [
-        Pin(1, "A4", Pin.INPUT),
-        Pin(2, "S3", Pin.OUTPUT),
-        Pin(3, "A3", Pin.INPUT),
-        Pin(4, "B3", Pin.INPUT),
-        Pin(5, "VCC", Pin.POWER),
-        Pin(6, "S2", Pin.OUTPUT),
-        Pin(7, "B2", Pin.INPUT),
-        Pin(8, "A2", Pin.INPUT),
-        Pin(9, "S1", Pin.OUTPUT),
-        Pin(10, "A1", Pin.INPUT),
-        Pin(11, "B1", Pin.INPUT),
-        Pin(12, "GND", Pin.POWER),
-        Pin(13, "C0", Pin.INPUT),
-        Pin(14, "C4", Pin.OUTPUT),
-        Pin(15, "S4", Pin.OUTPUT),
-        Pin(16, "B4", Pin.INPUT),
-    ]
+    pin_cfg = {
+        1: Pin("A4", Pin.INPUT),
+        2: Pin("S3", Pin.OUTPUT),
+        3: Pin("A3", Pin.INPUT),
+        4: Pin("B3", Pin.INPUT),
+        6: Pin("S2", Pin.OUTPUT),
+        7: Pin("B2", Pin.INPUT),
+        8: Pin("A2", Pin.INPUT),
+        9: Pin("S1", Pin.OUTPUT),
+        10: Pin("A1", Pin.INPUT),
+        11: Pin("B1", Pin.INPUT),
+        13: Pin("C0", Pin.INPUT),
+        14: Pin("C4", Pin.OUTPUT),
+        15: Pin("S4", Pin.OUTPUT),
+        16: Pin("B4", Pin.INPUT),
+    }
 
     # ------------------------------------------------------------------------
     def add_test_gen():
@@ -858,22 +814,20 @@ class Part7483(PartDIP16_vcc5):
 class Part7486(PartDIP14):
     name = "7486"
     desc = "Quad 2-input exclusive-OR gates"
-    pins = [
-        Pin(1, "1A", Pin.INPUT),
-        Pin(2, "1B", Pin.INPUT),
-        Pin(3, "1Y", Pin.OUTPUT),
-        Pin(4, "2A", Pin.INPUT),
-        Pin(5, "2B", Pin.INPUT),
-        Pin(6, "2Y", Pin.OUTPUT),
-        Pin(7, "GND", Pin.POWER),
-        Pin(8, "3Y", Pin.OUTPUT),
-        Pin(9, "3A", Pin.INPUT),
-        Pin(10, "3B", Pin.INPUT),
-        Pin(11, "4Y", Pin.OUTPUT),
-        Pin(12, "4A", Pin.INPUT),
-        Pin(13, "4B", Pin.INPUT),
-        Pin(14, "VCC", Pin.POWER),
-    ]
+    pin_cfg = {
+        1: Pin("1A", Pin.INPUT),
+        2: Pin("1B", Pin.INPUT),
+        3: Pin("1Y", Pin.OUTPUT),
+        4: Pin("2A", Pin.INPUT),
+        5: Pin("2B", Pin.INPUT),
+        6: Pin("2Y", Pin.OUTPUT),
+        8: Pin("3Y", Pin.OUTPUT),
+        9: Pin("3A", Pin.INPUT),
+        10: Pin("3B", Pin.INPUT),
+        11: Pin("4Y", Pin.OUTPUT),
+        12: Pin("4A", Pin.INPUT),
+        13: Pin("4B", Pin.INPUT),
+    }
     test_all = Test(
         name="Complete logic",
         inputs=[1, 2, 4, 5, 10, 9, 13, 12],
@@ -888,22 +842,20 @@ class Part7486(PartDIP14):
 class Part7490(PartDIP14_vcc5):
     name = "7490"
     desc = "Decade counter"
-    pins = [
-        Pin(1, "CKB", Pin.INPUT),
-        Pin(2, "R0(1)", Pin.INPUT),
-        Pin(3, "R0(2)", Pin.INPUT),
-        Pin(4, "NC", Pin.NC),
-        Pin(5, "VCC", Pin.POWER),
-        Pin(6, "R9-1", Pin.INPUT),
-        Pin(7, "R9-2", Pin.INPUT),
-        Pin(8, "QC", Pin.OUTPUT),
-        Pin(9, "QB", Pin.OUTPUT),
-        Pin(10, "GND", Pin.POWER),
-        Pin(11, "QD", Pin.OUTPUT),
-        Pin(12, "QA", Pin.OUTPUT),
-        Pin(13, "NC", Pin.NC),
-        Pin(14, "CKA", Pin.INPUT),
-    ]
+    pin_cfg = {
+        1: Pin("CKB", Pin.INPUT),
+        2: Pin("R0(1)", Pin.INPUT),
+        3: Pin("R0(2)", Pin.INPUT),
+        4: Pin("NC", Pin.NC),
+        6: Pin("R9-1", Pin.INPUT),
+        7: Pin("R9-2", Pin.INPUT),
+        8: Pin("QC", Pin.OUTPUT),
+        9: Pin("QB", Pin.OUTPUT),
+        11: Pin("QD", Pin.OUTPUT),
+        12: Pin("QA", Pin.OUTPUT),
+        13: Pin("NC", Pin.NC),
+        14: Pin("CKA", Pin.INPUT),
+    }
     test_resets = Test(
         name="Resets",
         inputs=[2, 3,  6, 7,  14, 1],
@@ -960,22 +912,20 @@ class Part7490(PartDIP14_vcc5):
 class Part7493(PartDIP14_vcc5):
     name = "7493"
     desc = "4-bit binary counter"
-    pins = [
-        Pin(1, "CKB", Pin.INPUT),
-        Pin(2, "R0(1)", Pin.INPUT),
-        Pin(3, "R0(2)", Pin.INPUT),
-        Pin(4, "NC", Pin.NC),
-        Pin(5, "VCC", Pin.POWER),
-        Pin(6, "NC", Pin.NC),
-        Pin(7, "NC", Pin.NC),
-        Pin(8, "QC", Pin.OUTPUT),
-        Pin(9, "QB", Pin.OUTPUT),
-        Pin(10, "GND", Pin.POWER),
-        Pin(11, "QD", Pin.OUTPUT),
-        Pin(12, "QA", Pin.OUTPUT),
-        Pin(13, "NC", Pin.NC),
-        Pin(14, "CKA", Pin.INPUT),
-    ]
+    pin_cfg = {
+        1: Pin("CKB", Pin.INPUT),
+        2: Pin("R0(1)", Pin.INPUT),
+        3: Pin("R0(2)", Pin.INPUT),
+        4: Pin("NC", Pin.NC),
+        6: Pin("NC", Pin.NC),
+        7: Pin("NC", Pin.NC),
+        8: Pin("QC", Pin.OUTPUT),
+        9: Pin("QB", Pin.OUTPUT),
+        11: Pin("QD", Pin.OUTPUT),
+        12: Pin("QA", Pin.OUTPUT),
+        13: Pin("NC", Pin.NC),
+        14: Pin("CKA", Pin.INPUT),
+    }
     test_count = Test(
         name="Count",
         inputs=[2, 3,  14, 1],
@@ -1019,22 +969,20 @@ class Part7493(PartDIP14_vcc5):
 class Part7495(PartDIP14):
     name = "7495"
     desc = "4-bit parallel-access shift registers"
-    pins = [
-        Pin(1, "SER", Pin.INPUT),
-        Pin(2, "A", Pin.INPUT),
-        Pin(3, "B", Pin.INPUT),
-        Pin(4, "C", Pin.INPUT),
-        Pin(5, "D", Pin.INPUT),
-        Pin(6, "MODE", Pin.INPUT),
-        Pin(7, "GND", Pin.POWER),
-        Pin(8, "CLK2", Pin.INPUT),
-        Pin(9, "CLK1", Pin.INPUT),
-        Pin(10, "QD", Pin.OUTPUT),
-        Pin(11, "QC", Pin.OUTPUT),
-        Pin(12, "QB", Pin.OUTPUT),
-        Pin(13, "QA", Pin.OUTPUT),
-        Pin(14, "VCC", Pin.POWER),
-    ]
+    pin_cfg = {
+        1: Pin("SER", Pin.INPUT),
+        2: Pin("A", Pin.INPUT),
+        3: Pin("B", Pin.INPUT),
+        4: Pin("C", Pin.INPUT),
+        5: Pin("D", Pin.INPUT),
+        6: Pin("MODE", Pin.INPUT),
+        8: Pin("CLK2", Pin.INPUT),
+        9: Pin("CLK1", Pin.INPUT),
+        10: Pin("QD", Pin.OUTPUT),
+        11: Pin("QC", Pin.OUTPUT),
+        12: Pin("QB", Pin.OUTPUT),
+        13: Pin("QA", Pin.OUTPUT),
+    }
     test_load = Test(
         name="Parallel load",
         inputs=[6, 8, 9, 1, 2, 3, 4, 5],
@@ -1073,24 +1021,22 @@ class Part7495(PartDIP14):
 class Part7496(PartDIP16_vcc5):
     name = "7496"
     desc = "5-bit shift register"
-    pins = [
-        Pin(1, "CLK", Pin.INPUT),
-        Pin(2, "A", Pin.INPUT),
-        Pin(3, "B", Pin.INPUT),
-        Pin(4, "C", Pin.INPUT),
-        Pin(5, "VCC", Pin.POWER),
-        Pin(6, "D", Pin.INPUT),
-        Pin(7, "E", Pin.INPUT),
-        Pin(8, "PRE", Pin.INPUT),
-        Pin(9, "SER", Pin.INPUT),
-        Pin(10, "QE", Pin.OUTPUT),
-        Pin(11, "QD", Pin.OUTPUT),
-        Pin(12, "GND", Pin.POWER),
-        Pin(13, "QC", Pin.OUTPUT),
-        Pin(14, "QB", Pin.OUTPUT),
-        Pin(15, "QA", Pin.OUTPUT),
-        Pin(16, "CLR", Pin.INPUT),
-    ]
+    pin_cfg = {
+        1: Pin("CLK", Pin.INPUT),
+        2: Pin("A", Pin.INPUT),
+        3: Pin("B", Pin.INPUT),
+        4: Pin("C", Pin.INPUT),
+        6: Pin("D", Pin.INPUT),
+        7: Pin("E", Pin.INPUT),
+        8: Pin("PRE", Pin.INPUT),
+        9: Pin("SER", Pin.INPUT),
+        10: Pin("QE", Pin.OUTPUT),
+        11: Pin("QD", Pin.OUTPUT),
+        13: Pin("QC", Pin.OUTPUT),
+        14: Pin("QB", Pin.OUTPUT),
+        15: Pin("QA", Pin.OUTPUT),
+        16: Pin("CLR", Pin.INPUT),
+    }
 
     test_preset = Test(
         name="Preset",
@@ -1177,22 +1123,20 @@ class Part7496(PartDIP16_vcc5):
 class Part74107(PartDIP14):
     name = "74107"
     desc = "Dual J-K flip-flops with clear"
-    pins = [
-        Pin(1, "1J", Pin.INPUT),
-        Pin(2, "~1Q", Pin.OUTPUT),
-        Pin(3, "1Q", Pin.OUTPUT),
-        Pin(4, "1K", Pin.INPUT),
-        Pin(5, "2Q", Pin.OUTPUT),
-        Pin(6, "~2Q", Pin.OUTPUT),
-        Pin(7, "GND", Pin.POWER),
-        Pin(8, "2J", Pin.INPUT),
-        Pin(9, "2CLK", Pin.INPUT),
-        Pin(10, "~2CLR", Pin.INPUT),
-        Pin(11, "2K", Pin.INPUT),
-        Pin(12, "1CLK", Pin.INPUT),
-        Pin(13, "~1CLR", Pin.INPUT),
-        Pin(14, "VCC", Pin.POWER),
-    ]
+    pin_cfg = {
+        1: Pin("1J", Pin.INPUT),
+        2: Pin("~1Q", Pin.OUTPUT),
+        3: Pin("1Q", Pin.OUTPUT),
+        4: Pin("1K", Pin.INPUT),
+        5: Pin("2Q", Pin.OUTPUT),
+        6: Pin("~2Q", Pin.OUTPUT),
+        8: Pin("2J", Pin.INPUT),
+        9: Pin("2CLK", Pin.INPUT),
+        10: Pin("~2CLR", Pin.INPUT),
+        11: Pin("2K", Pin.INPUT),
+        12: Pin("1CLK", Pin.INPUT),
+        13: Pin("~1CLR", Pin.INPUT),
+    }
     test_all = Test(
         name="Complete logic",
         inputs=[1, 4, 12, 13,  8, 11, 9, 10],
@@ -1228,32 +1172,30 @@ class Part74132(Part7400):
 class Part74150(PartDIP24):
     name = "74150"
     desc = "Data selectors/multiplexers"
-    pins = [
-        Pin(1, "E7", Pin.INPUT),
-        Pin(2, "E6", Pin.INPUT),
-        Pin(3, "E5", Pin.INPUT),
-        Pin(4, "E4", Pin.INPUT),
-        Pin(5, "E3", Pin.INPUT),
-        Pin(6, "E2", Pin.INPUT),
-        Pin(7, "E1", Pin.INPUT),
-        Pin(8, "E0", Pin.INPUT),
-        Pin(9, "~G", Pin.INPUT),
-        Pin(10, "W", Pin.OUTPUT),
-        Pin(11, "D", Pin.INPUT),
-        Pin(12, "GND", Pin.POWER),
-        Pin(13, "C", Pin.INPUT),
-        Pin(14, "B", Pin.INPUT),
-        Pin(15, "A", Pin.INPUT),
-        Pin(16, "E15", Pin.INPUT),
-        Pin(17, "E14", Pin.INPUT),
-        Pin(18, "E13", Pin.INPUT),
-        Pin(19, "E12", Pin.INPUT),
-        Pin(20, "E11", Pin.INPUT),
-        Pin(21, "E10", Pin.INPUT),
-        Pin(22, "E9", Pin.INPUT),
-        Pin(23, "E8", Pin.INPUT),
-        Pin(24, "VCC", Pin.POWER),
-    ]
+    pin_cfg = {
+        1: Pin("E7", Pin.INPUT),
+        2: Pin("E6", Pin.INPUT),
+        3: Pin("E5", Pin.INPUT),
+        4: Pin("E4", Pin.INPUT),
+        5: Pin("E3", Pin.INPUT),
+        6: Pin("E2", Pin.INPUT),
+        7: Pin("E1", Pin.INPUT),
+        8: Pin("E0", Pin.INPUT),
+        9: Pin("~G", Pin.INPUT),
+        10: Pin("W", Pin.OUTPUT),
+        11: Pin("D", Pin.INPUT),
+        13: Pin("C", Pin.INPUT),
+        14: Pin("B", Pin.INPUT),
+        15: Pin("A", Pin.INPUT),
+        16: Pin("E15", Pin.INPUT),
+        17: Pin("E14", Pin.INPUT),
+        18: Pin("E13", Pin.INPUT),
+        19: Pin("E12", Pin.INPUT),
+        20: Pin("E11", Pin.INPUT),
+        21: Pin("E10", Pin.INPUT),
+        22: Pin("E9", Pin.INPUT),
+        23: Pin("E8", Pin.INPUT),
+    }
     test_all = Test(
         name="Complete logic",
         inputs=[11, 13, 14, 15,  9,  8, 7, 6, 5, 4, 3, 2, 1, 23, 22, 21, 20, 19, 18, 17, 16],
@@ -1304,24 +1246,22 @@ class Part74150(PartDIP24):
 class Part74153(PartDIP16):
     name = "74153"
     desc = "Dual 4-line to 1-line data selectors/multiplexers"
-    pins = [
-        Pin(1, "~1G", Pin.INPUT),
-        Pin(2, "B", Pin.INPUT),
-        Pin(3, "1C3", Pin.INPUT),
-        Pin(4, "1C2", Pin.INPUT),
-        Pin(5, "1C1", Pin.INPUT),
-        Pin(6, "1C0", Pin.INPUT),
-        Pin(7, "1Y", Pin.OUTPUT),
-        Pin(8, "GND", Pin.POWER),
-        Pin(9, "2Y", Pin.OUTPUT),
-        Pin(10, "2C0", Pin.INPUT),
-        Pin(11, "2C1", Pin.INPUT),
-        Pin(12, "2C2", Pin.INPUT),
-        Pin(13, "2C3", Pin.INPUT),
-        Pin(14, "A", Pin.INPUT),
-        Pin(15, "~2G", Pin.INPUT),
-        Pin(16, "VCC", Pin.POWER),
-    ]
+    pin_cfg = {
+        1: Pin("~1G", Pin.INPUT),
+        2: Pin("B", Pin.INPUT),
+        3: Pin("1C3", Pin.INPUT),
+        4: Pin("1C2", Pin.INPUT),
+        5: Pin("1C1", Pin.INPUT),
+        6: Pin("1C0", Pin.INPUT),
+        7: Pin("1Y", Pin.OUTPUT),
+        9: Pin("2Y", Pin.OUTPUT),
+        10: Pin("2C0", Pin.INPUT),
+        11: Pin("2C1", Pin.INPUT),
+        12: Pin("2C2", Pin.INPUT),
+        13: Pin("2C3", Pin.INPUT),
+        14: Pin("A", Pin.INPUT),
+        15: Pin("~2G", Pin.INPUT),
+    }
     test_all = Test(
         name="Complete logic",
         inputs=[2, 14, 1, 3, 4, 5, 6, 15, 13, 12, 11, 10],
@@ -1357,32 +1297,30 @@ class Part74153(PartDIP16):
 class Part74154(PartDIP24):
     name = "74154"
     desc = "4-Line-to-16-Line Decoders/Demultiplexers"
-    pins = [
-        Pin(1, "O0", Pin.OUTPUT),
-        Pin(2, "O1", Pin.OUTPUT),
-        Pin(3, "O2", Pin.OUTPUT),
-        Pin(4, "O3", Pin.OUTPUT),
-        Pin(5, "O4", Pin.OUTPUT),
-        Pin(6, "O5", Pin.OUTPUT),
-        Pin(7, "O6", Pin.OUTPUT),
-        Pin(8, "O7", Pin.OUTPUT),
-        Pin(9, "O8", Pin.OUTPUT),
-        Pin(10, "O9", Pin.OUTPUT),
-        Pin(11, "O10", Pin.OUTPUT),
-        Pin(12, "GND", Pin.POWER),
-        Pin(13, "O11", Pin.OUTPUT),
-        Pin(14, "O12", Pin.OUTPUT),
-        Pin(15, "O13", Pin.OUTPUT),
-        Pin(16, "O14", Pin.OUTPUT),
-        Pin(17, "O15", Pin.OUTPUT),
-        Pin(18, "G1", Pin.INPUT),
-        Pin(19, "G2", Pin.INPUT),
-        Pin(20, "D", Pin.INPUT),
-        Pin(21, "C", Pin.INPUT),
-        Pin(22, "B", Pin.INPUT),
-        Pin(23, "A", Pin.INPUT),
-        Pin(24, "VCC", Pin.POWER),
-    ]
+    pin_cfg = {
+        1: Pin("O0", Pin.OUTPUT),
+        2: Pin("O1", Pin.OUTPUT),
+        3: Pin("O2", Pin.OUTPUT),
+        4: Pin("O3", Pin.OUTPUT),
+        5: Pin("O4", Pin.OUTPUT),
+        6: Pin("O5", Pin.OUTPUT),
+        7: Pin("O6", Pin.OUTPUT),
+        8: Pin("O7", Pin.OUTPUT),
+        9: Pin("O8", Pin.OUTPUT),
+        10: Pin("O9", Pin.OUTPUT),
+        11: Pin("O10", Pin.OUTPUT),
+        13: Pin("O11", Pin.OUTPUT),
+        14: Pin("O12", Pin.OUTPUT),
+        15: Pin("O13", Pin.OUTPUT),
+        16: Pin("O14", Pin.OUTPUT),
+        17: Pin("O15", Pin.OUTPUT),
+        18: Pin("G1", Pin.INPUT),
+        19: Pin("G2", Pin.INPUT),
+        20: Pin("D", Pin.INPUT),
+        21: Pin("C", Pin.INPUT),
+        22: Pin("B", Pin.INPUT),
+        23: Pin("A", Pin.INPUT),
+    }
     test_all = Test(
         name="Complete logic",
         inputs=[18, 19, 20, 21, 22, 23],
@@ -1423,24 +1361,22 @@ class Part74154(PartDIP24):
 class Part74174(PartDIP16):
     name = "74174"
     desc = "Hex D-type filp-flops with clear"
-    pins = [
-        Pin(1, "~CLR", Pin.INPUT),
-        Pin(2, "1Q", Pin.OUTPUT),
-        Pin(3, "1D", Pin.INPUT),
-        Pin(4, "2D", Pin.INPUT),
-        Pin(5, "2Q", Pin.OUTPUT),
-        Pin(6, "3D", Pin.INPUT),
-        Pin(7, "3Q", Pin.OUTPUT),
-        Pin(8, "GND", Pin.POWER),
-        Pin(9, "CLK", Pin.INPUT),
-        Pin(10, "4Q", Pin.OUTPUT),
-        Pin(11, "4D", Pin.INPUT),
-        Pin(12, "5Q", Pin.OUTPUT),
-        Pin(13, "5D", Pin.INPUT),
-        Pin(14, "6D", Pin.INPUT),
-        Pin(15, "6Q", Pin.OUTPUT),
-        Pin(16, "VCC", Pin.POWER),
-    ]
+    pin_cfg = {
+        1: Pin("~CLR", Pin.INPUT),
+        2: Pin("1Q", Pin.OUTPUT),
+        3: Pin("1D", Pin.INPUT),
+        4: Pin("2D", Pin.INPUT),
+        5: Pin("2Q", Pin.OUTPUT),
+        6: Pin("3D", Pin.INPUT),
+        7: Pin("3Q", Pin.OUTPUT),
+        9: Pin("CLK", Pin.INPUT),
+        10: Pin("4Q", Pin.OUTPUT),
+        11: Pin("4D", Pin.INPUT),
+        12: Pin("5Q", Pin.OUTPUT),
+        13: Pin("5D", Pin.INPUT),
+        14: Pin("6D", Pin.INPUT),
+        15: Pin("6Q", Pin.OUTPUT),
+    }
     test_sync = Test(
         name="Synchronous operation",
         inputs=[1, 9,  3, 4, 6, 11, 13, 14],
@@ -1477,24 +1413,22 @@ class Part74174(PartDIP16):
 class Part74175(PartDIP16):
     name = "74175"
     desc = "Quad D-type filp-flops"
-    pins = [
-        Pin(1, "~CLR", Pin.INPUT),
-        Pin(2, "1Q", Pin.OUTPUT),
-        Pin(3, "~1Q", Pin.OUTPUT),
-        Pin(4, "1D", Pin.INPUT),
-        Pin(5, "2D", Pin.INPUT),
-        Pin(6, "~2Q", Pin.OUTPUT),
-        Pin(7, "2Q", Pin.OUTPUT),
-        Pin(8, "GND", Pin.POWER),
-        Pin(9, "CLK", Pin.INPUT),
-        Pin(10, "3Q", Pin.OUTPUT),
-        Pin(11, "~3Q", Pin.OUTPUT),
-        Pin(12, "3D", Pin.INPUT),
-        Pin(13, "4D", Pin.INPUT),
-        Pin(14, "~4Q", Pin.OUTPUT),
-        Pin(15, "4Q", Pin.OUTPUT),
-        Pin(16, "VCC", Pin.POWER),
-    ]
+    pin_cfg = {
+        1: Pin("~CLR", Pin.INPUT),
+        2: Pin("1Q", Pin.OUTPUT),
+        3: Pin("~1Q", Pin.OUTPUT),
+        4: Pin("1D", Pin.INPUT),
+        5: Pin("2D", Pin.INPUT),
+        6: Pin("~2Q", Pin.OUTPUT),
+        7: Pin("2Q", Pin.OUTPUT),
+        9: Pin("CLK", Pin.INPUT),
+        10: Pin("3Q", Pin.OUTPUT),
+        11: Pin("~3Q", Pin.OUTPUT),
+        12: Pin("3D", Pin.INPUT),
+        13: Pin("4D", Pin.INPUT),
+        14: Pin("~4Q", Pin.OUTPUT),
+        15: Pin("4Q", Pin.OUTPUT),
+    }
     test_sync = Test(
         name="Synchronous operation",
         inputs=[1, 9,  4, 5, 12, 13],
@@ -1531,32 +1465,30 @@ class Part74175(PartDIP16):
 class Part74181(PartDIP24):
     name = "74181"
     desc = "Arithmetic logic units/function generators"
-    pins = [
-        Pin(1, "B0", Pin.INPUT),
-        Pin(2, "A0", Pin.INPUT),
-        Pin(3, "S3", Pin.INPUT),
-        Pin(4, "S2", Pin.INPUT),
-        Pin(5, "S1", Pin.INPUT),
-        Pin(6, "S0", Pin.INPUT),
-        Pin(7, "~Cn", Pin.INPUT),
-        Pin(8, "M", Pin.INPUT),
-        Pin(9, "F0", Pin.OUTPUT),
-        Pin(10, "F1", Pin.OUTPUT),
-        Pin(11, "F2", Pin.OUTPUT),
-        Pin(12, "GND", Pin.POWER),
-        Pin(13, "F3", Pin.OUTPUT),
-        Pin(14, "A=B", Pin.OC),
-        Pin(15, "X", Pin.OUTPUT),
-        Pin(16, "~Cn+4", Pin.OUTPUT),
-        Pin(17, "Y", Pin.OUTPUT),
-        Pin(18, "B3", Pin.INPUT),
-        Pin(19, "A3", Pin.INPUT),
-        Pin(20, "B2", Pin.INPUT),
-        Pin(21, "A2", Pin.INPUT),
-        Pin(22, "B1", Pin.INPUT),
-        Pin(23, "A1", Pin.INPUT),
-        Pin(24, "VCC", Pin.POWER),
-    ]
+    pin_cfg = {
+        1: Pin("B0", Pin.INPUT),
+        2: Pin("A0", Pin.INPUT),
+        3: Pin("S3", Pin.INPUT),
+        4: Pin("S2", Pin.INPUT),
+        5: Pin("S1", Pin.INPUT),
+        6: Pin("S0", Pin.INPUT),
+        7: Pin("~Cn", Pin.INPUT),
+        8: Pin("M", Pin.INPUT),
+        9: Pin("F0", Pin.OUTPUT),
+        10: Pin("F1", Pin.OUTPUT),
+        11: Pin("F2", Pin.OUTPUT),
+        13: Pin("F3", Pin.OUTPUT),
+        14: Pin("A=B", Pin.OC),
+        15: Pin("X", Pin.OUTPUT),
+        16: Pin("~Cn+4", Pin.OUTPUT),
+        17: Pin("Y", Pin.OUTPUT),
+        18: Pin("B3", Pin.INPUT),
+        19: Pin("A3", Pin.INPUT),
+        20: Pin("B2", Pin.INPUT),
+        21: Pin("A2", Pin.INPUT),
+        22: Pin("B1", Pin.INPUT),
+        23: Pin("A1", Pin.INPUT),
+    }
 
     # ------------------------------------------------------------------------
     def logic_test_gen(s, name, fun):
@@ -1656,24 +1588,22 @@ class Part74181(PartDIP24):
 class Part74182(PartDIP16):
     name = "74182"
     desc = "Look-ahead carry generator"
-    pins = [
-        Pin(1, "~G1", Pin.INPUT),
-        Pin(2, "~P1", Pin.INPUT),
-        Pin(3, "~G0", Pin.INPUT),
-        Pin(4, "~P0", Pin.INPUT),
-        Pin(5, "~G3", Pin.INPUT),
-        Pin(6, "~P3", Pin.INPUT),
-        Pin(7, "~P", Pin.OUTPUT),
-        Pin(8, "GND", Pin.POWER),
-        Pin(9, "Cn+z", Pin.OUTPUT),
-        Pin(10, "~G", Pin.OUTPUT),
-        Pin(11, "Cn+y", Pin.OUTPUT),
-        Pin(12, "Cn+x", Pin.OUTPUT),
-        Pin(13, "Cn", Pin.INPUT),
-        Pin(14, "~G2", Pin.INPUT),
-        Pin(15, "~P2", Pin.INPUT),
-        Pin(16, "VCC", Pin.POWER),
-    ]
+    pin_cfg = {
+        1: Pin("~G1", Pin.INPUT),
+        2: Pin("~P1", Pin.INPUT),
+        3: Pin("~G0", Pin.INPUT),
+        4: Pin("~P0", Pin.INPUT),
+        5: Pin("~G3", Pin.INPUT),
+        6: Pin("~P3", Pin.INPUT),
+        7: Pin("~P", Pin.OUTPUT),
+        9: Pin("Cn+z", Pin.OUTPUT),
+        10: Pin("~G", Pin.OUTPUT),
+        11: Pin("Cn+y", Pin.OUTPUT),
+        12: Pin("Cn+x", Pin.OUTPUT),
+        13: Pin("Cn", Pin.INPUT),
+        14: Pin("~G2", Pin.INPUT),
+        15: Pin("~P2", Pin.INPUT),
+    }
     test_g = Test(
         name="~G",
         inputs=[5, 14, 1, 3, 6, 15, 2],
@@ -1743,32 +1673,30 @@ class Part74182(PartDIP16):
 class Part74198(PartDIP24):
     name = "74198"
     desc = "8-bit shift registers"
-    pins = [
-        Pin(1, "S0", Pin.INPUT),
-        Pin(2, "SR SER", Pin.INPUT),
-        Pin(3, "A", Pin.INPUT),
-        Pin(4, "QA", Pin.OUTPUT),
-        Pin(5, "B", Pin.INPUT),
-        Pin(6, "QB", Pin.OUTPUT),
-        Pin(7, "C", Pin.INPUT),
-        Pin(8, "QC", Pin.OUTPUT),
-        Pin(9, "D", Pin.INPUT),
-        Pin(10, "QD", Pin.OUTPUT),
-        Pin(11, "CLK", Pin.INPUT),
-        Pin(12, "GND", Pin.POWER),
-        Pin(13, "~CLR", Pin.INPUT),
-        Pin(14, "QE", Pin.OUTPUT),
-        Pin(15, "E", Pin.INPUT),
-        Pin(16, "QF", Pin.OUTPUT),
-        Pin(17, "F", Pin.INPUT),
-        Pin(18, "QG", Pin.OUTPUT),
-        Pin(19, "G", Pin.INPUT),
-        Pin(20, "QH", Pin.OUTPUT),
-        Pin(21, "H", Pin.INPUT),
-        Pin(22, "SL SER", Pin.INPUT),
-        Pin(23, "S1", Pin.INPUT),
-        Pin(24, "VCC", Pin.POWER),
-    ]
+    pin_cfg = {
+        1: Pin("S0", Pin.INPUT),
+        2: Pin("SR SER", Pin.INPUT),
+        3: Pin("A", Pin.INPUT),
+        4: Pin("QA", Pin.OUTPUT),
+        5: Pin("B", Pin.INPUT),
+        6: Pin("QB", Pin.OUTPUT),
+        7: Pin("C", Pin.INPUT),
+        8: Pin("QC", Pin.OUTPUT),
+        9: Pin("D", Pin.INPUT),
+        10: Pin("QD", Pin.OUTPUT),
+        11: Pin("CLK", Pin.INPUT),
+        13: Pin("~CLR", Pin.INPUT),
+        14: Pin("QE", Pin.OUTPUT),
+        15: Pin("E", Pin.INPUT),
+        16: Pin("QF", Pin.OUTPUT),
+        17: Pin("F", Pin.INPUT),
+        18: Pin("QG", Pin.OUTPUT),
+        19: Pin("G", Pin.INPUT),
+        20: Pin("QH", Pin.OUTPUT),
+        21: Pin("H", Pin.INPUT),
+        22: Pin("SL SER", Pin.INPUT),
+        23: Pin("S1", Pin.INPUT),
+    }
 
     test_load = Test(
         name="Parallel load",
@@ -1863,24 +1791,22 @@ class Part4164(PartDIP16_rotated):
 
     name = "4164"
     desc = "(also HM4864, ...) (REVERSE CHIP ORIENTATION!) 65536 x 1bit DRAM memory"
-    pins = [
-        Pin(1, "NC", Pin.NC),
-        Pin(2, "Din", Pin.INPUT),
-        Pin(3, "~WE", Pin.INPUT),
-        Pin(4, "~RAS", Pin.INPUT),
-        Pin(5, "A0", Pin.INPUT),
-        Pin(6, "A2", Pin.INPUT),
-        Pin(7, "A1", Pin.INPUT),
-        Pin(8, "VCC", Pin.POWER),
-        Pin(9, "A7", Pin.INPUT),
-        Pin(10, "A5", Pin.INPUT),
-        Pin(11, "A4", Pin.INPUT),
-        Pin(12, "A3", Pin.INPUT),
-        Pin(13, "A6", Pin.INPUT),
-        Pin(14, "Dout", Pin.OUTPUT),
-        Pin(15, "~CAS", Pin.INPUT),
-        Pin(16, "GND", Pin.POWER),
-    ]
+    pin_cfg = {
+        1: Pin("NC", Pin.NC),
+        2: Pin("Din", Pin.INPUT),
+        3: Pin("~WE", Pin.INPUT),
+        4: Pin("~RAS", Pin.INPUT),
+        5: Pin("A0", Pin.INPUT),
+        6: Pin("A2", Pin.INPUT),
+        7: Pin("A1", Pin.INPUT),
+        9: Pin("A7", Pin.INPUT),
+        10: Pin("A5", Pin.INPUT),
+        11: Pin("A4", Pin.INPUT),
+        12: Pin("A3", Pin.INPUT),
+        13: Pin("A6", Pin.INPUT),
+        14: Pin("Dout", Pin.OUTPUT),
+        15: Pin("~CAS", Pin.INPUT),
+    }
     test_bit_all_0 = Test(
         name="Single bit: all 0s",
         inputs=[2, 3, 4, 5, 6, 7, 9, 10, 11, 12, 13, 15],
@@ -1888,7 +1814,6 @@ class Part4164(PartDIP16_rotated):
         ttype=Test.MEM,
         tsubtype=TEST_BIT_ALL_0,
         loops=1,
-        body=[],
     )
     test_bit_all_1 = Test(
         name="Single bit: all 1s",
@@ -1897,7 +1822,6 @@ class Part4164(PartDIP16_rotated):
         ttype=Test.MEM,
         tsubtype=TEST_BIT_ALL_1,
         loops=1,
-        body=[],
     )
     test_row_all_0 = Test(
         name="Page mode: all 0s",
@@ -1906,7 +1830,6 @@ class Part4164(PartDIP16_rotated):
         ttype=Test.MEM,
         tsubtype=TEST_ROW_ALL_0,
         loops=1,
-        body=[],
     )
     test_row_all_1 = Test(
         name="Page mode: all 1s",
@@ -1915,7 +1838,6 @@ class Part4164(PartDIP16_rotated):
         ttype=Test.MEM,
         tsubtype=TEST_ROW_ALL_1,
         loops=1,
-        body=[],
     )
     test_row_alternate_01 = Test(
         name="Page mode: alternating 0/1",
@@ -1924,7 +1846,6 @@ class Part4164(PartDIP16_rotated):
         ttype=Test.MEM,
         tsubtype=TEST_ROW_ALTERNATE_01,
         loops=1,
-        body=[],
     )
     test_row_alternate_10 = Test(
         name="Page mode: alternating 1/0",
@@ -1933,7 +1854,6 @@ class Part4164(PartDIP16_rotated):
         ttype=Test.MEM,
         tsubtype=TEST_ROW_ALTERNATE_10,
         loops=1,
-        body=[],
     )
 
     tests = [
@@ -1947,5 +1867,5 @@ class Part4164(PartDIP16_rotated):
 # build parts catalog
 catalog = {}
 for i in inspect.getmembers(sys.modules[__name__]):
-    if inspect.isclass(i[1]) and 'pins' in [i[0] for i in inspect.getmembers(i[1])]:
+    if inspect.isclass(i[1]) and 'tests' in [i[0] for i in inspect.getmembers(i[1])]:
         catalog[i[1].name] = i[1]
