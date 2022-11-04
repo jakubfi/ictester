@@ -19,7 +19,10 @@ class Part:
     pincount = 0
     name = None
     package_name = None
-    missing = ""
+    package_variant = None
+    full_package_name = None
+    missing = None
+    unusual_power = False
 
     def __init__(self):
         assert self.name
@@ -51,10 +54,12 @@ class Part:
 
         last_pin = self.pins[max(self.pins)]
         if last_pin.role != Pin.VCC:
+            self.unusual_power = True
             vcc_pin = next(k for k, v in self.pins.items() if v.role == Pin.VCC)
-            self.package_variant = f"{self.package_name}-VCC@pin{vcc_pin}"
+            self.package_variant = f"VCC@pin{vcc_pin}"
+            self.full_package_name = f"{self.package_name} {self.package_variant}"
         else:
-            self.package_variant = self.package_name
+            self.full_package_name = self.package_name
 
     def get_test(self, name):
         return next(t for t in self.tests if t.name == name)

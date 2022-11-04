@@ -18,12 +18,12 @@ class Tester:
             0,  0,  0,  0,  0,  0, 0, 0,  # port B[7..0]
             0,  0, 13, 12, 11, 10, 9, 8,  # port C[7..0]
         ],
-        "DIP14-VCC@pin5": [
+        "DIP14 VCC@pin5": [
             0, 14, 13, 12, 11,  9,  8,  0,  # port A[7..0]
             0,  0,  0,  0,  0,  0,  0,  0,  # port B[7..0]
             0,  1,  2,  3,  4,  6,  7,  0,  # port C[7..0]
         ],
-        "DIP14-VCC@pin4": [
+        "DIP14 VCC@pin4": [
             0,  0, 14, 13, 12, 10,  9,  8,  # port A[7..0]
             0,  0,  0,  0,  0,  0,  0,  0,  # port B[7..0]
             0,  0,  1,  2,  3,  5,  6,  7,  # port C[7..0]
@@ -33,12 +33,12 @@ class Tester:
             0,  0,  0,  0,  0,  0,  0,  0,  # port B[7..0]
             0,  1,  2,  3,  4,  5,  6,  7,  # port C[7..0]
         ],
-        "DIP16-VCC@pin8": [
+        "DIP16 VCC@pin8": [
             0,  1,  2,  3,  4,  5,  6,  7,  # port A[7..0]
             0,  0,  0,  0,  0,  0,  0,  0,  # port B[7..0]
             0,  9, 10, 11, 12, 13, 14, 15,  # port C[7..0]
         ],
-        "DIP16-VCC@pin5": [
+        "DIP16 VCC@pin5": [
             0, 16, 15, 14, 13, 11, 10,  9,  # port A[7..0]
             0,  0,  0,  0,  0,  0,  0,  0,  # port B[7..0]
             0,  1,  2,  3,  4,  6,  7,  8,  # port C[7..0]
@@ -50,8 +50,8 @@ class Tester:
         ],
     }
 
-    def __init__(self, part_class, port, speed, debug=False, serial_debug=False):
-        self.part = part_class()
+    def __init__(self, part, port, speed, debug=False, serial_debug=False):
+        self.part = part
         # accept either test list or gen_tests() method
         try:
             self.part.gen_tests()
@@ -104,19 +104,19 @@ class Tester:
         all_pins = test.inputs + test.outputs
         return [
             0 if not p else (1 if p in all_pins else 0)
-            for p in Tester.pin_map[self.part.package_variant]
+            for p in Tester.pin_map[self.part.full_package_name]
         ]
 
     def get_input_pins(self, test):
         return [
             0 if not p else (1 if p in test.inputs else 0)
-            for p in Tester.pin_map[self.part.package_variant]
+            for p in Tester.pin_map[self.part.full_package_name]
         ]
 
     def get_pullup_pins(self, test):
         return [
             0 if not p else (1 if self.part.pins[p].role == Pin.OC else 0)
-            for p in Tester.pin_map[self.part.package_variant]
+            for p in Tester.pin_map[self.part.full_package_name]
         ]
 
     def setup(self, test):
@@ -142,7 +142,7 @@ class Tester:
     def vector_by_port(self, pins, vals):
         return [
             0 if not pin else self.get_pinvalue(pins, vals, pin)
-            for pin in Tester.pin_map[self.part.package_variant]
+            for pin in Tester.pin_map[self.part.full_package_name]
         ]
 
     def sequentialize(self, v):

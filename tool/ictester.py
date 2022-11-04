@@ -21,7 +21,7 @@ if '--list' in sys.argv:
     names = sorted(parts.catalog.keys(), key=lambda x: int(re.sub("74[HS]", "74", x)))
     for name in names:
         p = parts.catalog[name]()
-        print(f"{p.name} ({p.package_variant}): {p.desc}")
+        print(f"{p.name} ({p.full_package_name}): {p.desc}")
     sys.exit(0)
 
 parser = argparse.ArgumentParser(description='IC tester controller')
@@ -34,15 +34,17 @@ parser.add_argument('part', help='Part symbol')
 args = parser.parse_args()
 
 try:
-    part = parts.catalog[args.part]
+    part = parts.catalog[args.part]()
 except KeyError:
     print(f"Part not found: {args.part}")
     print("Use --list to list all supported parts")
     sys.exit(1)
 
-print(f"Part: {part.name}, {part.package_name} - {part.desc}")
+print(f"Part: {part.name}, {part.full_package_name} - {part.desc}")
 if part.missing:
-    print(f"{WARN}Warning, missing tests: {part.missing}{ENDC}")
+    print(f"{WARN}WARNING: missing tests: {part.missing}{ENDC}")
+if part.unusual_power:
+    print(f"{WARN}WARNING, unusual pins used for power. Make sure to use the correct socket.{ENDC}")
 
 tester = Tester(part, args.device, 500000, debug=args.debug, serial_debug=args.serial_debug)
 all_tests = tester.tests_available()
