@@ -2,6 +2,7 @@ import sys
 import inspect
 from collections import namedtuple
 from prototypes import (Test, Pin, PartDIP14, PartDIP14_vcc5, PartDIP14_vcc4, PartDIP16, PartDIP16_vcc5, PartDIP16_rotated, PartDIP24)
+from functools import reduce
 
 
 # ------------------------------------------------------------------------
@@ -1459,6 +1460,53 @@ class Part74175(PartDIP16):
         ]
     )
     tests = [test_sync, test_async]
+
+
+# ------------------------------------------------------------------------
+class Part74180(PartDIP14):
+    name = "74180"
+    desc = "9-bit odd/even parity generator/checker"
+    pin_cfg = {
+        1: Pin("G", Pin.INPUT),
+        2: Pin("H", Pin.INPUT),
+        3: Pin("EVEN", Pin.INPUT),
+        4: Pin("ODD", Pin.INPUT),
+        5: Pin("sumEVEN", Pin.OUTPUT),
+        6: Pin("sumODD", Pin.OUTPUT),
+        8: Pin("A", Pin.INPUT),
+        9: Pin("B", Pin.INPUT),
+        10: Pin("C", Pin.INPUT),
+        11: Pin("D", Pin.INPUT),
+        12: Pin("E", Pin.INPUT),
+        13: Pin("F", Pin.INPUT),
+    }
+
+    # ------------------------------------------------------------------------
+    def parity_test_gen():
+        # ------------------------------------------------------------------------
+        def parity_check(v):
+            if v[8] == v[9]:
+                return [int(not v[8]), int(not v[8])]
+            else:
+                odd = reduce(lambda a, b: a^b, v[0:8] + [v[9]])
+                return [int(not odd), odd]
+
+        data = [Test.bin2vec(v, 10) for v in range(0, 2**10 - 1)]
+
+        body = [
+            [v, parity_check(v)] for v in data
+        ]
+
+        return Test(
+            name="Asynchronous operation",
+            inputs=[8, 9, 10, 11, 12, 13, 1, 2,  3, 4],
+            outputs=[5, 6],
+            ttype=Test.COMB,
+            loops=64,
+            body=body
+        )
+
+    tests = [parity_test_gen()]
 
 
 # ------------------------------------------------------------------------
