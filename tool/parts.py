@@ -1310,6 +1310,72 @@ class Part74107(PartDIP14):
 
 
 # ------------------------------------------------------------------------
+class Part74125(PartDIP14):
+    name = "74125"
+    desc = "Quarduple bus buffers with 3-state outputs"
+    pin_cfg = {
+        1: Pin("~1G", Pin.INPUT),
+        2: Pin("1A", Pin.INPUT),
+        3: Pin("1Y", Pin.OC),
+        4: Pin("~2G", Pin.INPUT),
+        5: Pin("2A", Pin.INPUT),
+        6: Pin("2Y", Pin.OC),
+        8: Pin("3Y", Pin.OC),
+        9: Pin("3A", Pin.INPUT),
+        10: Pin("~3G", Pin.INPUT),
+        11: Pin("4Y", Pin.OC),
+        12: Pin("4A", Pin.INPUT),
+        13: Pin("~4G", Pin.INPUT),
+    }
+    test_all = Test(
+        name="Complete logic",
+        inputs=[1, 2,  4, 5,  10, 9,  13, 12],
+        outputs=[3, 6, 8, 11],
+        ttype=Test.COMB,
+        body=[
+            [[0, 1,  0, 1,  0, 1,  0, 1], [1, 1, 1, 1]],
+            [[0, 0,  0, 0,  0, 0,  0, 0], [0, 0, 0, 0]],
+            [[1, 1,  1, 1,  1, 1,  1, 1], [1, 1, 1, 1]],
+            [[1, 0,  1, 0,  1, 0,  1, 0], [1, 1, 1, 1]],
+        ]
+    )
+    tests = [test_all]
+
+
+# ------------------------------------------------------------------------
+class Part74126(PartDIP14):
+    name = "74126"
+    desc = "Quarduple bus buffers with 3-state outputs"
+    pin_cfg = {
+        1: Pin("1G", Pin.INPUT),
+        2: Pin("1A", Pin.INPUT),
+        3: Pin("1Y", Pin.OC),
+        4: Pin("2G", Pin.INPUT),
+        5: Pin("2A", Pin.INPUT),
+        6: Pin("2Y", Pin.OC),
+        8: Pin("3Y", Pin.OC),
+        9: Pin("3A", Pin.INPUT),
+        10: Pin("3G", Pin.INPUT),
+        11: Pin("4Y", Pin.OC),
+        12: Pin("4A", Pin.INPUT),
+        13: Pin("4G", Pin.INPUT),
+    }
+    test_all = Test(
+        name="Complete logic",
+        inputs=[1, 2,  4, 5,  10, 9,  13, 12],
+        outputs=[3, 6, 8, 11],
+        ttype=Test.COMB,
+        body=[
+            [[1, 1,  1, 1,  1, 1,  1, 1], [1, 1, 1, 1]],
+            [[1, 0,  1, 0,  1, 0,  1, 0], [0, 0, 0, 0]],
+            [[0, 1,  0, 1,  0, 1,  0, 1], [1, 1, 1, 1]],
+            [[0, 0,  0, 0,  0, 0,  0, 0], [1, 1, 1, 1]],
+        ]
+    )
+    tests = [test_all]
+
+
+# ------------------------------------------------------------------------
 class Part74132(Part7400):
     name = "74132"
     desc = "Quad 2-input positive-NAND Shmitt triggers"
