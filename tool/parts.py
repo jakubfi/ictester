@@ -1382,6 +1382,82 @@ class Part74132(Part7400):
 
 
 # ------------------------------------------------------------------------
+class Part74136(PartDIP14):
+    name = "74136"
+    desc = "Quarduple 2-input exclusive-OR gates with open-collector outputs"
+    pin_cfg = {
+        1: Pin("1A", Pin.INPUT),
+        2: Pin("1B", Pin.INPUT),
+        3: Pin("1Y", Pin.OC),
+        4: Pin("2A", Pin.INPUT),
+        5: Pin("2B", Pin.INPUT),
+        6: Pin("2Y", Pin.OC),
+        8: Pin("3Y", Pin.OC),
+        9: Pin("3A", Pin.INPUT),
+        10: Pin("3B", Pin.INPUT),
+        11: Pin("4Y", Pin.OC),
+        12: Pin("4A", Pin.INPUT),
+        13: Pin("4B", Pin.INPUT),
+    }
+    tests = [
+        Test(
+            name="Complete logic",
+            inputs=[1, 2, 4, 5, 10, 9, 13, 12],
+            outputs=[3, 6, 8, 11],
+            ttype=Test.COMB,
+            body=Test.binary_fun_gen(4, 2, lambda a, b: a ^ b, inverted=False)
+        )
+    ]
+
+
+# ------------------------------------------------------------------------
+class Part74145(PartDIP16):
+    name = "74145"
+    desc = "BCD to decimal decoders/drivers",
+    pin_cfg = {
+         1: Pin("0", Pin.OC),
+         2: Pin("1", Pin.OC),
+         3: Pin("2", Pin.OC),
+         4: Pin("3", Pin.OC),
+         5: Pin("4", Pin.OC),
+         6: Pin("5", Pin.OC),
+         7: Pin("6", Pin.OC),
+         9: Pin("7", Pin.OC),
+        10: Pin("8", Pin.OC),
+        11: Pin("9", Pin.OC),
+        12: Pin("D", Pin.INPUT),
+        13: Pin("C", Pin.INPUT),
+        14: Pin("B", Pin.INPUT),
+        15: Pin("A", Pin.INPUT),
+    }
+    test_all = Test(
+        name="Complete logic",
+        inputs=[12, 13, 14, 15],
+        outputs=[1, 2, 3, 4, 5, 6, 7, 9, 10, 11],
+        ttype=Test.COMB,
+        body=[
+            [[0, 0, 0, 0], [0, 1, 1, 1, 1, 1, 1, 1, 1, 1]],
+            [[0, 0, 0, 1], [1, 0, 1, 1, 1, 1, 1, 1, 1, 1]],
+            [[0, 0, 1, 0], [1, 1, 0, 1, 1, 1, 1, 1, 1, 1]],
+            [[0, 0, 1, 1], [1, 1, 1, 0, 1, 1, 1, 1, 1, 1]],
+            [[0, 1, 0, 0], [1, 1, 1, 1, 0, 1, 1, 1, 1, 1]],
+            [[0, 1, 0, 1], [1, 1, 1, 1, 1, 0, 1, 1, 1, 1]],
+            [[0, 1, 1, 0], [1, 1, 1, 1, 1, 1, 0, 1, 1, 1]],
+            [[0, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1, 0, 1, 1]],
+            [[1, 0, 0, 0], [1, 1, 1, 1, 1, 1, 1, 1, 0, 1]],
+            [[1, 0, 0, 1], [1, 1, 1, 1, 1, 1, 1, 1, 1, 0]],
+            [[1, 0, 1, 0], [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]],
+            [[1, 0, 1, 1], [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]],
+            [[1, 1, 0, 0], [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]],
+            [[1, 1, 0, 1], [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]],
+            [[1, 1, 1, 0], [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]],
+            [[1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]],
+        ]
+    )
+    tests = [test_all]
+
+
+# ------------------------------------------------------------------------
 class Part74150(PartDIP24):
     name = "74150"
     desc = "Data selectors/multiplexers"
