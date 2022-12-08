@@ -569,6 +569,13 @@ class Part7450(PartDIP14):
 
 
 # ------------------------------------------------------------------------
+class Part7451(Part7450):
+    name = "7451"
+    desc = "AND-OR-INVERT Gate"
+    missing = None
+
+
+# ------------------------------------------------------------------------
 class Part74H53(PartDIP14):
     name = "74H53"
     desc = "Expandable 4-wide, 2-2-3-2 And-Or-Invert gate"
