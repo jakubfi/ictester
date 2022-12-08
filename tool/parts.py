@@ -576,6 +576,39 @@ class Part7451(Part7450):
 
 
 # ------------------------------------------------------------------------
+class Part7452(PartDIP14):
+    name = "7452"
+    desc = "AND-OR Gate (Expandable)"
+    pin_cfg = {
+        1: Pin("A", Pin.INPUT),
+        2: Pin("B", Pin.INPUT),
+        3: Pin("C", Pin.INPUT),
+        4: Pin("D", Pin.INPUT),
+        5: Pin("E", Pin.INPUT),
+        6: Pin("NC", Pin.NC),
+        8: Pin("Y", Pin.OUTPUT),
+        9: Pin("X", Pin.NC),
+        10: Pin("F", Pin.INPUT),
+        11: Pin("G", Pin.INPUT),
+        12: Pin("H", Pin.INPUT),
+        13: Pin("I", Pin.INPUT),
+    }
+    missing = "Gate expansion is not tested"
+    test_async = Test(
+        name="Asynchronous operation",
+        inputs=[1, 2,  3, 4, 5,  10, 11,  12, 13],
+        outputs=[8],
+        ttype=Test.COMB,
+        loops = 128,
+        body = [
+            [i, [(i[0] & i[1]) | (i[2] & i[3] & i[4]) | (i[5] & i[6]) | (i[7] & i[8])]]
+            for i in Test.binary_combinator(9)
+        ]
+    )
+    tests = [test_async]
+
+
+# ------------------------------------------------------------------------
 class Part74H53(PartDIP14):
     name = "74H53"
     desc = "Expandable 4-wide, 2-2-3-2 And-Or-Invert gate"
