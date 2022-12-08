@@ -299,6 +299,36 @@ class Part7420(Part7413):
 
 
 # ------------------------------------------------------------------------
+class Part7421(Part7413):
+    name = "7421"
+    desc = "Dual 4-input positive-AND gates"
+    pin_cfg = {
+        1: Pin("1A", Pin.INPUT),
+        2: Pin("1B", Pin.INPUT),
+        3: Pin("NC", Pin.NC),
+        4: Pin("1C", Pin.INPUT),
+        5: Pin("1D", Pin.INPUT),
+        6: Pin("1Y", Pin.OUTPUT),
+        8: Pin("2Y", Pin.OUTPUT),
+        9: Pin("2A", Pin.INPUT),
+        10: Pin("2B", Pin.INPUT),
+        11: Pin("NC", Pin.NC),
+        12: Pin("2C", Pin.INPUT),
+        13: Pin("2D", Pin.INPUT),
+    }
+
+    tests = [
+        Test(
+            name="Complete logic",
+            inputs=[1, 2, 4, 5, 13, 12, 10, 9],
+            outputs=[6, 8],
+            ttype=Test.COMB,
+            body=Test.binary_fun_gen(2, 4, lambda a, b: a & b, inverted=False)
+        )
+    ]
+
+
+# ------------------------------------------------------------------------
 class Part7430(PartDIP14):
     name = "7430"
     desc = "8-input positive-NAND gate"
