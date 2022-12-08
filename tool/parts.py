@@ -2738,6 +2738,97 @@ class Part74182(PartDIP16):
 
 
 # ------------------------------------------------------------------------
+class Part74194(PartDIP16):
+    name = "74194"
+    desc = "4-bit bidirectional universal shift register"
+    pin_cfg = {
+        1: Pin("~CLR", Pin.INPUT),
+        2: Pin("SR SER", Pin.INPUT),
+        3: Pin("A", Pin.INPUT),
+        4: Pin("B", Pin.INPUT),
+        5: Pin("C", Pin.INPUT),
+        6: Pin("D", Pin.INPUT),
+        7: Pin("SL SER", Pin.INPUT),
+        9: Pin("S0", Pin.INPUT),
+        10: Pin("S1", Pin.INPUT),
+        11: Pin("CLK", Pin.INPUT),
+        12: Pin("QD", Pin.OUTPUT),
+        13: Pin("QC", Pin.OUTPUT),
+        14: Pin("QB", Pin.OUTPUT),
+        15: Pin("QA", Pin.OUTPUT),
+    }
+
+    test_load = Test(
+        name="Load",
+        inputs=[1,  10, 9,  11,  7, 2,  3, 4, 5, 6],
+        outputs=[15, 14, 13, 12],
+        ttype=Test.SEQ,
+        body=[
+            # load 1's
+            [[1,  1, 1,  '+',  0, 0,  1, 1, 1, 1], [1, 1, 1, 1]],
+            # output current
+            [[1,  0, 0,  '+',  0, 0,  0, 0, 0, 0], [1, 1, 1, 1]],
+            # load 0's
+            [[1,  1, 1,  '+',  1, 1,  0, 0, 0, 0], [0, 0, 0, 0]],
+            # output current
+            [[1,  0, 0,  '+',  1, 1,  1, 1, 1, 1], [0, 0, 0, 0]],
+
+        ]
+    )
+    test_shright = Test(
+        name="Shift right",
+        inputs=[1,  10, 9,  11,  7, 2,  3, 4, 5, 6],
+        outputs=[15, 14, 13, 12],
+        ttype=Test.SEQ,
+        body=[
+            # shift right, insert 1's
+            [[1,  0, 1,  '+',  0, 1,  0, 0, 0, 0], [1, 0, 0, 0]],
+            [[1,  0, 1,  '+',  0, 1,  0, 0, 0, 0], [1, 1, 0, 0]],
+            [[1,  0, 1,  '+',  0, 1,  0, 0, 0, 0], [1, 1, 1, 0]],
+            [[1,  0, 1,  '+',  0, 1,  0, 0, 0, 0], [1, 1, 1, 1]],
+            # shift right, insert 0's
+            [[1,  0, 1,  '+',  1, 0,  1, 1, 1, 1], [0, 1, 1, 1]],
+            [[1,  0, 1,  '+',  1, 0,  1, 1, 1, 1], [0, 0, 1, 1]],
+            [[1,  0, 1,  '+',  1, 0,  1, 1, 1, 1], [0, 0, 0, 1]],
+            [[1,  0, 1,  '+',  1, 0,  1, 1, 1, 1], [0, 0, 0, 0]],
+        ]
+    )
+    test_shleft = Test(
+        name="Shift left",
+        inputs=[1,  10, 9,  11,  7, 2,  3, 4, 5, 6],
+        outputs=[15, 14, 13, 12],
+        ttype=Test.SEQ,
+        body=[
+            # shift left, insert 1's
+            [[1,  1, 0,  '+',  1, 0,  0, 0, 0, 0], [0, 0, 0, 1]],
+            [[1,  1, 0,  '+',  1, 0,  0, 0, 0, 0], [0, 0, 1, 1]],
+            [[1,  1, 0,  '+',  1, 0,  0, 0, 0, 0], [0, 1, 1, 1]],
+            [[1,  1, 0,  '+',  1, 0,  0, 0, 0, 0], [1, 1, 1, 1]],
+            # shift left, insert 0's
+            [[1,  1, 0,  '+',  0, 1,  1, 1, 1, 1], [1, 1, 1, 0]],
+            [[1,  1, 0,  '+',  0, 1,  1, 1, 1, 1], [1, 1, 0, 0]],
+            [[1,  1, 0,  '+',  0, 1,  1, 1, 1, 1], [1, 0, 0, 0]],
+            [[1,  1, 0,  '+',  0, 1,  1, 1, 1, 1], [0, 0, 0, 0]],
+
+        ]
+    )
+    test_clear = Test(
+        name="Clear",
+        inputs=[1,  10, 9,  11,  7, 2,  3, 4, 5, 6],
+        outputs=[15, 14, 13, 12],
+        ttype=Test.SEQ,
+        body=[
+            # load 1's
+            [[1,  1, 1,  '+',  0, 0,  1, 1, 1, 1], [1, 1, 1, 1]],
+            # clear
+            [[0,  1, 1,  '+',  1, 1,  1, 1, 1, 1], [0, 0, 0, 0]],
+        ]
+    )
+
+    tests = [test_load, test_shright, test_shleft, test_clear]
+
+
+# ------------------------------------------------------------------------
 class Part74198(PartDIP24):
     name = "74198"
     desc = "8-bit shift registers"
