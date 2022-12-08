@@ -927,6 +927,43 @@ class Part7486(PartDIP14):
 
 
 # ------------------------------------------------------------------------
+class Part7487(PartDIP14):
+    name = "7487"
+    desc = "4-bit True/Complement, Zero/One Element"
+    pin_cfg = {
+        1: Pin("C", Pin.INPUT),
+        2: Pin("A1", Pin.INPUT),
+        3: Pin("Y1", Pin.OUTPUT),
+        4: Pin("NC", Pin.NC),
+        5: Pin("A2", Pin.INPUT),
+        6: Pin("Y2", Pin.OUTPUT),
+        8: Pin("B", Pin.INPUT),
+        9: Pin("Y3", Pin.OUTPUT),
+        10: Pin("A3", Pin.INPUT),
+        11: Pin("NC", Pin.NC),
+        12: Pin("Y4", Pin.OUTPUT),
+        13: Pin("A4", Pin.INPUT),
+    }
+    test_all = Test(
+        name="Complete logic",
+        inputs=[8, 1,  2, 5, 10, 13],
+        outputs=[3, 6, 9, 12],
+        ttype=Test.COMB,
+        body=[
+            [[0, 0,  0, 0, 0, 0], [1, 1, 1, 1]],
+            [[0, 0,  1, 1, 1, 1], [0, 0, 0, 0]],
+            [[0, 1,  0, 0, 0, 0], [0, 0, 0, 0]],
+            [[0, 1,  1, 1, 1, 1], [1, 1, 1, 1]],
+            [[1, 0,  0, 0, 0, 0], [1, 1, 1, 1]],
+            [[1, 0,  1, 1, 1, 1], [1, 1, 1, 1]],
+            [[1, 1,  0, 0, 0, 0], [0, 0, 0, 0]],
+            [[1, 1,  1, 1, 1, 1], [0, 0, 0, 0]],
+        ]
+    )
+    tests = [test_all]
+
+
+# ------------------------------------------------------------------------
 class Part7489(PartDIP16):
     name = "7489"
     desc = "64-bit random-access read/write memory"
