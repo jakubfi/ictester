@@ -691,6 +691,51 @@ class Part7453(PartDIP14):
 
 
 # ------------------------------------------------------------------------
+class Part7462(PartDIP14):
+    name = "7462"
+    desc = "AND-OR Gate Expander"
+    '''
+    ~X and X are outputs, but not in a TTL-levels sense: ~X is output transistor collector, X is its emmiter.
+    Pin configuration does the following:
+     * pulls up the collector with the internal pull-up resistor (OC output)
+     * connects the emmiter to a current sink (output driven low)
+    Thus, ~X becomes the actual output, and X needs to be always driven low.
+    '''
+    pin_cfg = {
+        1: Pin("A", Pin.INPUT),
+        2: Pin("B", Pin.INPUT),
+        3: Pin("C", Pin.INPUT),
+        4: Pin("D", Pin.INPUT),
+        5: Pin("E", Pin.INPUT),
+        6: Pin("~X", Pin.OC),
+        8: Pin("X", Pin.INPUT),
+        9: Pin("F", Pin.INPUT),
+        10: Pin("G", Pin.INPUT),
+        11: Pin("H", Pin.INPUT),
+        12: Pin("I", Pin.INPUT),
+        13: Pin("J", Pin.INPUT),
+    }
+    missing = "Gate expansion is not tested"
+    test_async = Test(
+        name="Asynchronous operation",
+        inputs=[8,  1, 2,  3, 4, 5,  9, 10, 11,  12, 13],
+        outputs=[6],
+        ttype=Test.COMB,
+        loops = 64,
+        body = [
+            [
+                [0] + i, [
+                    not ((i[0] & i[1]) | (i[2] & i[3] & i[4]) | (i[5] & i[6] & i[7]) | (i[8] & i[9]))
+                ]
+            ]
+            for i in Test.binary_combinator(10)
+        ]
+    )
+    tests = [test_async]
+
+
+
+# ------------------------------------------------------------------------
 class Part7472(PartDIP14):
     name = "7472"
     desc = "And-gated J-K master-slave flip-flops with preset and clear"
