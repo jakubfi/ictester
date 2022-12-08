@@ -2,12 +2,12 @@ from functools import reduce
 
 # ------------------------------------------------------------------------
 class Pin:
-    INPUT = 1
-    OUTPUT = 2
-    OC = 3
-    VCC = 4
-    GND = 5
-    NC = 6
+    IN = 1      # regular TTL input
+    OUT = 2     # regular TTL output
+    OC = 3      # open-collector output
+    VCC = 4     # +5V power
+    GND = 5     # ground
+    NC = 6      # unused pin
 
     def __init__(self, name, role):
         self.name = name
