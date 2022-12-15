@@ -420,20 +420,20 @@ class Part7440(Part7413):
 
 
 # ------------------------------------------------------------------------
-class Part7445(PartDIP16):
-    name = "7445"
-    desc = "BCD-to-decimal decoders/drivers"
+class Part7442(PartDIP16):
+    name = "7442"
+    desc = "4-line BCD to 10-line decimal decoders"
     pin_cfg = {
-        1: Pin("0", Pin.OC),
-        2: Pin("1", Pin.OC),
-        3: Pin("2", Pin.OC),
-        4: Pin("3", Pin.OC),
-        5: Pin("4", Pin.OC),
-        6: Pin("5", Pin.OC),
-        7: Pin("6", Pin.OC),
-        9: Pin("7", Pin.OC),
-        10: Pin("8", Pin.OC),
-        11: Pin("9", Pin.OC),
+        1: Pin("0", Pin.OUT),
+        2: Pin("1", Pin.OUT),
+        3: Pin("2", Pin.OUT),
+        4: Pin("3", Pin.OUT),
+        5: Pin("4", Pin.OUT),
+        6: Pin("5", Pin.OUT),
+        7: Pin("6", Pin.OUT),
+        9: Pin("7", Pin.OUT),
+        10: Pin("8", Pin.OUT),
+        11: Pin("9", Pin.OUT),
         12: Pin("D", Pin.IN),
         13: Pin("C", Pin.IN),
         14: Pin("B", Pin.IN),
@@ -464,6 +464,28 @@ class Part7445(PartDIP16):
         ]
     )
     tests = [test_async]
+
+
+# ------------------------------------------------------------------------
+class Part7445(Part7442):
+    name = "7445"
+    desc = "BCD-to-decimal decoders/drivers"
+    pin_cfg = {
+        1: Pin("0", Pin.OC),
+        2: Pin("1", Pin.OC),
+        3: Pin("2", Pin.OC),
+        4: Pin("3", Pin.OC),
+        5: Pin("4", Pin.OC),
+        6: Pin("5", Pin.OC),
+        7: Pin("6", Pin.OC),
+        9: Pin("7", Pin.OC),
+        10: Pin("8", Pin.OC),
+        11: Pin("9", Pin.OC),
+        12: Pin("D", Pin.IN),
+        13: Pin("C", Pin.IN),
+        14: Pin("B", Pin.IN),
+        15: Pin("A", Pin.IN),
+    }
 
 
 # ------------------------------------------------------------------------
