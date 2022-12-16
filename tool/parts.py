@@ -548,7 +548,7 @@ class Part7450(PartDIP14):
         12: Pin("~1X", Pin.NC),
         13: Pin("1B", Pin.IN),
     }
-    missing = "Gate expansion is not tested"
+    missing_tests = "Gate expansion is not tested"
     test_async = Test(
         name="Asynchronous operation",
         inputs=[1, 13, 9, 10,  2, 3, 4, 5],
@@ -566,7 +566,7 @@ class Part7450(PartDIP14):
 class Part7451(Part7450):
     name = "7451"
     desc = "AND-OR-INVERT Gate"
-    missing = None
+    missing_tests = None
 
 
 # ------------------------------------------------------------------------
@@ -587,7 +587,7 @@ class Part7452(PartDIP14):
         12: Pin("H", Pin.IN),
         13: Pin("I", Pin.IN),
     }
-    missing = "Gate expansion is not tested"
+    missing_tests = "Gate expansion is not tested"
     test_async = Test(
         name="Asynchronous operation",
         inputs=[1, 2,  3, 4, 5,  10, 11,  12, 13],
@@ -620,7 +620,7 @@ class Part74H53(PartDIP14):
         12: Pin("~X", Pin.NC),
         13: Pin("A2", Pin.IN),
     }
-    missing = "Gate expansion is not tested"
+    missing_tests = "Gate expansion is not tested"
     test_async = Test(
         name="Asynchronous operation",
         inputs=[1, 13, 2, 3, 4, 5, 6, 9, 10],
@@ -653,7 +653,7 @@ class Part7453(PartDIP14):
         12: Pin("~X", Pin.NC),
         13: Pin("A2", Pin.IN),
     }
-    missing = "Gate expansion is not tested"
+    missing_tests = "Gate expansion is not tested"
     test_async = Test(
         name="Asynchronous operation",
         inputs=[1, 13, 2, 3, 4, 5, 6, 9, 10],
@@ -2685,7 +2685,10 @@ class Part74181(PartDIP24):
         # test vectors in [[inputs], [outputs]] order:
         # [[1, s3, s2, s1, s0,  a3, a2, a1, a1,  b3, b2, b1, b0], [f3, f2, f1, f0]]
         body = [
-            [[1] + Test.bin2vec(s, 4) + Test.bin2vec(v.a, 4) + Test.bin2vec(v.b, 4), Test.bin2vec(v.f, 4) + [v.f & 0b1111 == 0b1111]]
+            [
+                [1] + Test.bin2vec(s, 4) + Test.bin2vec(v.a, 4) + Test.bin2vec(v.b, 4),
+                Test.bin2vec(v.f, 4) + [int(v.f & 0b1111 == 0b1111)]
+            ]
             for v in data
         ]
 
@@ -2715,7 +2718,7 @@ class Part74181(PartDIP24):
         body = [
             [
                 [0] + Test.bin2vec(s, 4) + [v.c] + Test.bin2vec(v.a, 4) + Test.bin2vec(v.b, 4),
-                Test.bin2vec(v.f & 0b1111, 4) + [not v.f & 0b10000] + [v.f & 0b1111 == 0b1111]
+                Test.bin2vec(v.f & 0b1111, 4) + [int(not v.f & 0b10000)] + [int(v.f & 0b1111 == 0b1111)]
             ]
             for v in data
         ]
@@ -2727,7 +2730,7 @@ class Part74181(PartDIP24):
             loops=32,
             body=body
         )
-    missing = "outputs G, P are not tested"
+    missing_tests = "outputs G, P are not tested"
     tests = [
         logic_test_gen(0, "Logic: F = ~A", lambda a, b: ~a),
         logic_test_gen(1, "Logic: F = ~(A|B)", lambda a, b: ~(a | b)),

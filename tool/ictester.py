@@ -9,6 +9,21 @@ from tester import Tester
 import parts
 
 # ------------------------------------------------------------------------
+def list_tests():
+    names = sorted(parts.catalog.keys(), key=lambda x: int(re.sub("74[HLS]", "74", x)))
+    for name in names:
+        p = parts.catalog[name]()
+        print(f"{p.name} ({p.full_package_name}): {p.desc}")
+
+# ------------------------------------------------------------------------
+def print_part_info(part):
+    print(f"Part: {part.name}, {part.full_package_name} - {part.desc}")
+    if part.missing_tests:
+        print(f"{WARN}WARNING: missing tests: {part.missing_tests}{ENDC}")
+    if part.unusual_power:
+        print(f"{WARN}WARNING: unusual pins used for power. Make sure to use the correct socket.{ENDC}")
+
+# ------------------------------------------------------------------------
 # --- Main ---------------------------------------------------------------
 # ------------------------------------------------------------------------
 
@@ -18,10 +33,7 @@ WARN = '\033[95m\033[1m'
 ENDC = '\033[0m'
 
 if '--list' in sys.argv:
-    names = sorted(parts.catalog.keys(), key=lambda x: int(re.sub("74[HS]", "74", x)))
-    for name in names:
-        p = parts.catalog[name]()
-        print(f"{p.name} ({p.full_package_name}): {p.desc}")
+    list_tests()
     sys.exit(0)
 
 parser = argparse.ArgumentParser(description='IC tester controller')
@@ -38,55 +50,44 @@ try:
 except KeyError:
     print(f"Part not found: {args.part}")
     print("Use --list to list all supported parts")
-    sys.exit(1)
+    sys.exit(100)
 
-print(f"Part: {part.name}, {part.full_package_name} - {part.desc}")
-if part.missing:
-    print(f"{WARN}WARNING: missing tests: {part.missing}{ENDC}")
-if part.unusual_power:
-    print(f"{WARN}WARNING, unusual pins used for power. Make sure to use the correct socket.{ENDC}")
+print_part_info(part)
 
 tester = Tester(part, args.device, 500000, debug=args.debug, serial_debug=args.serial_debug)
 all_tests = tester.tests_available()
+test_count = len(all_tests)
 longest_desc = len(max(all_tests, key=len))
-failed = False
 tests_passed = 0
+
+print()
 
 for test_name in all_tests:
     test = tester.part.get_test(test_name)
-    loops = args.loops if args.loops is not None else test.loops
-    loops_pow = round((math.log2(loops)))
+    loops_pow = round((math.log2(args.loops if args.loops else test.loops)))
     loops = 2 ** loops_pow
 
-    if not args.debug:
-        print(" * Testing: {:{}s} ({} loop{}) ".format(
-            test_name,
-            longest_desc,
-            loops,
-            "s" if loops != 1 else ""
-        ), end='', flush=True)
-    else:
-        plural = "s" if loops != 1 else ""
-        print(f" * Testing: {test_name} ({loops} loop{plural})")
+    plural = "s" if loops != 1 else ""
+    endc = "\n" if args.debug else ""
+    print(f" * Testing: {test_name:{longest_desc}s} ({loops} loop{plural}) ... ", end=endc, flush=True)
 
-    res = tester.run(test, loops_pow)
+    res = tester.exec_test(test, loops_pow)
 
     if res == Tester.RES_PASS:
         tests_passed += 1
-        print("{}PASS{}".format(OK, ENDC))
+        print(f"{OK}PASS{ENDC}")
     else:
-        failed = True
-        print("{}FAIL{}".format(FAIL, ENDC))
+        print(f"{FAIL}FAIL{ENDC}")
 
-if tests_passed != len(tester.tests_available()):
+if tests_passed != test_count:
     color = FAIL
-    result = "FAILED"
+    result = "PART DEFECTIVE"
     ret = 1
 else:
     color = OK
-    result = "OK"
+    result = "PART OK"
     ret = 0
 
-print("{}{}: {} of {} tests passed{}".format(color, result, tests_passed, len(tester.tests_available()), ENDC))
+print(f"\n{color}{result}: {tests_passed} of {test_count} tests passed{ENDC}")
 
 sys.exit(ret)

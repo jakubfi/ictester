@@ -21,7 +21,7 @@ class Part:
     package_name = None
     package_variant = None
     full_package_name = None
-    missing = None
+    missing_tests = None
     unusual_power = False
 
     def __init__(self):

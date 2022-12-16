@@ -77,14 +77,14 @@ class Tester:
 
     def send(self, b):
         if self.serial_debug:
-            print("<- {:08b} {}".format(b, b))
+            print(f"<- {b:>08b} {b}")
         data = bytes([b])
         self.s.write(data)
 
     def recv(self):
         b = ord(self.s.read(1))
         if self.serial_debug:
-            print("-> {:08b} {}".format(b, b))
+            print(f"-> {b:>08b} {b}")
         return b
 
     def v2bin(self, tf):
@@ -123,10 +123,11 @@ class Tester:
         used = self.v2bin(self.get_used_pins(test))
         inputs = self.v2bin(self.get_input_pins(test))
         pullup = self.v2bin(self.get_pullup_pins(test))
+
         if self.debug:
-            print("  Used pins: {:024b}".format(used))
-            print(" Input pins: {:024b}".format(inputs))
-            print("Pullup pins: {:024b}".format(pullup))
+            print(f"  Used pins: A: {used>>16:>08b} B: {(used>>8) & 0xff:>08b} C: {used & 0xff:>08b}")
+            print(f" Input pins: A: {inputs>>16:>08b} B: {(inputs>>8) & 0xff:>08b} C: {inputs & 0xff:>08b}")
+            print(f"Pullup pins: A: {pullup>>16:>08b} B: {(pullup>>8) & 0xff:>08b} C: {pullup & 0xff:>08b}")
 
         self.send(Tester.CMD_SETUP)
         for shift in [16, 8, 0]:
@@ -162,7 +163,7 @@ class Tester:
                 body.extend(self.sequentialize(t))
 
         if self.debug:
-            print("Test len: {}".format(len(body)))
+            print(f"Test len: {len(body)} vectors")
 
         assert len(body) <= Tester.MAX_LEN
 
@@ -177,20 +178,24 @@ class Tester:
             v_port = self.vector_by_port(all_pins, v[0] + v[1])
             v_port_bin = self.v2bin(v_port)
             if self.debug:
-                print("Input vector: {}".format(v))
-                print("Port-ordered vector: {}".format(v_port))
-                print("Port-ordered vector: {:024b}".format(v_port_bin))
+                print(f"Vector: {v[0]} -> {v[1]} Ports: "
+                    f"A: {v_port_bin>>16:>08b} "
+                    f"B: {(v_port_bin>>8) & 0xff:>08b} "
+                    f"C: {v_port_bin & 0xff:>08b}"
+                )
             for shift in [16, 8, 0]:
                 self.send((v_port_bin >> shift) & 0xff)
 
         if self.recv() != Tester.RES_OK:
             raise RuntimeError("Upload failed")
 
-    def run(self, test, loop_pow):
+    def run(self, loop_pow):
         assert loop_pow < 16
-
-        self.setup(test)
-        self.upload(test)
         self.send(Tester.CMD_RUN)
         self.send(loop_pow)
         return self.recv()
+
+    def exec_test(self, test, loop_pow):
+        self.setup(test)
+        self.upload(test)
+        return self.run(loop_pow)
