@@ -3,6 +3,6 @@ fw/*.o
 fw/*.out
 fw/*.hex
 fw/*.out.map
-tool/*.pyc
-tool/__pycache__
+*.pyc
+__pycache__
 *.swp

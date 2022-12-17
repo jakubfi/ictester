@@ -8,11 +8,12 @@ import re
 from tester import Tester
 from parts import catalog
 
+
 # ------------------------------------------------------------------------
 def list_tests():
-    for part_name in catalog.names():
-        part = catalog.part(part_name)
-        print(f"{part.name} ({part.full_package_name}): {part.desc}")
+    parts = sorted(catalog.items(), key=lambda x: int(re.sub("74[HS]", "74", x[0])))
+    for name, part in parts:
+        print(f"{name:7s} {part.full_package_name:15s} {part.desc}")
 
 # ------------------------------------------------------------------------
 def print_part_info(part):
@@ -21,6 +22,7 @@ def print_part_info(part):
         print(f"{WARN}WARNING: missing tests: {part.missing_tests}{ENDC}")
     if part.unusual_power:
         print(f"{WARN}WARNING: unusual pins used for power. Make sure to use the correct socket.{ENDC}")
+
 
 # ------------------------------------------------------------------------
 # --- Main ---------------------------------------------------------------
@@ -45,7 +47,7 @@ parser.add_argument('part', help='Part symbol')
 args = parser.parse_args()
 
 try:
-    part = catalog.part(args.part)
+    part = catalog[args.part]
 except KeyError:
     print(f"Part not found: {args.part}")
     print("Use --list to list all supported parts")

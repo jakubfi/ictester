@@ -30,17 +30,7 @@ import re
 
 from . import *
 
-class Catalog:
-    def __init__(self):
-        self.parts = {}
-        for i in inspect.getmembers(sys.modules["parts"], lambda x: inspect.ismodule(x)):
-            for j in inspect.getmembers(i[1], lambda x: inspect.isclass(x) and x.__name__.startswith("Part")):
-                self.parts[j[1].name] = j[1]()
-
-    def names(self):
-        return sorted(self.parts, key=lambda t: int(re.sub("74[HS]", "74", t[0])))
-
-    def part(self, name):
-        return self.parts[name]
-
-catalog = Catalog()
+catalog = {}
+for i in inspect.getmembers(sys.modules["parts"], lambda x: inspect.ismodule(x)):
+    for j in inspect.getmembers(i[1], lambda x: inspect.isclass(x) and x.__name__.startswith("Part")):
+        catalog[j[1].name] = j[1]()
