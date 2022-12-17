@@ -66,7 +66,7 @@ class Part:
 
 
 # ------------------------------------------------------------------------
-class PartDIP14(Part):
+class PackageDIP14(Part):
     package_name = "DIP14"
     pincount = 14
     package_pins = {
@@ -76,7 +76,7 @@ class PartDIP14(Part):
 
 
 # ------------------------------------------------------------------------
-class PartDIP14_vcc5(Part):
+class PackageDIP14_vcc5(Part):
     package_name = "DIP14"
     pincount = 14
     package_pins = {
@@ -86,7 +86,7 @@ class PartDIP14_vcc5(Part):
 
 
 # ------------------------------------------------------------------------
-class PartDIP14_vcc4(Part):
+class PackageDIP14_vcc4(Part):
     package_name = "DIP14"
     pincount = 14
     package_pins = {
@@ -96,7 +96,7 @@ class PartDIP14_vcc4(Part):
 
 
 # ------------------------------------------------------------------------
-class PartDIP16(Part):
+class PackageDIP16(Part):
     package_name = "DIP16"
     pincount = 16
     package_pins = {
@@ -106,7 +106,7 @@ class PartDIP16(Part):
 
 
 # ------------------------------------------------------------------------
-class PartDIP16_rotated(Part):
+class PackageDIP16_rotated(Part):
     package_name = "DIP16"
     pincount = 16
     package_pins = {
@@ -116,7 +116,7 @@ class PartDIP16_rotated(Part):
 
 
 # ------------------------------------------------------------------------
-class PartDIP16_vcc5(Part):
+class PackageDIP16_vcc5(Part):
     package_name = "DIP16"
     pincount = 16
     package_pins = {
@@ -126,7 +126,7 @@ class PartDIP16_vcc5(Part):
 
 
 # ------------------------------------------------------------------------
-class PartDIP24(Part):
+class PackageDIP24(Part):
     package_name = "DIP24"
     pincount = 24
     package_pins = {
@@ -169,7 +169,7 @@ class Test():
             (val >> (bitlen-pos-1)) & 1
             for pos in range(0, bitlen)
         ]
-    
+
     # ------------------------------------------------------------------------
     # Get all bit combinations for given bit length
     # binary_combinator(2) -> [[0, 0], [0, 1], [1, 0], [1, 1]]
@@ -179,7 +179,7 @@ class Test():
             Test.bin2vec(v, bitlen)
             for v in range(0, 2**bitlen)
         ]
-    
+
     # ------------------------------------------------------------------------
     # Prepare test vectors for unit_cnt separate units with input_cnt inputs doing fun
     # Units are tested inm parallel

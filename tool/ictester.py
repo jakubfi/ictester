@@ -6,14 +6,13 @@ import math
 import re
 
 from tester import Tester
-import parts
+from parts import catalog
 
 # ------------------------------------------------------------------------
 def list_tests():
-    names = sorted(parts.catalog.keys(), key=lambda x: int(re.sub("74[HLS]", "74", x)))
-    for name in names:
-        p = parts.catalog[name]()
-        print(f"{p.name} ({p.full_package_name}): {p.desc}")
+    for part_name in catalog.names():
+        part = catalog.part(part_name)
+        print(f"{part.name} ({part.full_package_name}): {part.desc}")
 
 # ------------------------------------------------------------------------
 def print_part_info(part):
@@ -46,7 +45,7 @@ parser.add_argument('part', help='Part symbol')
 args = parser.parse_args()
 
 try:
-    part = parts.catalog[args.part]()
+    part = catalog.part(args.part)
 except KeyError:
     print(f"Part not found: {args.part}")
     print("Use --list to list all supported parts")
