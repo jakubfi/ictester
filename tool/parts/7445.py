@@ -1,7 +1,6 @@
-from prototypes import (PackageDIP16, Pin, Test)
-Part7442 = __import__('parts.7442', fromlist=['Part7442']).Part7442
+from prototypes import (Pin, partimport)
 
-class Part7445(Part7442):
+class Part7445(partimport("7442")):
     name = "7445"
     desc = "BCD-to-decimal decoders/drivers"
     pin_cfg = {

@@ -1,7 +1,6 @@
-from prototypes import Pin
-Part7410 = __import__('parts.7410', fromlist=['Part7410']).Part7410
+from prototypes import (Pin, partimport)
 
-class Part7412(Part7410):
+class Part7412(partimport("7410")):
     name = "7412"
     desc = "Triple 3-input positive-NAND gates with open-collector outputs"
     pin_cfg = {

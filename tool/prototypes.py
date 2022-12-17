@@ -1,4 +1,15 @@
 from functools import reduce
+import inspect
+
+# ------------------------------------------------------------------------
+def partimport(part_name):
+    '''
+    Since module names cannot start with a number... Nasty hack time!
+    '''
+    part_module = __import__(f'parts.{part_name}', fromlist=[f'Part{part_name}'])
+    class_list = inspect.getmembers(part_module, lambda x: inspect.isclass(x) and x.__name__ == f'Part{part_name}')
+    assert len(class_list) == 1
+    return class_list[0][1]
 
 # ------------------------------------------------------------------------
 class Pin:

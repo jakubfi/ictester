@@ -1,7 +1,6 @@
-from prototypes import Test
-Part7405 = __import__('parts.7405', fromlist=['Part7405']).Part7405
+from prototypes import (Test, partimport)
 
-class Part7407(Part7405):
+class Part7407(partimport("7405")):
     name = "7407"
     desc = "Hex Buffers/Drivers With Open-Collector High-Voltage Outputs"
     tests = [

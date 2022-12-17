@@ -1,7 +1,6 @@
-from prototypes import (Pin, Test)
-Part7489 = __import__('parts.7489', fromlist=['Part7489']).Part7489
+from prototypes import (Pin, Test, partimport)
 
-class Part780101(Part7489):
+class Part780101(partimport("7489")):
     name = "780101"
     '''
     Similar to 7489. Same pinout, but differences in behavior:

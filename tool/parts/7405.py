@@ -1,7 +1,6 @@
-from prototypes import Pin
-Part7404 = __import__('parts.7404', fromlist=['Part7404']).Part7404
+from prototypes import (Pin, partimport)
 
-class Part7405(Part7404):
+class Part7405(partimport("7404")):
     name = "7405"
     desc = "Hex inverters with open collector outputs"
     pin_cfg = {

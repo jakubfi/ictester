@@ -1,7 +1,6 @@
-from prototypes import Pin
-Part74155 = __import__('parts.74155', fromlist=['Part74155']).Part74155
+from prototypes import (Pin, partimport)
 
-class Part74156(Part74155):
+class Part74156(partimport("74155")):
     name = "74156"
     desc = "Dual 2-line to 4-line decoders/demultiplexers"
     pin_cfg = {
