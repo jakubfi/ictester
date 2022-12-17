@@ -39,14 +39,15 @@ class Part:
         assert self.name
         assert self.desc
         assert self.package_name
+        assert self.tests
 
         for p in self.pin_cfg:
             if p in self.package_pins:
-                raise RuntimeError(f"Duplicate pin {p} definition")
+                raise RuntimeError(f"Duplicate pin {p} definition for {self.name}")
 
         pin_cfg_roles = [p.role for p in self.pin_cfg.values()]
         if Pin.VCC in pin_cfg_roles or Pin.GND in pin_cfg_roles:
-            raise RuntimeError("VCC/GND pins should not be configured for a part. Package classes provide this.")
+            raise RuntimeError(f"VCC/GND pins should not be configured for {self.name}. Package classes provide this.")
 
         self.pins = {}
         self.pins.update(self.package_pins)

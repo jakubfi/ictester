@@ -52,14 +52,9 @@ class Tester:
 
     def __init__(self, part, port, speed, debug=False, serial_debug=False):
         self.part = part
-        # accept either test list or gen_tests() method
-        try:
-            self.part.gen_tests()
-        except AttributeError:
-            assert self.part.tests
 
-        # no duplicate names allowed
-        assert len(self.tests_available()) == len(set(self.tests_available()))
+        if len(self.tests_available()) != len(set(self.tests_available())):
+            raise RuntimeError(f"Test names for part {part.name} are not unique")
 
         self.debug = debug
         self.serial_debug = serial_debug
