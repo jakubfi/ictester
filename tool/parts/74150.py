@@ -27,10 +27,11 @@ class Part74150(PackageDIP24):
         22: Pin("E9", Pin.IN),
         23: Pin("E8", Pin.IN),
     }
+
     default_inputs = [11, 13, 14, 15,  9,  8, 7, 6, 5, 4, 3, 2, 1, 23, 22, 21, 20, 19, 18, 17, 16]
     default_outputs = [10]
-    test_select_0 = Test("Select 0", Test.COMB,
-        inputs=default_inputs, outputs=default_outputs,
+
+    test_select_0 = Test("Select 0", Test.COMB, default_inputs, default_outputs,
         body=[
             [Test.bin2vec(addr, 4) + [0] + Test.bin2vec(~(1<<(15-addr)), 16), [1]]
             for addr in range(0, 15)
@@ -54,4 +55,5 @@ class Part74150(PackageDIP24):
             for addr in Test.binary_combinator(4)
         ]
     )
+
     tests = [test_select_0, test_select_1, test_inhibit_0, test_inhibit_1]

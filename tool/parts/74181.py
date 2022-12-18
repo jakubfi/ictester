@@ -29,6 +29,8 @@ class Part74181(PackageDIP24):
         23: Pin("A1", Pin.IN),
     }
 
+    missing_tests = "outputs G, P are not tested"
+
     # ------------------------------------------------------------------------
     def logic_test_gen(s, name, fun):
         Vector = namedtuple('Vector', ['a', 'b', 'f'])
@@ -50,11 +52,9 @@ class Part74181(PackageDIP24):
             for v in data
         ]
 
-        return Test(
-            name=name,
+        return Test(name, Test.COMB,
             inputs=[8,  3, 4, 5, 6,  19, 21, 23, 2,  18, 20, 22, 1],
             outputs=[13, 11, 10, 9, 14],
-            ttype=Test.COMB,
             loops=32,
             body=body,
         )
@@ -80,15 +80,13 @@ class Part74181(PackageDIP24):
             ]
             for v in data
         ]
-        return Test(
-            name=name,
+        return Test(name, Test.COMB,
             inputs=[8,  3, 4, 5, 6,  7,  19, 21, 23, 2,  18, 20, 22, 1],
             outputs=[13, 11, 10, 9, 16, 14],
-            ttype=Test.COMB,
             loops=32,
             body=body
         )
-    missing_tests = "outputs G, P are not tested"
+
     tests = [
         logic_test_gen(0, "Logic: F = ~A", lambda a, b: ~a),
         logic_test_gen(1, "Logic: F = ~(A|B)", lambda a, b: ~(a | b)),

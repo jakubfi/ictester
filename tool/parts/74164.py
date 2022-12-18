@@ -17,11 +17,10 @@ class Part74164(PackageDIP14):
         12: Pin("QG", Pin.OUT),
         13: Pin("QH", Pin.OUT),
     }
-    test_all = Test(
-        name="Complete logic",
+
+    test_all = Test("Complete logic", Test.SEQ,
         inputs=[9, 8,  1, 2],
         outputs=[3, 4, 5, 6, 10, 11, 12, 13],
-        ttype=Test.SEQ,
         body=[
             # clear
             [[0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0]],
@@ -47,4 +46,5 @@ class Part74164(PackageDIP14):
             [[0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0]],
         ]
     )
+
     tests = [test_all]

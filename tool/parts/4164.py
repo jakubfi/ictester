@@ -26,51 +26,31 @@ class Part4164(PackageDIP16_rotated):
         14: Pin("Dout", Pin.OUT),
         15: Pin("~CAS", Pin.IN),
     }
-    test_bit_all_0 = Test(
-        name="Single bit: all 0s",
-        inputs=[2, 3, 4, 5, 6, 7, 9, 10, 11, 12, 13, 15],
-        outputs=[14],
-        ttype=Test.MEM,
+
+    default_inputs = [2, 3, 4, 5, 6, 7, 9, 10, 11, 12, 13, 15]
+    default_outputs = [14]
+
+    test_bit_all_0 = Test("Single bit: all 0s", Test.MEM, default_inputs, default_outputs,
         tsubtype=TEST_BIT_ALL_0,
         loops=1,
     )
-    test_bit_all_1 = Test(
-        name="Single bit: all 1s",
-        inputs=[2, 3, 4, 5, 6, 7, 9, 10, 11, 12, 13, 15],
-        outputs=[14],
-        ttype=Test.MEM,
+    test_bit_all_1 = Test("Single bit: all 1s", Test.MEM, default_inputs, default_outputs,
         tsubtype=TEST_BIT_ALL_1,
         loops=1,
     )
-    test_row_all_0 = Test(
-        name="Page mode: all 0s",
-        inputs=[2, 3, 4, 5, 6, 7, 9, 10, 11, 12, 13, 15],
-        outputs=[14],
-        ttype=Test.MEM,
+    test_row_all_0 = Test("Page mode: all 0s", Test.MEM, default_inputs, default_outputs,
         tsubtype=TEST_ROW_ALL_0,
         loops=1,
     )
-    test_row_all_1 = Test(
-        name="Page mode: all 1s",
-        inputs=[2, 3, 4, 5, 6, 7, 9, 10, 11, 12, 13, 15],
-        outputs=[14],
-        ttype=Test.MEM,
+    test_row_all_1 = Test("Page mode: all 1s", Test.MEM, default_inputs, default_outputs,
         tsubtype=TEST_ROW_ALL_1,
         loops=1,
     )
-    test_row_alternate_01 = Test(
-        name="Page mode: alternating 0/1",
-        inputs=[2, 3, 4, 5, 6, 7, 9, 10, 11, 12, 13, 15],
-        outputs=[14],
-        ttype=Test.MEM,
+    test_row_alternate_01 = Test("Page mode: alternating 0/1", Test.MEM, default_inputs, default_outputs,
         tsubtype=TEST_ROW_ALTERNATE_01,
         loops=1,
     )
-    test_row_alternate_10 = Test(
-        name="Page mode: alternating 1/0",
-        inputs=[2, 3, 4, 5, 6, 7, 9, 10, 11, 12, 13, 15],
-        outputs=[14],
-        ttype=Test.MEM,
+    test_row_alternate_10 = Test("Page mode: alternating 1/0", Test.MEM, default_inputs, default_outputs,
         tsubtype=TEST_ROW_ALTERNATE_10,
         loops=1,
     )

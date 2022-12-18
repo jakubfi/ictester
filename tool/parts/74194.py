@@ -20,11 +20,10 @@ class Part74194(PackageDIP16):
         15: Pin("QA", Pin.OUT),
     }
 
-    test_load = Test(
-        name="Load",
-        inputs=[1,  10, 9,  11,  7, 2,  3, 4, 5, 6],
-        outputs=[15, 14, 13, 12],
-        ttype=Test.SEQ,
+    default_inputs = [1,  10, 9,  11,  7, 2,  3, 4, 5, 6]
+    default_outputs = [15, 14, 13, 12]
+
+    test_load = Test("Load", Test.SEQ, default_inputs, default_outputs,
         body=[
             # load 1's
             [[1,  1, 1,  '+',  0, 0,  1, 1, 1, 1], [1, 1, 1, 1]],
@@ -37,11 +36,7 @@ class Part74194(PackageDIP16):
 
         ]
     )
-    test_shright = Test(
-        name="Shift right",
-        inputs=[1,  10, 9,  11,  7, 2,  3, 4, 5, 6],
-        outputs=[15, 14, 13, 12],
-        ttype=Test.SEQ,
+    test_shright = Test("Shift right", Test.SEQ, default_inputs, default_outputs,
         body=[
             # shift right, insert 1's
             [[1,  0, 1,  '+',  0, 1,  0, 0, 0, 0], [1, 0, 0, 0]],
@@ -55,11 +50,7 @@ class Part74194(PackageDIP16):
             [[1,  0, 1,  '+',  1, 0,  1, 1, 1, 1], [0, 0, 0, 0]],
         ]
     )
-    test_shleft = Test(
-        name="Shift left",
-        inputs=[1,  10, 9,  11,  7, 2,  3, 4, 5, 6],
-        outputs=[15, 14, 13, 12],
-        ttype=Test.SEQ,
+    test_shleft = Test("Shift left", Test.SEQ, default_inputs, default_outputs,
         body=[
             # shift left, insert 1's
             [[1,  1, 0,  '+',  1, 0,  0, 0, 0, 0], [0, 0, 0, 1]],
@@ -74,11 +65,7 @@ class Part74194(PackageDIP16):
 
         ]
     )
-    test_clear = Test(
-        name="Clear",
-        inputs=[1,  10, 9,  11,  7, 2,  3, 4, 5, 6],
-        outputs=[15, 14, 13, 12],
-        ttype=Test.SEQ,
+    test_clear = Test("Clear", Test.SEQ, default_inputs, default_outputs,
         body=[
             # load 1's
             [[1,  1, 1,  '+',  0, 0,  1, 1, 1, 1], [1, 1, 1, 1]],

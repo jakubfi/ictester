@@ -26,11 +26,10 @@ class Part7462(PackageDIP14):
         12: Pin("I", Pin.IN),
         13: Pin("J", Pin.IN),
     }
-    test_async = Test(
-        name="Asynchronous operation",
+
+    test_async = Test("Asynchronous operation", Test.COMB,
         inputs=[8,  1, 2,  3, 4, 5,  9, 10, 11,  12, 13],
         outputs=[6],
-        ttype=Test.COMB,
         loops = 64,
         body = [
             [
@@ -39,4 +38,5 @@ class Part7462(PackageDIP14):
             ] for i in Test.binary_combinator(10)
         ]
     )
+
     tests = [test_async]

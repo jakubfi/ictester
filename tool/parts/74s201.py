@@ -27,33 +27,24 @@ class Part74S201(PackageDIP16):
             for addr in range(0, 256)
         ]
 
-    test_rw = Test(
-        name="R/W all address space",
-        inputs=[12,  3, 4, 5,  1, 2, 15, 7, 9, 10, 11, 14,  13],
-        outputs=[6],
-        ttype=Test.COMB,
+    default_inputs = [12,  3, 4, 5,  1, 2, 15, 7, 9, 10, 11, 14,  13]
+    default_outputs = [6]
+
+    test_rw = Test("R/W all address space", Test.COMB, default_inputs, default_outputs,
         loops=32,
         body= for_all_addr(0,  0, 0, 0,  0,  1)  # write '0', output = high impedance
             + for_all_addr(1,  0, 0, 0,  0,  1)  # read, output = '1'
             + for_all_addr(0,  0, 0, 0,  1,  1)  # write '1', output = high impedance
             + for_all_addr(1,  0, 0, 0,  0,  0)  # read, output = '0'
     )
-    test_inhibit_read = Test(
-        name="Inhibit read",
-        inputs=[12,  3, 4, 5,  1, 2, 15, 7, 9, 10, 11, 14,  13],
-        outputs=[6],
-        ttype=Test.COMB,
+    test_inhibit_read = Test("Inhibit read", Test.COMB, default_inputs, default_outputs,
         loops=32,
         body= for_all_addr(0,  0, 0, 0,  1,  1)  # write '1', output = high impedance
             + for_all_addr(1,  0, 0, 1,  0,  1)  # inhibit read, output = high impedance
             + for_all_addr(1,  0, 1, 0,  0,  1)  # inhibit read, output = high impedance
             + for_all_addr(1,  1, 0, 0,  0,  1)  # inhibit read, output = high impedance
     )
-    test_inhibit_write = Test(
-        name="Inhibit write",
-        inputs=[12,  3, 4, 5,  1, 2, 15, 7, 9, 10, 11, 14,  13],
-        outputs=[6],
-        ttype=Test.COMB,
+    test_inhibit_write = Test("Inhibit write", Test.COMB, default_inputs, default_outputs,
         loops=32,
         body= for_all_addr(0,  0, 0, 0,  1,  1)  # write '1', output = high impedance
             + [[[1, 1, 1, 1,  0, 0, 0, 0, 0, 0, 0, 0,  0], [1]]]  # set inhibit
@@ -62,4 +53,3 @@ class Part74S201(PackageDIP16):
     )
 
     tests = [test_rw, test_inhibit_read, test_inhibit_write]
-

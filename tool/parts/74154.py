@@ -27,8 +27,10 @@ class Part74154(PackageDIP24):
         22: Pin("B", Pin.IN),
         23: Pin("A", Pin.IN),
     }
+
     default_inputs = [18, 19,  20, 21, 22, 23]
     default_outputs = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 14, 15, 16, 17]
+
     test_inhibit = Test("Inhibit", Test.COMB, default_inputs, default_outputs,
         body=[
             [select + addr, 16*[1]]
@@ -42,4 +44,5 @@ class Part74154(PackageDIP24):
             for addr in range(0, 16)
         ]
     )
+
     tests = [test_select, test_inhibit]

@@ -17,11 +17,11 @@ class Part7486(PackageDIP14):
         12: Pin("4A", Pin.IN),
         13: Pin("4B", Pin.IN),
     }
-    test_all = Test(
-        name="Complete logic",
+
+    test_all = Test("Complete logic", Test.COMB,
         inputs=[1, 2, 4, 5, 10, 9, 13, 12],
         outputs=[3, 6, 8, 11],
-        ttype=Test.COMB,
         body=Test.binary_fun_gen(4, 2, lambda a, b: a ^ b)
     )
+
     tests = [test_all]

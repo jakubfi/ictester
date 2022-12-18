@@ -19,11 +19,10 @@ class Part74148(PackageDIP16):
         14: Pin("GS", Pin.OUT),
         15: Pin("E0", Pin.OUT),
     }
-    test_all = Test(
-        name="Complete logic",
+
+    test_all = Test("Complete logic", Test.COMB,
         inputs=[5,  10, 11, 12, 13, 1, 2, 3, 4],
         outputs=[6, 7, 9, 14, 15],
-        ttype=Test.COMB,
         body=[
             [[1,  0, 0, 0, 0, 0, 0, 0, 0], [1, 1, 1,  1, 1]],
             [[1,  1, 1, 1, 1, 1, 1, 1, 1], [1, 1, 1,  1, 1]],
@@ -50,4 +49,5 @@ class Part74148(PackageDIP16):
 
         ]
     )
+
     tests = [test_all]

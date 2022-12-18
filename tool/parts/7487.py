@@ -17,8 +17,10 @@ class Part7487(PackageDIP14):
         12: Pin("Y4", Pin.OUT),
         13: Pin("A4", Pin.IN),
     }
-    default_inputs=[8, 1,  2, 5, 10, 13]
-    default_outputs=[3, 6, 9, 12]
+
+    default_inputs = [8, 1,  2, 5, 10, 13]
+    default_outputs = [3, 6, 9, 12]
+
     test_true = Test("True", Test.COMB, default_inputs, default_outputs,
         body=[
             [[0, 1] + Test.bin2vec(i, 4), Test.bin2vec(i, 4)]

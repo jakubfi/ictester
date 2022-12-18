@@ -17,12 +17,12 @@ class Part7453(PackageDIP14):
         12: Pin("~X", Pin.NC),
         13: Pin("A2", Pin.IN),
     }
+
     missing_tests = "Gate expansion is not tested"
-    test_async = Test(
-        name="Asynchronous operation",
+
+    test_async = Test("Asynchronous operation", Test.COMB,
         inputs=[1, 13, 2, 3, 4, 5, 6, 9, 10],
         outputs=[8],
-        ttype=Test.COMB,
         loops=256,
         body=[
             [
@@ -31,4 +31,5 @@ class Part7453(PackageDIP14):
             ] for i in Test.binary_combinator(8)
         ]
     )
+
     tests = [test_async]

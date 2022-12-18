@@ -19,11 +19,9 @@ class Part7413(PackageDIP14):
     }
 
     tests = [
-        Test(
-            name="Complete logic",
+        Test("Complete logic", Test.COMB,
             inputs=[1, 2, 4, 5, 13, 12, 10, 9],
             outputs=[6, 8],
-            ttype=Test.COMB,
             body=Test.binary_fun_gen(2, 4, lambda a, b: a & b, inverted=True)
         )
     ]

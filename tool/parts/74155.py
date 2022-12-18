@@ -19,8 +19,10 @@ class Part74155(PackageDIP16):
         14: Pin("~2G", Pin.IN),
         15: Pin("~2C", Pin.IN),
     }
+
     default_inputs = [3, 13,  2, 1,  14, 15]
     default_outputs = [7, 8, 5, 4,  9, 10, 11, 12]
+
     test_inhibit = Test("Inhibit", Test.COMB, default_inputs, default_outputs,
         body=[
             [addr + [1, data, 1, data], 8*[1]]
@@ -40,4 +42,5 @@ class Part74155(PackageDIP16):
             for addr in range(0, 4)
         ]
     )
+
     tests = [test_select_0, test_select_1, test_inhibit]

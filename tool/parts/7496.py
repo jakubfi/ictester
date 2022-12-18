@@ -20,11 +20,10 @@ class Part7496(PackageDIP16_vcc5):
         16: Pin("CLR", Pin.IN),
     }
 
-    test_preset = Test(
-        name="Preset",
-        inputs=[16, 8,  2, 3, 4, 6, 7,  1, 9],
-        outputs=[15, 14, 13, 11, 10],
-        ttype=Test.COMB,
+    default_inputs = [16, 8,  2, 3, 4, 6, 7,  1, 9]
+    default_outputs = [15, 14, 13, 11, 10]
+
+    test_preset = Test("Preset", Test.COMB, default_inputs, default_outputs,
         body=[
             # preset all 1
             [[1, 1,  1, 1, 1, 1, 1,  0, 0], [1, 1, 1, 1, 1]],
@@ -43,12 +42,7 @@ class Part7496(PackageDIP16_vcc5):
             [[1, 0,  1, 1, 1, 1, 1,  0, 0], [0, 1, 0, 1, 0]],
         ]
     )
-
-    test_clear = Test(
-        name="Clear",
-        inputs=[16, 8,  2, 3, 4, 6, 7,  1, 9],
-        outputs=[15, 14, 13, 11, 10],
-        ttype=Test.COMB,
+    test_clear = Test("Clear", Test.COMB, default_inputs, default_outputs,
         body=[
             # preset/clear
             [[1, 1,  1, 1, 1, 1, 1,  0, 0], [1, 1, 1, 1, 1]],
@@ -61,12 +55,7 @@ class Part7496(PackageDIP16_vcc5):
             [[0, 0,  1, 1, 1, 1, 1,  0, 0], [0, 0, 0, 0, 0]],
         ]
     )
-
-    test_serial_in = Test(
-        name="Serial in",
-        inputs=[16, 8,  2, 3, 4, 6, 7,  1, 9],
-        outputs=[15, 14, 13, 11, 10],
-        ttype=Test.COMB,
+    test_serial_in = Test("Serial in", Test.COMB, default_inputs, default_outputs,
         body=[
             # clear, preset known
             [[0, 0,  0, 0, 0, 0, 0,  0, 0], [0, 0, 0, 0, 0]],
@@ -94,8 +83,4 @@ class Part7496(PackageDIP16_vcc5):
         ]
     )
 
-    tests = [
-        test_preset,
-        test_clear,
-        test_serial_in,
-    ]
+    tests = [test_preset, test_clear, test_serial_in]

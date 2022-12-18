@@ -17,21 +17,17 @@ class Part7495(PackageDIP14):
         12: Pin("QB", Pin.OUT),
         13: Pin("QA", Pin.OUT),
     }
-    test_load = Test(
-        name="Parallel load",
-        inputs=[6, 8, 9, 1, 2, 3, 4, 5],
-        outputs=[13, 12, 11, 10],
-        ttype=Test.SEQ,
+
+    default_inputs = [6, 8, 9, 1, 2, 3, 4, 5]
+    default_outputs = [13, 12, 11, 10]
+
+    test_load = Test("Parallel load", Test.SEQ, default_inputs, default_outputs,
         body=[
             [[1, '-', 0, 0, 1, 1, 1, 1], [1, 1, 1, 1]],
             [[1, '-', 0, 0, 0, 0, 0, 0], [0, 0, 0, 0]],
         ]
     )
-    test_rshift = Test(
-        name="Right Shift",
-        inputs=[6, 8, 9, 1, 2, 3, 4, 5],
-        outputs=[13, 12, 11, 10],
-        ttype=Test.SEQ,
+    test_rshift = Test("Right Shift", Test.SEQ, default_inputs, default_outputs,
         body=[
             # set known starting value
             [[1, '-', 0, 0, 0, 0, 0, 0], [0, 0, 0, 0]],
@@ -48,4 +44,5 @@ class Part7495(PackageDIP14):
             [[0, 0, '-', 0, 0, 0, 0, 0], [0, 0, 0, 0]],
         ]
     )
+
     tests = [test_load, test_rshift]

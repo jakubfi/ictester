@@ -17,24 +17,21 @@ class Part7474(PackageDIP14):
         12: Pin("2D", Pin.IN),
         13: Pin("~2CLR", Pin.IN),
     }
-    test_sync = Test(
-        name="Synchronous operation",
-        inputs=[1, 4, 2, 3, 13, 10, 12, 11],
-        outputs=[5, 6, 9, 8],
-        ttype=Test.SEQ,
+
+    default_inputs = [1, 4, 2, 3, 13, 10, 12, 11]
+    default_outputs = [5, 6, 9, 8]
+
+    test_sync = Test("Synchronous operation", Test.SEQ, default_inputs, default_outputs,
         body=[
             [[1, 1, 0, '+',  1, 1, 0, '+'], [0, 1,  0, 1]],
             [[1, 1, 1, '+',  1, 1, 1, '+'], [1, 0,  1, 0]],
         ]
     )
-    test_async = Test(
-        name="Asynchronous operation",
-        inputs=[1, 4, 2, 3, 13, 10, 12, 11],
-        outputs=[5, 6, 9, 8],
-        ttype=Test.COMB,
+    test_async = Test("Asynchronous operation", Test.COMB, default_inputs, default_outputs,
         body=[
             [[0, 1, 0, 0,  0, 1, 0, 0], [0, 1,  0, 1]],
             [[1, 0, 0, 0,  1, 0, 0, 0], [1, 0,  1, 0]],
         ]
     )
+
     tests = [test_sync, test_async]

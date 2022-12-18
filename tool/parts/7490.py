@@ -17,11 +17,11 @@ class Part7490(PackageDIP14_vcc5):
         13: Pin("NC", Pin.NC),
         14: Pin("CKA", Pin.IN),
     }
-    test_resets = Test(
-        name="Resets",
-        inputs=[2, 3,  6, 7,  14, 1],
-        outputs=[12, 9, 8, 11],
-        ttype=Test.COMB,
+
+    default_inputs = [2, 3,  6, 7,  14, 1]
+    default_outputs = [12, 11, 8, 9]
+
+    test_resets = Test("Resets", Test.COMB, default_inputs, default_outputs,
         body=[
             # resets
             [[1, 1,  0, 0,  0, 0], [0, 0, 0, 0]],
@@ -32,11 +32,7 @@ class Part7490(PackageDIP14_vcc5):
             [[1, 1,  1, 1,  0, 0], [1, 0, 0, 1]],
         ]
     )
-    test_count_cka = Test(
-        name="Count CKA",
-        inputs=[2, 3,  6, 7,  14, 1],
-        outputs=[12, 11, 8, 9],
-        ttype=Test.SEQ,
+    test_count_cka = Test("Count CKA", Test.SEQ, default_inputs, default_outputs,
         body=[
             # reset
             [[1, 1,  0, 0,  0, 0], [0, 0, 0, 0]],
@@ -46,11 +42,7 @@ class Part7490(PackageDIP14_vcc5):
             [[0, 0,  0, 0,  '-', 0], [1, 0, 0, 0]],
         ]
     )
-    test_count_ckb = Test(
-        name="Count CKB",
-        inputs=[2, 3,  6, 7,  14, 1],
-        outputs=[12, 11, 8, 9],
-        ttype=Test.SEQ,
+    test_count_ckb = Test("Count CKB", Test.SEQ, default_inputs, default_outputs,
         body=[
             #reset
             [[1, 1,  0, 0,  0, 0], [0, 0, 0, 0]],
@@ -66,4 +58,5 @@ class Part7490(PackageDIP14_vcc5):
             [[0, 0,  0, 0,  0, '-'], [0, 0, 1, 1]],
         ]
     )
+
     tests = [test_resets, test_count_cka, test_count_ckb]

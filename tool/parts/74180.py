@@ -21,8 +21,10 @@ class Part74180(PackageDIP14):
         12: Pin("E", Pin.IN),
         13: Pin("F", Pin.IN),
     }
+
     default_inputs = [8, 9, 10, 11, 12, 13, 1, 2,  3, 4]
     default_outputs = [5, 6]
+
     test_valid_even = Test("Even upstream", Test.COMB, default_inputs, default_outputs,
         loops=64,
         body=[
@@ -45,4 +47,5 @@ class Part74180(PackageDIP14):
             for even_odd in [[1, 1], [0, 0]]
         ]
     )
+
     tests = [test_valid_even, test_valid_odd, test_invalid]

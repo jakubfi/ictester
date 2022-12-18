@@ -19,6 +19,7 @@ class Part7489(PackageDIP16):
         14: Pin("A2", Pin.IN),
         15: Pin("A1", Pin.IN),
     }
+
     # ------------------------------------------------------------------------
     def mem_rw_test_gen():
         # --------------------------------------------------------------------
@@ -46,11 +47,9 @@ class Part7489(PackageDIP16):
         for v in Test.binary_combinator(4):
             body.extend(rw_cycle(v))
 
-        return Test(
-            name="Complete array",
+        return Test("Complete array", Test.COMB,
             inputs=[1, 15, 14, 13,  4, 6, 10, 12,  2, 3],
             outputs=[5, 7, 9, 11],
-            ttype=Test.COMB,
             body=body,
             loops=256,
         )

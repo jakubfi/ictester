@@ -19,8 +19,10 @@ class Part74157(PackageDIP16):
         14: Pin("A4", Pin.IN),
         15: Pin("~G", Pin.IN),
     }
+
     default_inputs = [15, 1,  2, 3,  5, 6,  11, 10,  14, 13]
     default_outputs = [4, 7, 9, 12]
+
     test_inhibit = Test("Inhibit", Test.COMB, default_inputs, default_outputs,
         body=[
             [[1, addr] + 4 * data, 4*[0]]
@@ -35,4 +37,5 @@ class Part74157(PackageDIP16):
             for data in Test.binary_combinator(2)
         ]
     )
+
     tests = [test_select, test_inhibit]

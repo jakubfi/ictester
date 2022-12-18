@@ -19,11 +19,10 @@ class Part7447(PackageDIP16):
         14: Pin("g", Pin.OC),
         15: Pin("f", Pin.OC),
     }
-    test_async = Test(
-        name="Asynchronous operation",
+
+    test_async = Test("Asynchronous operation", Test.COMB,
         inputs=[6, 2, 1, 7,  3, 5, 4],
         outputs=[13, 12, 11, 10, 9, 15, 14],
-        ttype=Test.COMB,
         body=[
             # symbols
             [[0, 0, 0, 0,  1, 1, 1], [0, 0, 0, 0, 0, 0, 1]],
@@ -52,5 +51,5 @@ class Part7447(PackageDIP16):
             [[1, 1, 1, 1,  0, 1, 1], [0, 0, 0, 0, 0, 0, 0]],
         ]
     )
-    tests = [test_async]
 
+    tests = [test_async]

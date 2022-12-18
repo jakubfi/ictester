@@ -19,11 +19,10 @@ class Part7475(PackageDIP16_vcc5):
         15: Pin("2Q", Pin.OUT),
         16: Pin("1Q", Pin.OUT),
     }
-    test_async = Test(
-        name="Asynchronous operation",
+
+    test_async = Test("Asynchronous operation", Test.COMB,
         inputs=[2, 3, 13,  6, 7, 4],
         outputs=[16, 1,  15, 14,  10, 11,  9, 8],
-        ttype=Test.COMB,
         body=[
             [[0, 0, 1,  0, 0, 1], [0, 1,  0, 1,  0, 1,  0, 1]],
             [[1, 1, 0,  1, 1, 0], [0, 1,  0, 1,  0, 1,  0, 1]],
@@ -38,4 +37,5 @@ class Part7475(PackageDIP16_vcc5):
             [[0, 0, 0,  0, 0, 0], [1, 0,  1, 0,  1, 0,  1, 0]],
         ]
     )
+
     tests = [test_async]

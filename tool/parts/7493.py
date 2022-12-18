@@ -17,11 +17,10 @@ class Part7493(PackageDIP14_vcc5):
         13: Pin("NC", Pin.NC),
         14: Pin("CKA", Pin.IN),
     }
-    test_count = Test(
-        name="Count",
+
+    test_count = Test("Count", Test.SEQ,
         inputs=[2, 3,  14, 1],
         outputs=[12, 9, 8, 11],
-        ttype=Test.SEQ,
         body=[
             # reset
             [['-', '-',  0, 0], [0, 0, 0, 0]],
@@ -53,4 +52,5 @@ class Part7493(PackageDIP14_vcc5):
             [['-', 0,  0, 0], [0, 1, 1, 1]],
         ]
     )
+
     tests = [test_count]

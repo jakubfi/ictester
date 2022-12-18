@@ -19,11 +19,10 @@ class Part74182(PackageDIP16):
         14: Pin("~G2", Pin.IN),
         15: Pin("~P2", Pin.IN),
     }
-    test_g = Test(
-        name="~G",
+
+    test_g = Test("~G", Test.SEQ,
         inputs=[5, 14, 1, 3, 6, 15, 2],
         outputs=[10],
-        ttype=Test.SEQ,
         loops=64,
         body=[
             [
@@ -36,44 +35,36 @@ class Part74182(PackageDIP16):
             for v in Test.binary_combinator(7)
         ]
     )
-    test_p = Test(
-        name="~P",
+    test_p = Test("~P", Test.SEQ,
         inputs=[2, 4, 6, 15],
         outputs=[7],
-        ttype=Test.SEQ,
         loops=64,
         body=[
             [v, [0] if v == [0, 0, 0, 0] else [1]]
             for v in Test.binary_combinator(4)
         ]
     )
-    test_cnx = Test(
-        name="Cn+x",
+    test_cnx = Test("Cn+x", Test.SEQ,
         inputs=[3, 4, 13],
         outputs=[12],
-        ttype=Test.SEQ,
         loops=64,
         body=[
             [v, [1] if not v[0] or v[1:3] == [0, 1] else [0]]
             for v in Test.binary_combinator(3)
         ]
     )
-    test_cny = Test(
-        name="Cn+y",
+    test_cny = Test("Cn+y", Test.SEQ,
         inputs=[1, 3, 2, 4, 13],
         outputs=[11],
-        ttype=Test.SEQ,
         loops=64,
         body=[
             [v, [1] if not v[0] or v[1:3] == [0, 0] or v[2:5] == [0, 0, 1] else [0]]
             for v in Test.binary_combinator(5)
         ]
     )
-    test_cnz = Test(
-        name="Cn+z",
+    test_cnz = Test("Cn+z", Test.SEQ,
         inputs=[14, 1, 3, 15, 2, 4, 13],
         outputs=[9],
-        ttype=Test.SEQ,
         loops=64,
         body=[
             [v, [1] if not v[0] or (not v[1] and not v[3]) or v[2:5] == [0, 0, 0] or v[3:] == [0, 0, 0, 1] else [0]]

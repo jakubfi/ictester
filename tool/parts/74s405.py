@@ -20,21 +20,16 @@ class Part74S405(PackageDIP16):
         15: Pin("O0", Pin.OUT),
     }
 
-    test_select = Test(
-        name="Select",
-        inputs=[4, 5, 6,  3, 2, 1],
-        outputs=[7, 9, 10, 11, 12, 13, 14, 15],
-        ttype=Test.SEQ,
+    default_inputs = [4, 5, 6,  3, 2, 1]
+    default_outputs = [7, 9, 10, 11, 12, 13, 14, 15]
+
+    test_select = Test("Select", Test.SEQ, default_inputs, default_outputs,
         body=[
             [[0, 0, 1] + Test.bin2vec(i, 3), Test.bin2vec(~(1<<i), 8)]
             for i in range(0, 8)
         ]
     )
-    test_inhibit = Test(
-        name="Inhibit",
-        inputs=[4, 5, 6,  3, 2, 1],
-        outputs=[7, 9, 10, 11, 12, 13, 14, 15],
-        ttype=Test.SEQ,
+    test_inhibit = Test("Inhibit", Test.SEQ, default_inputs, default_outputs,
         body=[
             [Test.bin2vec(i, 3) + [0, 0, 0], 8*[1]]
             for i in set(range(0, 8)) - {1}  # all inhibit combinations

@@ -19,11 +19,11 @@ class Part74170(PackageDIP16):
         14: Pin("WA", Pin.IN),
         15: Pin("D1", Pin.IN),
     }
-    test_bits = Test(
-        name="Bit storage test",
-        inputs=[13, 14, 12,  4, 5, 11,  15, 1, 2, 3],
-        outputs=[10, 9, 7, 6],
-        ttype=Test.COMB,
+
+    default_inputs = [13, 14, 12,  4, 5, 11,  15, 1, 2, 3]
+    default_outputs = [10, 9, 7, 6]
+
+    test_bits = Test("Bit storage test", Test.COMB, default_inputs, default_outputs,
         body=[
             # R/W 0's
             [[0, 0, 0,  0, 0, 1,  0, 0, 0, 0], [1, 1, 1, 1]],
@@ -53,11 +53,7 @@ class Part74170(PackageDIP16):
         ]
     )
 
-    test_addr = Test(
-        name="Addressing test",
-        inputs=[13, 14, 12,  4, 5, 11,  15, 1, 2, 3],
-        outputs=[10, 9, 7, 6],
-        ttype=Test.COMB,
+    test_addr = Test("Addressing test", Test.COMB, default_inputs, default_outputs,
         body=[
             # W: 0 0 0 0
             [[0, 0, 0,  0, 0, 1,  0, 0, 0, 0], [1, 1, 1, 1]],
@@ -80,11 +76,7 @@ class Part74170(PackageDIP16):
             [[0, 0, 1,  1, 1, 0,  0, 0, 0, 0], [1, 0, 0, 0]],
         ]
     )
-    test_rw = Test(
-        name="Simultaneous read/write",
-        inputs=[13, 14, 12,  4, 5, 11,  15, 1, 2, 3],
-        outputs=[10, 9, 7, 6],
-        ttype=Test.COMB,
+    test_rw = Test("Simultaneous read/write", Test.COMB, default_inputs, default_outputs,
         body=[
             [[0, 0, 0,  0, 0, 1,  0, 0, 0, 1], [1, 1, 1, 1]],
             [[0, 0, 1,  0, 0, 0,  0, 0, 0, 0], [0, 0, 0, 1]],

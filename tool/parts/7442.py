@@ -19,14 +19,14 @@ class Part7442(PackageDIP16):
         14: Pin("B", Pin.IN),
         15: Pin("A", Pin.IN),
     }
-    test_async = Test(
-        name="Asynchronous operation",
+
+    test_async = Test("Asynchronous operation", Test.COMB,
         inputs=[12, 13, 14, 15],
         outputs=[11, 10, 9, 7, 6, 5, 4, 3, 2, 1],
-        ttype=Test.COMB,
         body=[
             [Test.bin2vec(i, 4), Test.bin2vec(~(1<<i), 10)]
             for i in range(0, 2**4)
         ]
     )
+
     tests = [test_async]

@@ -19,11 +19,11 @@ class Part74174(PackageDIP16):
         14: Pin("6D", Pin.IN),
         15: Pin("6Q", Pin.OUT),
     }
-    test_sync = Test(
-        name="Synchronous operation",
-        inputs=[1, 9,  3, 4, 6, 11, 13, 14],
-        outputs=[2, 5, 7, 10, 12, 15],
-        ttype=Test.SEQ,
+
+    default_inputs = [1, 9,  3, 4, 6, 11, 13, 14]
+    default_outputs = [2, 5, 7, 10, 12, 15]
+
+    test_sync = Test("Synchronous operation", Test.SEQ, default_inputs, default_outputs,
         body=[
             [[1, '+',  0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0]],
             [[1, '+',  1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1]],
@@ -31,11 +31,7 @@ class Part74174(PackageDIP16):
             [[1, '+',  1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1]],
         ]
     )
-    test_async = Test(
-        name="Asynchronous operation",
-        inputs=[1, 9,  3, 4, 6, 11, 13, 14],
-        outputs=[2, 5, 7, 10, 12, 15],
-        ttype=Test.COMB,
+    test_async = Test("Asynchronous operation", Test.COMB, default_inputs, default_outputs,
         body=[
             # clear
             [[0, 0,  1, 1, 1, 1, 1, 1], [0, 0, 0, 0, 0, 0]],
@@ -48,5 +44,5 @@ class Part74174(PackageDIP16):
             [[1, 0,  1, 1, 1, 1, 1, 1], [0, 0, 0, 0, 0, 0]],
         ]
     )
-    tests = [test_sync, test_async]
 
+    tests = [test_sync, test_async]

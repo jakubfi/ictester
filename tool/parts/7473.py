@@ -17,11 +17,10 @@ class Part7473(PackageDIP14_vcc4):
         13: Pin("~1Q", Pin.OUT),
         14: Pin("1J", Pin.IN),
     }
-    test_all = Test(
-        name="Sync/Async operation",
+
+    test_all = Test("Sync/Async operation", Test.SEQ,
         inputs=[14, 3, 2, 1,  7, 10, 6, 5],
         outputs=[12, 13, 9, 8],
-        ttype=Test.SEQ,
         body=[
             # load 1
             [[1, 0, 1, '-',  1, 0, 1, '-'], [1, 0,  1, 0]],
@@ -50,4 +49,5 @@ class Part7473(PackageDIP14_vcc4):
             [[1, 1, 0, '-',  1, 0, 0, '-'], [0, 1,  0, 1]],
         ]
     )
+
     tests = [test_all]

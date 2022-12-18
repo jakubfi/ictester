@@ -19,11 +19,10 @@ class Part74161(PackageDIP16):
         14: Pin("QA", Pin.OUT),
         15: Pin("RCO", Pin.OUT),
     }
-    test_all = Test(
-        name="Complete logic",
+
+    test_all = Test("Complete logic", Test.SEQ,
         inputs=[1, 9, 2,  10, 7,  6, 5, 4, 3],
         outputs=[11, 12, 13, 14,  15],
-        ttype=Test.SEQ,
         body=[
             # NOTE: "enable" transitions done on clock high,
             # some chips are more sensitive to that
@@ -80,4 +79,5 @@ class Part74161(PackageDIP16):
             [[  1, 1,   1,  0, 0,  0, 0, 0, 0], [1, 1, 1, 1,  0]],
         ]
     )
+
     tests = [test_all]
