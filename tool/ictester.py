@@ -47,7 +47,7 @@ parser.add_argument('part', help='Part symbol')
 args = parser.parse_args()
 
 try:
-    part = catalog[args.part]
+    part = catalog[args.part.upper()]
 except KeyError:
     print(f"Part not found: {args.part}")
     print("Use --list to list all supported parts")
