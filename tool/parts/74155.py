@@ -19,38 +19,25 @@ class Part74155(PackageDIP16):
         14: Pin("~2G", Pin.IN),
         15: Pin("~2C", Pin.IN),
     }
-    test_all = Test(
-        name="Complete logic",
-        inputs=[3, 13,  2, 1,  14, 15],
-        outputs=[7, 8, 5, 4,  9, 10, 11, 12],
-        ttype=Test.COMB,
+    default_inputs = [3, 13,  2, 1,  14, 15]
+    default_outputs = [7, 8, 5, 4,  9, 10, 11, 12]
+    test_inhibit = Test("Inhibit", Test.COMB, default_inputs, default_outputs,
         body=[
-            # ~G = 1, any 1C/~2C, any A/B
-            [[0, 0,  1, 0,  1, 0], [1, 1, 1, 1,  1, 1, 1, 1]],
-            [[0, 1,  1, 0,  1, 0], [1, 1, 1, 1,  1, 1, 1, 1]],
-            [[1, 0,  1, 0,  1, 0], [1, 1, 1, 1,  1, 1, 1, 1]],
-            [[1, 1,  1, 0,  1, 0], [1, 1, 1, 1,  1, 1, 1, 1]],
-
-            [[0, 0,  1, 1,  1, 1], [1, 1, 1, 1,  1, 1, 1, 1]],
-            [[0, 1,  1, 1,  1, 1], [1, 1, 1, 1,  1, 1, 1, 1]],
-            [[1, 0,  1, 1,  1, 1], [1, 1, 1, 1,  1, 1, 1, 1]],
-            [[1, 1,  1, 1,  1, 1], [1, 1, 1, 1,  1, 1, 1, 1]],
-            # 1C/~2C = 0/1, any ~G, any A/B
-            [[0, 0,  0, 0,  0, 1], [1, 1, 1, 1,  1, 1, 1, 1]],
-            [[0, 1,  0, 0,  0, 1], [1, 1, 1, 1,  1, 1, 1, 1]],
-            [[1, 0,  0, 0,  0, 1], [1, 1, 1, 1,  1, 1, 1, 1]],
-            [[1, 1,  0, 0,  0, 1], [1, 1, 1, 1,  1, 1, 1, 1]],
-
-            [[0, 0,  1, 0,  1, 1], [1, 1, 1, 1,  1, 1, 1, 1]],
-            [[0, 1,  1, 0,  1, 1], [1, 1, 1, 1,  1, 1, 1, 1]],
-            [[1, 0,  1, 0,  1, 1], [1, 1, 1, 1,  1, 1, 1, 1]],
-            [[1, 1,  1, 0,  1, 1], [1, 1, 1, 1,  1, 1, 1, 1]],
-
-            # selections
-            [[0, 0,  0, 1,  0, 0], [0, 1, 1, 1,  0, 1, 1, 1]],
-            [[0, 1,  0, 1,  0, 0], [1, 0, 1, 1,  1, 0, 1, 1]],
-            [[1, 0,  0, 1,  0, 0], [1, 1, 0, 1,  1, 1, 0, 1]],
-            [[1, 1,  0, 1,  0, 0], [1, 1, 1, 0,  1, 1, 1, 0]],
+            [addr + [1, data, 1, data], 8*[1]]
+            for addr in Test.binary_combinator(2)
+            for data in [0, 1]
         ]
     )
-    tests = [test_all]
+    test_select_0 = Test("Select 0", Test.COMB, default_inputs, default_outputs,
+        body=[
+            [Test.bin2vec(addr, 2) + [0, 0,  0, 0], [1, 1, 1, 1] + Test.bin2vec(~(1<<(3-addr)), 4)]
+            for addr in range(0, 4)
+        ]
+    )
+    test_select_1 = Test("Select 1", Test.COMB, default_inputs, default_outputs,
+        body=[
+            [Test.bin2vec(addr, 2) + [0, 1,  0, 1], Test.bin2vec(~(1<<(3-addr)), 4) + [1, 1, 1, 1]]
+            for addr in range(0, 4)
+        ]
+    )
+    tests = [test_select_0, test_select_1, test_inhibit]
