@@ -17,20 +17,31 @@ class Part7487(PackageDIP14):
         12: Pin("Y4", Pin.OUT),
         13: Pin("A4", Pin.IN),
     }
-    test_all = Test(
-        name="Complete logic",
-        inputs=[8, 1,  2, 5, 10, 13],
-        outputs=[3, 6, 9, 12],
-        ttype=Test.COMB,
+    default_inputs=[8, 1,  2, 5, 10, 13]
+    default_outputs=[3, 6, 9, 12]
+    test_true = Test("True", Test.COMB, default_inputs, default_outputs,
         body=[
-            [[0, 0,  0, 0, 0, 0], [1, 1, 1, 1]],
-            [[0, 0,  1, 1, 1, 1], [0, 0, 0, 0]],
-            [[0, 1,  0, 0, 0, 0], [0, 0, 0, 0]],
-            [[0, 1,  1, 1, 1, 1], [1, 1, 1, 1]],
-            [[1, 0,  0, 0, 0, 0], [1, 1, 1, 1]],
-            [[1, 0,  1, 1, 1, 1], [1, 1, 1, 1]],
-            [[1, 1,  0, 0, 0, 0], [0, 0, 0, 0]],
-            [[1, 1,  1, 1, 1, 1], [0, 0, 0, 0]],
+            [[0, 1] + Test.bin2vec(i, 4), Test.bin2vec(i, 4)]
+            for i in range(0, 16)
         ]
     )
-    tests = [test_all]
+    test_complement = Test("Complement", Test.COMB, default_inputs, default_outputs,
+        body=[
+            [[0, 0] + Test.bin2vec(i, 4), Test.bin2vec(~i, 4)]
+            for i in range(0, 16)
+        ]
+    )
+    test_zero = Test("Zero", Test.COMB, default_inputs, default_outputs,
+        body=[
+            [[1, 1] + Test.bin2vec(i, 4), 4*[0]]
+            for i in range(0, 16)
+        ]
+    )
+    test_one = Test("One", Test.COMB, default_inputs, default_outputs,
+        body=[
+            [[1, 0] + Test.bin2vec(i, 4), 4*[1]]
+            for i in range(0, 16)
+        ]
+    )
+
+    tests = [test_true, test_complement, test_zero, test_one]
