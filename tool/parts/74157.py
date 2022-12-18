@@ -17,27 +17,22 @@ class Part74157(PackageDIP16):
         12: Pin("Y4", Pin.OUT),
         13: Pin("B4", Pin.IN),
         14: Pin("A4", Pin.IN),
-        15: Pin("G", Pin.IN),
+        15: Pin("~G", Pin.IN),
     }
-    test_all = Test(
-        name="Complete logic",
-        inputs=[15, 1,  2, 3,  5, 6,  11, 10,  14, 13],
-        outputs=[4, 7, 9, 12],
-        ttype=Test.COMB,
+    default_inputs = [15, 1,  2, 3,  5, 6,  11, 10,  14, 13]
+    default_outputs = [4, 7, 9, 12]
+    test_inhibit = Test("Inhibit", Test.COMB, default_inputs, default_outputs,
         body=[
-            [[1, 0,  1, 1,  1, 1,  1, 1,  1, 1], [0, 0, 0, 0]],
-            [[1, 1,  1, 1,  1, 1,  1, 1,  1, 1], [0, 0, 0, 0]],
-            [[1, 0,  0, 0,  0, 0,  0, 0,  0, 0], [0, 0, 0, 0]],
-            [[1, 1,  0, 0,  0, 0,  0, 0,  0, 0], [0, 0, 0, 0]],
-
-            [[0, 0,  0, 0,  0, 0,  0, 0,  0, 0], [0, 0, 0, 0]],
-            [[0, 1,  0, 0,  0, 0,  0, 0,  0, 0], [0, 0, 0, 0]],
-            [[0, 0,  0, 1,  0, 1,  0, 1,  0, 1], [0, 0, 0, 0]],
-            [[0, 1,  0, 1,  0, 1,  0, 1,  0, 1], [1, 1, 1, 1]],
-            [[0, 0,  1, 0,  1, 0,  1, 0,  1, 0], [1, 1, 1, 1]],
-            [[0, 1,  1, 0,  1, 0,  1, 0,  1, 0], [0, 0, 0, 0]],
-            [[0, 0,  1, 1,  1, 1,  1, 1,  1, 1], [1, 1, 1, 1]],
-            [[0, 1,  1, 1,  1, 1,  1, 1,  1, 1], [1, 1, 1, 1]],
+            [[1, addr] + 4 * data, 4*[0]]
+            for addr in [0, 1]
+            for data in Test.binary_combinator(2)
         ]
     )
-    tests = [test_all]
+    test_select = Test("Select", Test.COMB, default_inputs, default_outputs,
+        body=[
+            [[0, addr] + 4*data, 4*[data[addr]]]
+            for addr in [0, 1]
+            for data in Test.binary_combinator(2)
+        ]
+    )
+    tests = [test_select, test_inhibit]
