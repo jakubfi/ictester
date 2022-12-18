@@ -1,6 +1,9 @@
 from functools import reduce
 from prototypes import (PackageDIP14, Pin, Test)
 
+def even(v):
+    return reduce(lambda a, b: a==b, v)
+
 class Part74180(PackageDIP14):
     name = "74180"
     desc = "9-bit odd/even parity generator/checker"
@@ -18,30 +21,28 @@ class Part74180(PackageDIP14):
         12: Pin("E", Pin.IN),
         13: Pin("F", Pin.IN),
     }
-
-    # ------------------------------------------------------------------------
-    def parity_test_gen():
-        # ------------------------------------------------------------------------
-        def parity_check(v):
-            if v[8] == v[9]:
-                return [int(not v[8]), int(not v[8])]
-            else:
-                odd = reduce(lambda a, b: a^b, v[0:8] + [v[9]])
-                return [int(not odd), odd]
-
-        data = [Test.bin2vec(v, 10) for v in range(0, 2**10 - 1)]
-
-        body = [
-            [v, parity_check(v)] for v in data
+    default_inputs = [8, 9, 10, 11, 12, 13, 1, 2,  3, 4]
+    default_outputs = [5, 6]
+    test_valid_even = Test("Even upstream", Test.COMB, default_inputs, default_outputs,
+        loops=64,
+        body=[
+            [data + [1, 0], [even(data), not even(data)]]
+            for data in Test.binary_combinator(8)
         ]
-
-        return Test(
-            name="Asynchronous operation",
-            inputs=[8, 9, 10, 11, 12, 13, 1, 2,  3, 4],
-            outputs=[5, 6],
-            ttype=Test.COMB,
-            loops=64,
-            body=body
-        )
-
-    tests = [parity_test_gen()]
+    )
+    test_valid_odd = Test("Odd upstream", Test.COMB, default_inputs, default_outputs,
+        loops=64,
+        body=[
+            [data + [0, 1], [not even(data), even(data)]]
+            for data in Test.binary_combinator(8)
+        ]
+    )
+    test_invalid = Test("Invalid upstream", Test.COMB, default_inputs, default_outputs,
+        loops=64,
+        body=[
+            [data + even_odd, list(map(lambda x: not x, even_odd))]
+            for data in Test.binary_combinator(8)
+            for even_odd in [[1, 1], [0, 0]]
+        ]
+    )
+    tests = [test_valid_even, test_valid_odd, test_invalid]
