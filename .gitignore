@@ -6,3 +6,4 @@ fw/*.out.map
 *.pyc
 __pycache__
 *.swp
+/.vscode
