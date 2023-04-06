@@ -9,8 +9,8 @@ Pin configuration does the following:
 Thus, ~X becomes the actual output, and X needs to be always driven low.
 '''
 
-class Part7462(PackageDIP14):
-    name = "7462"
+class Part74H62(PackageDIP14):
+    name = "74H62"
     desc = "AND-OR Gate Expander"
     pin_cfg = {
         1: Pin("A", Pin.IN),

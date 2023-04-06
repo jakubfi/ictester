@@ -1,7 +1,7 @@
 from prototypes import (PackageDIP14, Pin, Test)
 
-class Part7460(PackageDIP14):
-    name = "7461"
+class Part74H61(PackageDIP14):
+    name = "74H61"
     desc = "Triple 3-input expanders"
     pin_cfg = {
         1: Pin("1A", Pin.IN),

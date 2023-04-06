@@ -1,7 +1,7 @@
 from prototypes import (PackageDIP14, Pin, Test)
 
-class Part7487(PackageDIP14):
-    name = "7487"
+class Part74H87(PackageDIP14):
+    name = "74H87"
     desc = "4-bit True/Complement, Zero/One Element"
     pin_cfg = {
         1: Pin("C", Pin.IN),

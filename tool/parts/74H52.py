@@ -1,7 +1,7 @@
 from prototypes import (PackageDIP14, Pin, Test)
 
-class Part7452(PackageDIP14):
-    name = "7452"
+class Part74H52(PackageDIP14):
+    name = "74H52"
     desc = "AND-OR Gate (Expandable)"
     pin_cfg = {
         1: Pin("A", Pin.IN),
