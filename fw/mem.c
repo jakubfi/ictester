@@ -71,8 +71,8 @@ void mem_setup(void)
 	DDRC  = 0b11111101;
 	PORTC = 0b00000001;
 
-	// wait 100us after initialization
-	_delay_us(100);
+	// wait 500us after power-upn (120us typical, but some chips apparently require 500us)
+	_delay_us(500);
 	// blink RAS 8 times before using the chip
 	for (uint8_t i=0 ; i<8 ; i++) {
 		RAS_ON;
