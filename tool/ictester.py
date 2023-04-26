@@ -10,10 +10,15 @@ from parts import catalog
 
 
 # ------------------------------------------------------------------------
-def list_tests():
+def list_parts(list_tests=False):
     parts = sorted(catalog.items(), key=lambda x: int(re.sub("74[HS]", "74", x[0])))
     for name, part in parts:
         print(f"{name:7s} {part.full_package_name:15s} {part.desc}")
+        if (list_tests):
+            for t in part.tests:
+                # NOTE: hack to work around sequentialize()
+                l = 2*len(t.body) if (t.type == t.SEQ) else len(t.body)
+                print(f"  * ({l} vectors) {t.name}")
 
 # ------------------------------------------------------------------------
 def print_part_info(part):
@@ -34,13 +39,14 @@ WARN = '\033[95m\033[1m'
 ENDC = '\033[0m'
 
 if '--list' in sys.argv:
-    list_tests()
+    list_parts("--tests" in sys.argv)
     sys.exit(0)
 
 parser = argparse.ArgumentParser(description='IC tester controller')
 parser.add_argument('--device', default="/dev/ttyUSB1", help='Serial port where the IC tester is connected')
 parser.add_argument('--loops', type=int, help='Loop count (<65536, will be rounded to the nearest power of 2)')
 parser.add_argument('--list', action="store_true", help='List all supported parts')
+parser.add_argument('--tests', action="store_true", help='When listing parts, list also tests for each part')
 parser.add_argument('--debug', action="store_true", help='Enable debug output')
 parser.add_argument('--serial_debug', action="store_true", help='Enable serial debug output')
 parser.add_argument('part', help='Part symbol')
