@@ -4,6 +4,7 @@ import sys
 import argparse
 import math
 import re
+import time
 
 from tester import Tester
 from parts import catalog
@@ -26,7 +27,7 @@ def print_part_info(part):
     if part.missing_tests:
         print(f"{WARN}WARNING: missing tests: {part.missing_tests}{ENDC}")
     if part.unusual_power:
-        print(f"{WARN}WARNING: unusual pins used for power. Make sure to use the correct socket.{ENDC}")
+        print(f"{WARN}WARNING: unusual pins used for power. Make sure to use the correct socket and orientation.{ENDC}")
 
 
 # ------------------------------------------------------------------------
@@ -78,13 +79,15 @@ for test_name in all_tests:
     endc = "\n" if args.debug else ""
     print(f" * Testing: {test_name:{longest_desc}s} ({loops} loop{plural}) ... ", end=endc, flush=True)
 
+    start = time.time()
     res = tester.exec_test(test, loops_pow)
+    elapsed = time.time() - start
 
     if res == Tester.RES_PASS:
         tests_passed += 1
-        print(f"{OK}PASS{ENDC}")
+        print(f"{OK}PASS (in {elapsed:.2f} sec.){ENDC}")
     else:
-        print(f"{FAIL}FAIL{ENDC}")
+        print(f"{FAIL}FAIL (in {elapsed:.2f} sec.){ENDC}")
 
 if tests_passed != test_count:
     color = FAIL
