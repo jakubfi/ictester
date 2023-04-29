@@ -5,7 +5,7 @@ PROJECTNAME=ictester
 PRJSRC=ictester.c serial.c mem.c
 INC=
 LIBS=
-OPTLEVEL=s
+OPTLEVEL=3
 HEXFORMAT=ihex
 
 # compiler

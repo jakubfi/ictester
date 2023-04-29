@@ -1,15 +1,12 @@
 from prototypes import (PackageDIP16_rotated, Pin, Test)
 
 class Part4164(PackageDIP16_rotated):
-    TEST_BIT_ALL_0 = 0
-    TEST_BIT_ALL_1 = 1
-    TEST_ROW_ALL_0 = 2
-    TEST_ROW_ALL_1 = 3
-    TEST_ROW_ALTERNATE_01 = 4
-    TEST_ROW_ALTERNATE_10 = 5
+    MEM_TEST_MARCH_C_MINUS_RMW = 0
+    MEM_TEST_MARCH_C_MINUS_RW = 1
+    MEM_TEST_MARCH_C_MINUS_PAGE = 2
 
     name = "4164"
-    desc = "(also HM4864, ...) (REVERSE CHIP ORIENTATION!) 65536 x 1bit DRAM memory"
+    desc = "65536 x 1bit DRAM memory"
     pin_cfg = {
         1: Pin("NC", Pin.NC),
         2: Pin("Din", Pin.IN),
@@ -30,33 +27,17 @@ class Part4164(PackageDIP16_rotated):
     default_inputs = [2, 3, 4, 5, 6, 7, 9, 10, 11, 12, 13, 15]
     default_outputs = [14]
 
-    test_bit_all_0 = Test("Single bit: all 0s", Test.MEM, default_inputs, default_outputs,
-        tsubtype=TEST_BIT_ALL_0,
-        loops=1,
-    )
-    test_bit_all_1 = Test("Single bit: all 1s", Test.MEM, default_inputs, default_outputs,
-        tsubtype=TEST_BIT_ALL_1,
-        loops=1,
-    )
-    test_row_all_0 = Test("Page mode: all 0s", Test.MEM, default_inputs, default_outputs,
-        tsubtype=TEST_ROW_ALL_0,
-        loops=1,
-    )
-    test_row_all_1 = Test("Page mode: all 1s", Test.MEM, default_inputs, default_outputs,
-        tsubtype=TEST_ROW_ALL_1,
-        loops=1,
-    )
-    test_row_alternate_01 = Test("Page mode: alternating 0/1", Test.MEM, default_inputs, default_outputs,
-        tsubtype=TEST_ROW_ALTERNATE_01,
-        loops=1,
-    )
-    test_row_alternate_10 = Test("Page mode: alternating 1/0", Test.MEM, default_inputs, default_outputs,
-        tsubtype=TEST_ROW_ALTERNATE_10,
-        loops=1,
-    )
-
     tests = [
-        test_bit_all_0, test_bit_all_1,
-        test_row_all_0, test_row_all_1,
-        test_row_alternate_01, test_row_alternate_10
+        Test("MARCH C- (Read-Modify-Write mode)", Test.MEM, default_inputs, default_outputs,
+            tsubtype=MEM_TEST_MARCH_C_MINUS_RMW,
+            loops=1,
+        ),
+        Test("MARCH C- (Read+Write mode)", Test.MEM, default_inputs, default_outputs,
+            tsubtype=MEM_TEST_MARCH_C_MINUS_RW,
+            loops=1,
+        ),
+        Test("MARCH C- (Page access mode)", Test.MEM, default_inputs, default_outputs,
+            tsubtype=MEM_TEST_MARCH_C_MINUS_PAGE,
+            loops=1,
+        ),
     ]

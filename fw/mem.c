@@ -1,6 +1,7 @@
 #define F_CPU	16000000UL
 
 #include <inttypes.h>
+#include <stdbool.h>
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <avr/cpufunc.h>
@@ -8,18 +9,9 @@
 
 #include "results.h"
 
-enum mem_test_type {
-	MEM_TEST_BIT_ALL_0			= 0,
-	MEM_TEST_BIT_ALL_1			= 1,
-	MEM_TEST_ROW_ALL_0			= 2,
-	MEM_TEST_ROW_ALL_1			= 3,
-	MEM_TEST_ROW_ALTERNATE_01	= 4,
-	MEM_TEST_ROW_ALTERNATE_10	= 5,
-};
-
-//    pin:  7   6   5   4    3  2  1    0
-// port A:  -  NC Din ~WE ~RAS A0 A2   A1
-// port C: NC  a7  a5  a4   a3 a6 Do ~CAS 
+//    pin:  7    6    5    4    3    2    1    0
+// port A:  -   NC   Di  ~WE ~RAS   A0   A2   A1
+// port C: NC   A7   A5   A4   A3   A6   Do ~CAS
 
 #define PORT_RAS	PORTA
 #define PORT_WE		PORTA
@@ -47,20 +39,42 @@ enum mem_test_type {
 #define RAS_ON		PORT_RAS &= ~VAL_RAS
 #define CAS_OFF		PORT_CAS |= VAL_CAS
 #define CAS_ON		PORT_CAS &= ~VAL_CAS
-#define DATA		(PIN_DOUT >> 1) & 1;
 
-#define ADDR_LOW(addr)	(((addr) & 0b111))
-#define ADDR_HIGH(addr)	(((addr) & 0b11111000) >> 1)
+#define READ_ZERO 0
+#define READ_ONE  1
+#define READ_NONE 2
+#define WRITE_ZERO 0
+#define WRITE_ONE  1
+#define WRITE_NONE 2
+#define DIR_UP 0
+#define DIR_DOWN 1
 
-#define SET_ROW_ADDR(addr)							\
-	PORT_AL = ADDR_LOW(addr) | VAL_WE | VAL_RAS;	\
-	PORT_AH = ADDR_HIGH(addr) | VAL_CAS;			\
-	RAS_ON;
+register uint8_t addr_col asm("r2");
+register uint8_t addr_row asm("r3");
 
-#define SET_COL_ADDR(addr)					\
-	PORT_AL |= ADDR_LOW(addr);				\
-	PORT_AH = ADDR_HIGH(addr) | VAL_CAS;	\
-	CAS_ON;
+enum mem_test_type {
+	MEM_TEST_MARCH_RMW		= 0,
+	MEM_TEST_MARCH_RW		= 1,
+	MEM_TEST_MARCH_PAGE		= 2,
+};
+
+struct march {
+	uint8_t read;
+	uint8_t write;
+	uint8_t dir;
+};
+
+static const struct march march_cm[6] = {
+	{ READ_NONE, WRITE_ZERO, DIR_UP   }, // any(w0)
+	{ READ_ZERO, WRITE_ONE,  DIR_UP   }, // up(r0,w1)
+	{ READ_ONE,  WRITE_ZERO, DIR_UP   }, // up(r1,w0)
+	{ READ_ZERO, WRITE_ONE,  DIR_DOWN }, // down(r0,w1)
+	{ READ_ONE,  WRITE_ZERO, DIR_DOWN }, // down(r1,w0)
+	{ READ_ZERO, WRITE_NONE, DIR_UP   }, // up(r0)
+};
+
+typedef uint8_t (*march_fun)(uint8_t r, uint8_t w, uint8_t dir);
+
 
 // -----------------------------------------------------------------------
 void mem_setup(void)
@@ -71,136 +85,209 @@ void mem_setup(void)
 	DDRC  = 0b11111101;
 	PORTC = 0b00000001;
 
-	// wait 500us after power-upn (120us typical, but some chips apparently require 500us)
+	// wait 500us after power-up (100-120us typical, but some chips apparently require 500us)
 	_delay_us(500);
+
 	// blink RAS 8 times before using the chip
 	for (uint8_t i=0 ; i<8 ; i++) {
 		RAS_ON;
-		RAS_ON; // repeated twice, because 120ns min pulse
+		RAS_ON; // repeated twice, because 120ns min. pulse length
 		RAS_OFF;
 	}
 }
 
 // -----------------------------------------------------------------------
-uint8_t mem_test_bit(uint16_t addr, uint8_t data)
+static inline uint8_t addr_low(uint8_t addr)
 {
-	uint8_t addr_col = addr & 0xff;
-	uint8_t addr_row = addr >> 8;
+	return addr & 0b111;
+}
+
+// -----------------------------------------------------------------------
+static inline uint8_t addr_high(uint8_t addr)
+{
+	return (addr & 0b11111000) >> 1;
+}
+
+// -----------------------------------------------------------------------
+static inline void set_row_addr(uint8_t addr)
+{
+	PORT_AL = addr_low(addr) | VAL_WE | VAL_RAS;
+	PORT_AH = addr_high(addr) | VAL_CAS;
+	RAS_ON;
+}
+
+// -----------------------------------------------------------------------
+static inline void set_col_addr(uint8_t addr)
+{
+	PORT_AL = addr_low(addr) | VAL_WE;
+	PORT_AH = addr_high(addr) | VAL_CAS;
+	CAS_ON;
+}
+
+// -----------------------------------------------------------------------
+static inline uint8_t read_data(void)
+{
+	_NOP();
+	_NOP();
+	return (PIN_DOUT >> BIT_DO) & 1;
+}
+
+// -----------------------------------------------------------------------
+static inline void write_data(uint8_t data)
+{
+	PORT_DIN = (PORT_DIN & ~(1<<BIT_DI)) | (data << BIT_DI);
+	WE_ON;
+	WE_OFF;
+}
+
+// -----------------------------------------------------------------------
+// 1.1s full pass
+uint8_t march_step_rmw(uint8_t r, uint8_t w, uint8_t dir)
+{
 	uint8_t dout;
 
-	// --- WRITE ---
-
-	SET_ROW_ADDR(addr_row);
-	// early data
-	WE_ON;
-	PORT_DIN = (data & 1) << 5;
-	SET_COL_ADDR(addr_col);
-	// close
-	WE_OFF;
-	CAS_OFF;
-	RAS_OFF;
-
-	// --- READ ---
-
-	SET_ROW_ADDR(addr_row);
-	PORT_AL = VAL_WE;
-	SET_COL_ADDR(addr_col);
-	// wait for data and read
-	_NOP();
-	_NOP();
-	dout = DATA;
-	// close
-	CAS_OFF;
-	RAS_OFF;
-
-	if (dout != data) return RES_FAIL;
+	do {
+		if (dir == DIR_DOWN) addr_col--;
+		do {
+			// iterating over rows in the inner loop makes each row being refreshed every ~737ns
+			if (dir == DIR_DOWN) addr_row--;
+			set_row_addr(addr_row);
+			set_col_addr(addr_col);
+			dout = read_data();
+			if (w != WRITE_NONE) write_data(w);
+			CAS_OFF;
+			RAS_OFF;
+			// check data only when necessary
+			if ((r != READ_NONE) && (dout != r)) return RES_FAIL;
+			if (dir == DIR_UP) addr_row++;
+		} while (addr_row);
+		if (dir == DIR_UP) addr_col++;
+	} while (addr_col);
 
 	return RES_PASS;
 }
 
 // -----------------------------------------------------------------------
-uint8_t mem_test_page(uint16_t addr, uint8_t data, uint8_t alternate)
+// 1.5s full pass
+uint8_t march_step_rw(uint8_t r, uint8_t w, uint8_t dir)
 {
-	uint8_t res = RES_PASS;
-	uint16_t addr_col;
-	uint8_t addr_row = addr;
 	uint8_t dout;
 
-	// --- WRITE ---
+	do {
+		if (dir == DIR_DOWN) addr_col--;
+		do {
+			if (dir == DIR_DOWN) addr_row--;
 
-	SET_ROW_ADDR(addr_row);
-	for (addr_col=0 ; addr_col<256 ; addr_col++) {
-		// data
-		WE_ON;
-		PORT_DIN = (data & 1) << 5;
-		SET_COL_ADDR(addr_col);
-		// close column
-		WE_OFF;
-		CAS_OFF;
-		data ^= alternate;
+			set_row_addr(addr_row);
+			set_col_addr(addr_col);
+			dout = read_data();
+			CAS_OFF;
+			RAS_OFF;
+			if ((r != READ_NONE) && (dout != r)) return RES_FAIL;
+
+			if (w != WRITE_NONE) {
+				set_row_addr(addr_row);
+				set_col_addr(addr_col);
+				write_data(w);
+				CAS_OFF;
+				RAS_OFF;
+			}
+
+			if (dir == DIR_UP) addr_row++;
+		} while (addr_row);
+		if (dir == DIR_UP) addr_col++;
+	} while (addr_col);
+
+	return RES_PASS;
+}
+
+// -----------------------------------------------------------------------
+static inline void full_refresh(void)
+{
+	uint8_t addr_row_refresh = 0;
+	do {
+		set_row_addr(addr_row);
+		RAS_OFF;
+		addr_row_refresh++;
+	} while (addr_row_refresh);
+}
+
+// -----------------------------------------------------------------------
+// 1.2s full pass
+uint8_t march_step_page(uint8_t r, uint8_t w, uint8_t dir)
+{
+	uint8_t dout;
+
+	if (r != READ_NONE) {
+		do {
+			if (dir == DIR_DOWN) addr_row--;
+			set_row_addr(addr_row);
+
+			do {
+				if (dir == DIR_DOWN) addr_col--;
+				set_col_addr(addr_col);
+				dout = read_data();
+				CAS_OFF;
+				if (dout != r) return RES_FAIL;
+				if (dir == DIR_UP) addr_col++;
+			} while (addr_col);
+
+			RAS_OFF;
+			if (dir == DIR_UP) addr_row++;
+			// full refresh every 4 rows == every 1.9ms
+			if ((addr_row & 0b11) == 0) full_refresh();
+
+		} while (addr_row);
 	}
-	// close row
-	RAS_OFF;
 
-	// --- READ ---
+	if (w != WRITE_NONE) {
+		do {
+			if (dir == DIR_DOWN) addr_row--;
+			set_row_addr(addr_row);
 
-	SET_ROW_ADDR(addr_row);
-	for (addr_col=0 ; addr_col<256 ; addr_col++) {
-		PORT_AL = VAL_WE;
-		SET_COL_ADDR(addr_col);
-		// wait and read data
-		_NOP();
-		_NOP();
-		dout = DATA;
-		// close column
-		CAS_OFF;
-		// check data
-		if (dout != data) {
-			res = RES_FAIL;
-			break;
-		}
-		data ^= alternate;
+			do {
+				if (dir == DIR_DOWN) addr_col--;
+				set_col_addr(addr_col);
+				write_data(w);
+				CAS_OFF;
+				if (dir == DIR_UP) addr_col++;
+			} while (addr_col);
+
+			RAS_OFF;
+			if (dir == DIR_UP) addr_row++;
+			// full refresh every 4 rows == every 1.9ms
+			if ((addr_row & 0b11) == 0) full_refresh();
+
+		} while (addr_row);
 	}
-	// close row
-	RAS_OFF;
 
-	return res;
+	return RES_PASS;
 }
 
 // -----------------------------------------------------------------------
 uint8_t run_mem(uint8_t test)
 {
-	uint8_t res = RES_PASS;
-	uint32_t addr;
-	uint8_t alternate = 0;
-	uint8_t data = 0;
-
-	if ((test == MEM_TEST_BIT_ALL_1) || (test == MEM_TEST_ROW_ALL_1) || (test == MEM_TEST_ROW_ALTERNATE_10)) {
-		data = 1;
-	}
+	march_fun m_fun;
 
 	switch (test) {
-		case MEM_TEST_BIT_ALL_0:
-		case MEM_TEST_BIT_ALL_1:
-			for (addr=0 ; addr<65536; addr++) {
-				res = mem_test_bit(addr, data);
-				if (res != RES_PASS) break;
-			}
+		case MEM_TEST_MARCH_RMW:
+			m_fun = march_step_rmw;
 			break;
-		case MEM_TEST_ROW_ALL_0:
-		case MEM_TEST_ROW_ALL_1:
-		case MEM_TEST_ROW_ALTERNATE_01:
-		case MEM_TEST_ROW_ALTERNATE_10:
-			if ((test == MEM_TEST_ROW_ALTERNATE_01) || (test == MEM_TEST_ROW_ALTERNATE_10)) {
-				alternate = 1;
-			}
-			for (addr=0 ; addr<256; addr++) {
-				res = mem_test_page(addr, data, alternate);
-				if (res != RES_PASS) break;
-			}
+		case MEM_TEST_MARCH_RW:
+			m_fun = march_step_rw;
 			break;
+		case MEM_TEST_MARCH_PAGE:
+			m_fun = march_step_page;
+			break;
+		default:
+			return RES_FAIL;
 	}
-	return res;
+
+	for (uint8_t i=0 ; i<6 ; i++) {
+		if (m_fun(march_cm[i].read, march_cm[i].write, march_cm[i].dir) != RES_PASS) return RES_FAIL;
+	}
+
+	return RES_PASS;
 }
 
 // vim: tabstop=4 shiftwidth=4 autoindent
