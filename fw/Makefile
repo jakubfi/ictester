@@ -6,8 +6,6 @@ PRJSRC=ictester.c serial.c mem.c
 INC=
 LIBS=
 OPTLEVEL=s
-AVRDUDE_PROGRAMMERID=stk500v2
-AVRDUDE_OPTS=-P avrdoper
 HEXFORMAT=ihex
 
 # compiler
@@ -95,12 +93,14 @@ stats: $(TRG)
 
 hex: $(HEXTRG)
 
+.check-programmer-var:
+	@test -n "$${AVRDUDE_PROGRAMMER}" || (echo Please set environment variable AVRDUDE_PROGRAMMER to define options for your programmer \(eg. \"-c stk500v2 -P avrdoper\"\) && exit 1)
 
-writeflash: hex
-	$(AVRDUDE) -c $(AVRDUDE_PROGRAMMERID)   \
-	 -p $(PROGRAMMER_MCU) -e                \
-	 $(AVRDUDE_OPTS)			\
-	 -U flash:w:$(HEXROMTRG)
+writeflash: hex .check-programmer-var
+	$(AVRDUDE) $(AVRDUDE_PROGRAMMER) -p $(PROGRAMMER_MCU) -e -U flash:w:$(HEXROMTRG)
+
+fuses: .check-programmer-var
+	$(AVRDUDE) $(AVRDUDE_PROGRAMMER) -p $(PROGRAMMER_MCU) -U lfuse:w:0xff:m -U hfuse:w:0xd9:m -U efuse:w:0xff:m
 
 install: writeflash
 
@@ -182,8 +182,4 @@ clean:
 	$(REMOVE) $(LST) $(GDBINITFILE)
 	$(REMOVE) $(GENASMFILES)
 	$(REMOVE) $(HEXTRG)
-	
-
-
-#####                    EOF                   #####
 
