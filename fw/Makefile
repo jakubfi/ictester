@@ -11,6 +11,7 @@ HEXFORMAT=ihex
 # compiler
 CFLAGS=-I. $(INC) -g -mmcu=$(MCU) -O$(OPTLEVEL) \
         -std=gnu99 $(DEFINES)                   \
+	--param=min-pagesize=0                  \
 	-fpack-struct -fshort-enums             \
 	-funsigned-bitfields -funsigned-char    \
 	-Wall -Wstrict-prototypes               \
