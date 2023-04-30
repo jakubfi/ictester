@@ -23,13 +23,13 @@ class Part74S405(PackageDIP16):
     default_inputs = [4, 5, 6,  3, 2, 1]
     default_outputs = [7, 9, 10, 11, 12, 13, 14, 15]
 
-    test_select = Test("Select", Test.SEQ, default_inputs, default_outputs,
+    test_select = Test("Select", Test.COMB, default_inputs, default_outputs,
         body=[
             [[0, 0, 1] + Test.bin2vec(i, 3), Test.bin2vec(~(1<<i), 8)]
             for i in range(0, 8)
         ]
     )
-    test_inhibit = Test("Inhibit", Test.SEQ, default_inputs, default_outputs,
+    test_inhibit = Test("Inhibit", Test.COMB, default_inputs, default_outputs,
         body=[
             [Test.bin2vec(i, 3) + [0, 0, 0], 8*[1]]
             for i in set(range(0, 8)) - {1}  # all inhibit combinations
