@@ -68,8 +68,8 @@ test_count = len(all_tests)
 longest_desc = len(max(all_tests, key=len))
 tests_passed = 0
 
+total_time = 0
 print()
-
 for test_name in all_tests:
     test = tester.part.get_test(test_name)
     loops_pow = round((math.log2(args.loops if args.loops else test.loops)))
@@ -82,12 +82,13 @@ for test_name in all_tests:
     start = time.time()
     res = tester.exec_test(test, loops_pow)
     elapsed = time.time() - start
+    total_time += elapsed
 
     if res == Tester.RES_PASS:
         tests_passed += 1
-        print(f"{OK}PASS (in {elapsed:.2f} sec.){ENDC}")
+        print(f"{OK}PASS{ENDC} ({elapsed:.2f} sec.)")
     else:
-        print(f"{FAIL}FAIL (in {elapsed:.2f} sec.){ENDC}")
+        print(f"{FAIL}FAIL{ENDC} ({elapsed:.2f} sec.)")
 
 if tests_passed != test_count:
     color = FAIL
@@ -98,6 +99,6 @@ else:
     result = "PART OK"
     ret = 0
 
-print(f"\n{color}{result}: {tests_passed} of {test_count} tests passed{ENDC}")
+print(f"\n{color}{result}: {tests_passed} of {test_count} tests passed{ENDC} ({total_time:.2f} sec. total)")
 
 sys.exit(ret)
