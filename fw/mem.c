@@ -59,21 +59,22 @@ enum mem_test_type {
 };
 
 struct march {
+	uint8_t dir;
 	uint8_t read;
 	uint8_t write;
-	uint8_t dir;
 };
 
-static const struct march march_cm[6] = {
-	{ READ_NONE, WRITE_ZERO, DIR_UP   }, // any(w0)
-	{ READ_ZERO, WRITE_ONE,  DIR_UP   }, // up(r0,w1)
-	{ READ_ONE,  WRITE_ZERO, DIR_UP   }, // up(r1,w0)
-	{ READ_ZERO, WRITE_ONE,  DIR_DOWN }, // down(r0,w1)
-	{ READ_ONE,  WRITE_ZERO, DIR_DOWN }, // down(r1,w0)
-	{ READ_ZERO, WRITE_NONE, DIR_UP   }, // up(r0)
+#define MARCH_STEPS 6
+static const struct march march_cm[MARCH_STEPS] = {
+	{ DIR_UP,   READ_NONE, WRITE_ZERO }, // any(w0)
+	{ DIR_UP,   READ_ZERO, WRITE_ONE  }, // up(r0,w1)
+	{ DIR_UP,   READ_ONE,  WRITE_ZERO }, // up(r1,w0)
+	{ DIR_DOWN, READ_ZERO, WRITE_ONE  }, // down(r0,w1)
+	{ DIR_DOWN, READ_ONE,  WRITE_ZERO }, // down(r1,w0)
+	{ DIR_UP,   READ_ZERO, WRITE_NONE }, // up(r0)
 };
 
-typedef uint8_t (*march_fun)(uint8_t r, uint8_t w, uint8_t dir);
+typedef uint8_t (*march_fun)(uint8_t dir, uint8_t r, uint8_t w);
 
 
 // -----------------------------------------------------------------------
@@ -141,23 +142,25 @@ static inline void write_data(uint8_t data)
 }
 
 // -----------------------------------------------------------------------
-// 1.1s full pass
-uint8_t march_step_rmw(uint8_t r, uint8_t w, uint8_t dir)
+// MARCH using read-write cycle (1.1s full pass)
+// No need for additional refreshes, iterating over rows in the inner loop
+// makes each row being refreshed every ~737ns
+uint8_t march_step_rmw(uint8_t dir, uint8_t r, uint8_t w)
 {
 	uint8_t dout;
 
 	do {
 		if (dir == DIR_DOWN) addr_col--;
 		do {
-			// iterating over rows in the inner loop makes each row being refreshed every ~737ns
 			if (dir == DIR_DOWN) addr_row--;
 			set_row_addr(addr_row);
 			set_col_addr(addr_col);
+			// read always
 			dout = read_data();
 			if (w != WRITE_NONE) write_data(w);
 			CAS_OFF;
 			RAS_OFF;
-			// check data only when necessary
+			// check data only when required
 			if ((r != READ_NONE) && (dout != r)) return RES_FAIL;
 			if (dir == DIR_UP) addr_row++;
 		} while (addr_row);
@@ -168,8 +171,9 @@ uint8_t march_step_rmw(uint8_t r, uint8_t w, uint8_t dir)
 }
 
 // -----------------------------------------------------------------------
-// 1.5s full pass
-uint8_t march_step_rw(uint8_t r, uint8_t w, uint8_t dir)
+// MARCH using read cycle + write cycle (1.5s full pass)
+// No need for additional refreshes, as above.
+uint8_t march_step_rw(uint8_t dir, uint8_t r, uint8_t w)
 {
 	uint8_t dout;
 
@@ -178,6 +182,7 @@ uint8_t march_step_rw(uint8_t r, uint8_t w, uint8_t dir)
 		do {
 			if (dir == DIR_DOWN) addr_row--;
 
+			// read always, check if required (faster than conditional read)
 			set_row_addr(addr_row);
 			set_col_addr(addr_col);
 			dout = read_data();
@@ -213,8 +218,10 @@ static inline void full_refresh(void)
 }
 
 // -----------------------------------------------------------------------
-// 1.2s full pass
-uint8_t march_step_page(uint8_t r, uint8_t w, uint8_t dir)
+// MARCH using full page reads and writes + refresh (1.2s full pass)
+// It treats one page as a single "memory cell".
+// This is for testing page access mode + refresh cycles
+uint8_t march_step_page(uint8_t dir, uint8_t r, uint8_t w)
 {
 	uint8_t dout;
 
@@ -234,7 +241,7 @@ uint8_t march_step_page(uint8_t r, uint8_t w, uint8_t dir)
 
 			RAS_OFF;
 			if (dir == DIR_UP) addr_row++;
-			// full refresh every 4 rows == every 1.9ms
+			// do a full refresh every 4 rows == every ~1.9ms
 			if ((addr_row & 0b11) == 0) full_refresh();
 
 		} while (addr_row);
@@ -283,8 +290,8 @@ uint8_t run_mem(uint8_t test)
 			return RES_FAIL;
 	}
 
-	for (uint8_t i=0 ; i<6 ; i++) {
-		if (m_fun(march_cm[i].read, march_cm[i].write, march_cm[i].dir) != RES_PASS) return RES_FAIL;
+	for (uint8_t i=0 ; i<MARCH_STEPS ; i++) {
+		if (m_fun(march_cm[i].dir, march_cm[i].read, march_cm[i].write) != RES_PASS) return RES_FAIL;
 	}
 
 	return RES_PASS;
