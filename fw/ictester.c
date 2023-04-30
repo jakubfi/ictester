@@ -93,6 +93,7 @@ void upload(void)
 }
 
 // -----------------------------------------------------------------------
+// ~61us per test cycle
 uint8_t run_logic(void)
 {
 	for (uint16_t pos=0 ; pos<test_len ; pos++) {
@@ -100,7 +101,7 @@ uint8_t run_logic(void)
 		PORTB = port[1].dut_used & ((test[pos][1] & port[1].dut_input) | (port[1].dut_pullup & ~port[1].dut_input));
 		PORTC = port[2].dut_used & ((test[pos][2] & port[2].dut_input) | (port[2].dut_pullup & ~port[2].dut_input));
 
-		if ((test_type == TYPE_COMB) || ((test_type == TYPE_SEQ) && (pos%2))) {
+		if ((test_type == TYPE_COMB) || ((test_type == TYPE_SEQ) && (pos % 2))) {
 			if ((PINA & ~port[0].dut_input & port[0].dut_used) != (test[pos][0] & ~port[0].dut_input & port[0].dut_used)) return RES_FAIL;
 			if ((PINB & ~port[1].dut_input & port[1].dut_used) != (test[pos][1] & ~port[1].dut_input & port[1].dut_used)) return RES_FAIL;
 			if ((PINC & ~port[2].dut_input & port[2].dut_used) != (test[pos][2] & ~port[2].dut_input & port[2].dut_used)) return RES_FAIL;
