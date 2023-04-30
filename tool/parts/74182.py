@@ -20,7 +20,7 @@ class Part74182(PackageDIP16):
         15: Pin("~P2", Pin.IN),
     }
 
-    test_g = Test("~G", Test.SEQ,
+    test_g = Test("~G", Test.COMB,
         inputs=[5, 14, 1, 3, 6, 15, 2],
         outputs=[10],
         loops=64,
@@ -35,7 +35,7 @@ class Part74182(PackageDIP16):
             for v in Test.binary_combinator(7)
         ]
     )
-    test_p = Test("~P", Test.SEQ,
+    test_p = Test("~P", Test.COMB,
         inputs=[2, 4, 6, 15],
         outputs=[7],
         loops=64,
@@ -44,7 +44,7 @@ class Part74182(PackageDIP16):
             for v in Test.binary_combinator(4)
         ]
     )
-    test_cnx = Test("Cn+x", Test.SEQ,
+    test_cnx = Test("Cn+x", Test.COMB,
         inputs=[3, 4, 13],
         outputs=[12],
         loops=64,
@@ -53,7 +53,7 @@ class Part74182(PackageDIP16):
             for v in Test.binary_combinator(3)
         ]
     )
-    test_cny = Test("Cn+y", Test.SEQ,
+    test_cny = Test("Cn+y", Test.COMB,
         inputs=[1, 3, 2, 4, 13],
         outputs=[11],
         loops=64,
@@ -62,7 +62,7 @@ class Part74182(PackageDIP16):
             for v in Test.binary_combinator(5)
         ]
     )
-    test_cnz = Test("Cn+z", Test.SEQ,
+    test_cnz = Test("Cn+z", Test.COMB,
         inputs=[14, 1, 3, 15, 2, 4, 13],
         outputs=[9],
         loops=64,
