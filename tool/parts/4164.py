@@ -28,15 +28,15 @@ class Part4164(PackageDIP16_rotated):
     default_outputs = [14]
 
     tests = [
-        Test("MARCH C- (Read-Modify-Write mode)", Test.MEM, default_inputs, default_outputs,
+        Test("MARCH C- Read-Modify-Write mode", Test.MEM, default_inputs, default_outputs,
             tsubtype=MEM_TEST_MARCH_C_MINUS_RMW,
             loops=1,
         ),
-        Test("MARCH C- (Read+Write mode)", Test.MEM, default_inputs, default_outputs,
+        Test("MARCH C- Read+Write mode", Test.MEM, default_inputs, default_outputs,
             tsubtype=MEM_TEST_MARCH_C_MINUS_RW,
             loops=1,
         ),
-        Test("MARCH C- (Page access mode)", Test.MEM, default_inputs, default_outputs,
+        Test("MARCH C- Page access mode", Test.MEM, default_inputs, default_outputs,
             tsubtype=MEM_TEST_MARCH_C_MINUS_PAGE,
             loops=1,
         ),

@@ -77,7 +77,7 @@ for test_name in all_tests:
 
     plural = "s" if loops != 1 else ""
     endc = "\n" if args.debug else ""
-    print(f" * Testing: {test_name:{longest_desc}s} ({loops} loop{plural}) ... ", end=endc, flush=True)
+    print(f" * Testing: {test_name:{longest_desc}s}   {loops} loop{plural}  ... ", end=endc, flush=True)
 
     start = time.time()
     res = tester.exec_test(test, loops_pow)
@@ -86,9 +86,9 @@ for test_name in all_tests:
 
     if res == Tester.RES_PASS:
         tests_passed += 1
-        print(f"{OK}PASS{ENDC} ({elapsed:.2f} sec.)")
+        print(f"\b\b\b\b{OK}PASS{ENDC}  ({elapsed:.2f} sec.)")
     else:
-        print(f"{FAIL}FAIL{ENDC} ({elapsed:.2f} sec.)")
+        print(f"\b\b\b\b{FAIL}FAIL{ENDC}  ({elapsed:.2f} sec.)")
 
 if tests_passed != test_count:
     color = FAIL
@@ -99,6 +99,6 @@ else:
     result = "PART OK"
     ret = 0
 
-print(f"\n{color}{result}: {tests_passed} of {test_count} tests passed{ENDC} ({total_time:.2f} sec. total)")
+print(f"\n{color}{result}: {tests_passed} of {test_count} tests passed{ENDC}  ({total_time:.2f} sec. total)")
 
 sys.exit(ret)
