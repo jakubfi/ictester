@@ -28,8 +28,8 @@ enum type {
 
 struct port {
 	volatile uint8_t *pin;
-	uint8_t dut_used;
 	uint8_t dut_input;
+	uint8_t dut_output;
 	uint8_t dut_pullup;
 } port[3];
 
@@ -58,16 +58,16 @@ void deconfigure(void)
 // -----------------------------------------------------------------------
 void setup(void)
 {
-	DDRA = port[0].dut_input & port[0].dut_used;
-	DDRB = port[1].dut_input & port[1].dut_used;
-	DDRC = port[2].dut_input & port[2].dut_used;
+	DDRA = port[0].dut_input;
+	DDRB = port[1].dut_input;
+	DDRC = port[2].dut_input;
 }
 
 // -----------------------------------------------------------------------
 void read_setup(void)
 {
 	for (int i=0 ; i<3 ; i++) {
-		port[i].dut_used = serial_rx_char();
+		port[i].dut_output = serial_rx_char();
 		port[i].dut_input = serial_rx_char();
 		port[i].dut_pullup = serial_rx_char();
 	}
@@ -96,15 +96,23 @@ void upload(void)
 // ~61us per test cycle
 uint8_t run_logic(void)
 {
+	// Seems that due to weak pull-ups in atmega, OC outputs take much longer to set up
+	uint8_t oc_delay = port[0].dut_pullup | port[1].dut_pullup | port[2].dut_pullup;
+
 	for (uint16_t pos=0 ; pos<test_len ; pos++) {
-		PORTA = port[0].dut_used & ((test[pos][0] & port[0].dut_input) | (port[0].dut_pullup & ~port[0].dut_input));
-		PORTB = port[1].dut_used & ((test[pos][1] & port[1].dut_input) | (port[1].dut_pullup & ~port[1].dut_input));
-		PORTC = port[2].dut_used & ((test[pos][2] & port[2].dut_input) | (port[2].dut_pullup & ~port[2].dut_input));
+		PORTA = ((test[pos][0] & port[0].dut_input) | port[0].dut_pullup);
+		PORTB = ((test[pos][1] & port[1].dut_input) | port[1].dut_pullup);
+		PORTC = ((test[pos][2] & port[2].dut_input) | port[2].dut_pullup);
+
+		if (oc_delay) {
+			_NOP(); _NOP(); _NOP(); _NOP();
+			_NOP(); _NOP(); _NOP(); _NOP();
+		}
 
 		if ((test_type == TYPE_COMB) || ((test_type == TYPE_SEQ) && (pos % 2))) {
-			if ((PINA & ~port[0].dut_input & port[0].dut_used) != (test[pos][0] & ~port[0].dut_input & port[0].dut_used)) return RES_FAIL;
-			if ((PINB & ~port[1].dut_input & port[1].dut_used) != (test[pos][1] & ~port[1].dut_input & port[1].dut_used)) return RES_FAIL;
-			if ((PINC & ~port[2].dut_input & port[2].dut_used) != (test[pos][2] & ~port[2].dut_input & port[2].dut_used)) return RES_FAIL;
+			if ((PINA ^ test[pos][0]) & port[0].dut_output) return RES_FAIL;
+			if ((PINB ^ test[pos][1]) & port[1].dut_output) return RES_FAIL;
+			if ((PINC ^ test[pos][2]) & port[2].dut_output) return RES_FAIL;
 		}
 	}
 

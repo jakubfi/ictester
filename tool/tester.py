@@ -95,10 +95,9 @@ class Tester:
     def tests_available(self):
         return [t.name for t in self.part.tests]
 
-    def get_used_pins(self, test):
-        all_pins = test.inputs + test.outputs
+    def get_output_pins(self, test):
         return [
-            0 if not p else (1 if p in all_pins else 0)
+            0 if not p else (1 if p in test.outputs else 0)
             for p in Tester.pin_map[self.part.full_package_name]
         ]
 
@@ -115,18 +114,18 @@ class Tester:
         ]
 
     def setup(self, test):
-        used = self.v2bin(self.get_used_pins(test))
+        outputs = self.v2bin(self.get_output_pins(test))
         inputs = self.v2bin(self.get_input_pins(test))
         pullup = self.v2bin(self.get_pullup_pins(test))
 
         if self.debug:
-            print(f"  Used pins: A: {used>>16:>08b} B: {(used>>8) & 0xff:>08b} C: {used & 0xff:>08b}")
-            print(f" Input pins: A: {inputs>>16:>08b} B: {(inputs>>8) & 0xff:>08b} C: {inputs & 0xff:>08b}")
-            print(f"Pullup pins: A: {pullup>>16:>08b} B: {(pullup>>8) & 0xff:>08b} C: {pullup & 0xff:>08b}")
+            print(f"Output pins: A: {outputs>>16:>08b} B: {(outputs>>8) & 0xff:>08b} C: {outputs & 0xff:>08b}")
+            print(f" Input pins: A: {inputs>>16:>08b}  B: {(inputs>>8) & 0xff:>08b}  C: {inputs & 0xff:>08b}")
+            print(f"Pullup pins: A: {pullup>>16:>08b}  B: {(pullup>>8) & 0xff:>08b}  C: {pullup & 0xff:>08b}")
 
         self.send(Tester.CMD_SETUP)
         for shift in [16, 8, 0]:
-            self.send((used >> shift) & 0xff)
+            self.send((outputs >> shift) & 0xff)
             self.send((inputs >> shift) & 0xff)
             self.send((pullup >> shift) & 0xff)
         if self.recv() != Tester.RES_OK:
