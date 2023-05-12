@@ -27,7 +27,6 @@ enum type {
 };
 
 struct port {
-	volatile uint8_t *pin;
 	uint8_t dut_input;
 	uint8_t dut_output;
 	uint8_t dut_pullup;
