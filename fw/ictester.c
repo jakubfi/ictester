@@ -1,6 +1,7 @@
 #define F_CPU	16000000UL
 
 #include <inttypes.h>
+#include <stdbool.h>
 #include <math.h>
 #include <avr/io.h>
 #include <avr/interrupt.h>
@@ -92,26 +93,43 @@ void upload(void)
 }
 
 // -----------------------------------------------------------------------
+static inline void logic_port_setup(uint16_t pos)
+{
+	PORTA = ((test[pos][0] & port[0].dut_input) | port[0].dut_pullup);
+	PORTB = ((test[pos][1] & port[1].dut_input) | port[1].dut_pullup);
+	PORTC = ((test[pos][2] & port[2].dut_input) | port[2].dut_pullup);
+}
+
+// -----------------------------------------------------------------------
+static inline bool logic_port_check(uint16_t pos)
+{
+	if ((test_type == TYPE_COMB) || (pos % 2)) {
+		if ((PINA ^ test[pos][0]) & port[0].dut_output) return false;
+		if ((PINB ^ test[pos][1]) & port[1].dut_output) return false;
+		if ((PINC ^ test[pos][2]) & port[2].dut_output) return false;
+	}
+
+	return true;
+}
+
+// -----------------------------------------------------------------------
 // ~61us per test cycle
 uint8_t run_logic(void)
 {
 	// Seems that due to weak pull-ups in atmega, OC outputs take much longer to set up
-	uint8_t oc_delay = port[0].dut_pullup | port[1].dut_pullup | port[2].dut_pullup;
-
-	for (uint16_t pos=0 ; pos<test_len ; pos++) {
-		PORTA = ((test[pos][0] & port[0].dut_input) | port[0].dut_pullup);
-		PORTB = ((test[pos][1] & port[1].dut_input) | port[1].dut_pullup);
-		PORTC = ((test[pos][2] & port[2].dut_input) | port[2].dut_pullup);
-
-		if (oc_delay) {
-			_NOP(); _NOP(); _NOP(); _NOP();
-			_NOP(); _NOP(); _NOP(); _NOP();
+	// Treat them separately to not slow down the test loop
+	// ICs sensitive to that are: 7447, 74H62, 7489, 74156, 74170, 780101
+	if (port[0].dut_pullup | port[1].dut_pullup | port[2].dut_pullup) {
+		for (uint16_t pos=0 ; pos<test_len ; pos++) {
+			logic_port_setup(pos);
+			_NOP(); _NOP(); _NOP(); _NOP(); _NOP();
+			_NOP(); _NOP(); _NOP(); _NOP(); _NOP();
+			if (!logic_port_check(pos)) return RES_FAIL;
 		}
-
-		if ((test_type == TYPE_COMB) || ((test_type == TYPE_SEQ) && (pos % 2))) {
-			if ((PINA ^ test[pos][0]) & port[0].dut_output) return RES_FAIL;
-			if ((PINB ^ test[pos][1]) & port[1].dut_output) return RES_FAIL;
-			if ((PINC ^ test[pos][2]) & port[2].dut_output) return RES_FAIL;
+	} else {
+		for (uint16_t pos=0 ; pos<test_len ; pos++) {
+			logic_port_setup(pos);
+			if (!logic_port_check(pos)) return RES_FAIL;
 		}
 	}
 
