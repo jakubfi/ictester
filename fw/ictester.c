@@ -113,7 +113,6 @@ static inline bool logic_port_check(uint16_t pos)
 }
 
 // -----------------------------------------------------------------------
-// ~61us per test cycle
 uint8_t run_logic(void)
 {
 	// Seems that due to weak pull-ups in atmega, OC outputs take much longer to set up
@@ -127,6 +126,7 @@ uint8_t run_logic(void)
 			if (!logic_port_check(pos)) return RES_FAIL;
 		}
 	} else {
+		// ~3.9us per test cycle
 		for (uint16_t pos=0 ; pos<test_len ; pos++) {
 			logic_port_setup(pos);
 			if (!logic_port_check(pos)) return RES_FAIL;
