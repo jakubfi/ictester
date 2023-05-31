@@ -1,15 +1,15 @@
 from prototypes import (PackageDIP16_rotated, Pin, Test)
 
-class Part4164(PackageDIP16_rotated):
-    SIZE_64 = 0 << 7
-    MEM_TEST_MARCH_C_MINUS_RMW = SIZE_64 | 0
-    MEM_TEST_MARCH_C_MINUS_RW = SIZE_64 | 1
-    MEM_TEST_MARCH_C_MINUS_PAGE = SIZE_64 | 2
+class Part41256(PackageDIP16_rotated):
+    SIZE_256 = 1 << 7
+    MEM_TEST_MARCH_C_MINUS_RMW = SIZE_256 |0
+    MEM_TEST_MARCH_C_MINUS_RW = SIZE_256 |1
+    MEM_TEST_MARCH_C_MINUS_PAGE = SIZE_256 |2
 
-    name = "4164"
-    desc = "65536 x 1bit DRAM memory"
+    name = "41256"
+    desc = "262144 x 1bit DRAM memory"
     pin_cfg = {
-        1: Pin("NC", Pin.NC),
+        1: Pin("A8", Pin.IN),
         2: Pin("Din", Pin.IN),
         3: Pin("~WE", Pin.IN),
         4: Pin("~RAS", Pin.IN),
@@ -25,7 +25,7 @@ class Part4164(PackageDIP16_rotated):
         15: Pin("~CAS", Pin.IN),
     }
 
-    default_inputs = [2, 3, 4, 5, 6, 7, 9, 10, 11, 12, 13, 15]
+    default_inputs = [1, 2, 3, 4, 5, 6, 7, 9, 10, 11, 12, 13, 15]
     default_outputs = [14]
 
     tests = [
