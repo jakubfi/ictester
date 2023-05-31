@@ -12,14 +12,21 @@ from parts import catalog
 
 # ------------------------------------------------------------------------
 def list_parts(list_tests=False):
-    parts = sorted(catalog.items(), key=lambda x: int(re.sub("74[HS]", "74", x[0])))
-    for name, part in parts:
-        print(f"{name:7s} {part.full_package_name:15s} {part.desc}")
-        if (list_tests):
-            for t in part.tests:
-                # NOTE: hack to work around sequentialize()
-                l = 2*len(t.body) if (t.type == t.SEQ) else len(t.body)
-                print(f"  * ({l} vectors) {t.name}")
+    families = {}
+    for i in catalog.items():
+        family = i[0][0:2]
+        if family not in families:
+            families[family] = []
+        families[family].append(i)
+
+    for family, parts in sorted(families.items()):
+        for name, part in sorted(parts, key=lambda x: int(re.sub("74[HS]", "74", x[0]))):
+            print(f"{name:7s} {part.full_package_name:15s} {part.desc}")
+            if (list_tests):
+                for t in part.tests:
+                    # NOTE: hack to work around sequentialize()
+                    l = 2*len(t.body) if (t.type == t.SEQ) else len(t.body)
+                    print(f"  * ({l} vectors) {t.name}")
 
 # ------------------------------------------------------------------------
 def print_part_info(part):
