@@ -26,7 +26,6 @@ __all__ = [
 
 import inspect
 import sys
-import re
 
 from . import *
 
