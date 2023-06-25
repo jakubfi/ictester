@@ -194,7 +194,7 @@ class Test():
 
     # ------------------------------------------------------------------------
     # Prepare test vectors for unit_cnt separate units with input_cnt inputs doing fun
-    # Units are tested inm parallel
+    # Units are tested in parallel
     # Four 3-input OR gates: binary_fun_gen(4, 3, lambda a, b: a|b)
     @staticmethod
     def binary_fun_gen(unit_cnt, input_cnt, fun, inverted=False):
@@ -202,4 +202,3 @@ class Test():
             [unit_cnt*v, unit_cnt*[reduce(fun, v) if not inverted else not reduce(fun, v)]]
             for v in Test.binary_combinator(input_cnt)
         ]
-
