@@ -7,10 +7,10 @@ class BV(list):
 
     @classmethod
     def int(cls, val, length):
-        binval = [
-            bool((val >> (length-pos-1)) & 1)
+        binval = (
+            (val >> (length-pos-1)) & 1
             for pos in range(0, length)
-        ]
+        )
         carry = True if val & (2**length) else False
         return cls(binval, carry)
 
@@ -66,7 +66,8 @@ class BV(list):
     def __int__(self):
         p = 0
         x = 0
-        for i in list(reversed(self)) + [self.carry]:
+        for i in reversed(self):
             x += i * 2**p
             p += 1
+        x += self.carry * 2**p
         return x
