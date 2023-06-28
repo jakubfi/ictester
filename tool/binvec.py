@@ -60,8 +60,8 @@ class BV(list):
         return BV.int(int(self) ^ int(obj), len(self))
 
     def __str__(self):
-        strvec = ''.join(str(int(v)) for v in self)
-        return f"[{strvec}]"
+        strvec = [int(v) for v in self]
+        return f"{strvec}"
 
     def __int__(self):
         p = 0
