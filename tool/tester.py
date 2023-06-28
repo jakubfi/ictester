@@ -172,7 +172,7 @@ class Tester:
 
         all_pins = test.inputs + test.outputs
         for v in body:
-            v_port = self.vector_by_port(all_pins, v[0] + v[1])
+            v_port = self.vector_by_port(all_pins, [*v[0], *v[1]])
             v_port_bin = self.v2bin(v_port)
             if self.debug:
                 print(f"Ports: "
