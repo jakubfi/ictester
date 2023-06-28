@@ -11,3 +11,9 @@
 191
 92
 549
+
+name matching?
+ * exact name (SN7400, UCY7400),
+ * common name (7400),
+ * difflib fuzzy high similarity (0.8)
+ * difflib fuzzy low similarity (0.7?)
