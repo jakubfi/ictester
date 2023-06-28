@@ -1,3 +1,4 @@
+from binvec import BV
 from prototypes import (PackageDIP14, Pin, Test)
 
 class Part7402(PackageDIP14):
@@ -22,6 +23,6 @@ class Part7402(PackageDIP14):
         Test("Complete logic", Test.COMB,
             inputs=[2, 3, 5, 6, 8, 9, 11, 12],
             outputs=[1, 4, 10, 13],
-            body=Test.binary_fun_gen(4, 2, lambda a, b: a | b, inverted=True)
+            body=[[4*v, 4*~v.vor()] for v in BV.range(0, 4)]
         )
     ]

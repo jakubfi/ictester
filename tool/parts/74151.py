@@ -1,3 +1,4 @@
+from binvec import BV
 from prototypes import (PackageDIP16, Pin, Test)
 
 class Part74151(PackageDIP16):
@@ -20,32 +21,20 @@ class Part74151(PackageDIP16):
         15: Pin("D4", Pin.IN),
     }
 
-    default_inputs = [4, 3, 2, 1, 15, 14, 13, 12,  9, 10, 11,  7]
+    default_inputs = [12, 13, 14, 15, 1, 2, 3, 4,  9, 10, 11,  7]
     default_outputs = [5, 6]
 
-    test_select_0 = Test("Select 0", Test.COMB, default_inputs, default_outputs,
-        body=[
-            [Test.bin2vec(~(1<<(7-addr)), 8) + Test.bin2vec(addr, 3) + [0], [0, 1]]
-            for addr in range(0, 8)
-        ]
-    )
-    test_select_1 = Test("Select 1", Test.COMB, default_inputs, default_outputs,
-        body=[
-            [Test.bin2vec(1<<(7-addr), 8) + Test.bin2vec(addr, 3) + [0], [1, 0]]
-            for addr in range(0, 8)
-        ]
-    )
-    test_inhibit_0 = Test("Inhibit 0", Test.COMB, default_inputs, default_outputs,
-        body=[
-            [8*[0] + addr + [1], [0, 1]]
-            for addr in Test.binary_combinator(3)
-        ]
-    )
-    test_inhibit_1 = Test("Inhibit 1", Test.COMB, default_inputs, default_outputs,
-        body=[
-            [8*[1] + addr + [1], [0, 1]]
-            for addr in Test.binary_combinator(3)
-        ]
-    )
-
-    tests = [test_select_0, test_select_1, test_inhibit_0, test_inhibit_1]
+    tests = [
+        Test("Select 0", Test.COMB, default_inputs, default_outputs,
+            body=[[[*~BV.bit(addr, 8), *BV.int(addr, 3), 0], [0, 1]] for addr in range(0, 8)]
+        ),
+        Test("Select 1", Test.COMB, default_inputs, default_outputs,
+            body=[[[*BV.bit(addr, 8), *BV.int(addr, 3), 0], [1, 0]] for addr in range(0, 8)]
+        ),
+        Test("Inhibit 0", Test.COMB, default_inputs, default_outputs,
+            body=[[[*~BV.bit(addr, 8), *BV.int(addr, 3), 1], [0, 1]] for addr in range(0, 8)]
+        ),
+        Test("Inhibit 1", Test.COMB, default_inputs, default_outputs,
+            body=[[[*BV.bit(addr, 8), *BV.int(addr, 3), 1], [0, 1]] for addr in range(0, 8)]
+        )
+    ]

@@ -1,3 +1,4 @@
+from binvec import BV
 from prototypes import (PackageDIP24, Pin, Test)
 
 class Part74150(PackageDIP24):
@@ -28,32 +29,20 @@ class Part74150(PackageDIP24):
         23: Pin("E8", Pin.IN),
     }
 
-    default_inputs = [11, 13, 14, 15,  9,  8, 7, 6, 5, 4, 3, 2, 1, 23, 22, 21, 20, 19, 18, 17, 16]
+    default_inputs = [11, 13, 14, 15,  9,  16, 17, 18, 19, 20, 21, 22, 23, 1, 2, 3, 4, 5, 6, 7, 8]
     default_outputs = [10]
 
-    test_select_0 = Test("Select 0", Test.COMB, default_inputs, default_outputs,
-        body=[
-            [Test.bin2vec(addr, 4) + [0] + Test.bin2vec(~(1<<(15-addr)), 16), [1]]
-            for addr in range(0, 15)
-        ]
-    )
-    test_select_1 = Test("Select 1", Test.COMB, default_inputs, default_outputs,
-        body=[
-            [Test.bin2vec(addr, 4) + [0] + Test.bin2vec((1<<(15-addr)), 16), [0]]
-            for addr in range(0, 15)
-        ]
-    )
-    test_inhibit_0 = Test("Inhibit 0", Test.COMB, default_inputs, default_outputs,
-        body=[
-            [addr + [1] + 16*[0], [1]]
-            for addr in Test.binary_combinator(4)
-        ]
-    )
-    test_inhibit_1 = Test("Inhibit 1", Test.COMB, default_inputs, default_outputs,
-        body=[
-            [addr + [1] + 16*[1], [1]]
-            for addr in Test.binary_combinator(4)
-        ]
-    )
-
-    tests = [test_select_0, test_select_1, test_inhibit_0, test_inhibit_1]
+    tests = [
+        Test("Select 0", Test.COMB, default_inputs, default_outputs,
+            body=[[[*BV.int(addr, 4), 0, *~BV.bit(addr, 16)], [1]] for addr in range(0, 15)]
+        ),
+        Test("Select 1", Test.COMB, default_inputs, default_outputs,
+            body=[[[*BV.int(addr, 4), 0, *BV.bit(addr, 16)], [0]] for addr in range(0, 15)]
+        ),
+        Test("Inhibit 0", Test.COMB, default_inputs, default_outputs,
+            body=[[[*BV.int(addr, 4), 1, *~BV.bit(addr, 16)], [1]] for addr in range(0, 15)]
+        ),
+        Test("Inhibit 1", Test.COMB, default_inputs, default_outputs,
+            body=[[[*BV.int(addr, 4), 1, *BV.bit(addr, 16)], [1]] for addr in range(0, 15)]
+        ),
+    ]
