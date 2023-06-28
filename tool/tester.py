@@ -120,8 +120,8 @@ class Tester:
 
         if self.debug:
             print(f"Output pins: A: {outputs>>16:>08b} B: {(outputs>>8) & 0xff:>08b} C: {outputs & 0xff:>08b}")
-            print(f" Input pins: A: {inputs>>16:>08b}  B: {(inputs>>8) & 0xff:>08b}  C: {inputs & 0xff:>08b}")
-            print(f"Pullup pins: A: {pullup>>16:>08b}  B: {(pullup>>8) & 0xff:>08b}  C: {pullup & 0xff:>08b}")
+            print(f"Input pins:  A: {inputs>>16:>08b} B: {(inputs>>8) & 0xff:>08b} C: {inputs & 0xff:>08b}")
+            print(f"Pullup pins: A: {pullup>>16:>08b} B: {(pullup>>8) & 0xff:>08b} C: {pullup & 0xff:>08b}")
 
         self.send(Tester.CMD_SETUP)
         for shift in [16, 8, 0]:
@@ -158,6 +158,9 @@ class Tester:
 
         if self.debug:
             print(f"Test len: {len(body)} vectors")
+            print("Test vectors:")
+            for v in body:
+                print(f" {v[0]} -> {v[1]}")
 
         assert len(body) <= Tester.MAX_LEN
 
@@ -172,7 +175,7 @@ class Tester:
             v_port = self.vector_by_port(all_pins, v[0] + v[1])
             v_port_bin = self.v2bin(v_port)
             if self.debug:
-                print(f"Vector: {v[0]} -> {v[1]} Ports: "
+                print(f"Ports: "
                     f"A: {v_port_bin>>16:>08b} "
                     f"B: {(v_port_bin>>8) & 0xff:>08b} "
                     f"C: {v_port_bin & 0xff:>08b}"
