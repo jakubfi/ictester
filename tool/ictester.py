@@ -20,7 +20,7 @@ def list_parts(list_tests=False):
         families[family].append(i)
 
     for family, parts in sorted(families.items()):
-        for name, part in sorted(parts, key=lambda x: int(re.sub("74[HS]", "74", x[0]))):
+        for name, part in sorted(parts, key=lambda x: int(re.sub("74[HSL]+", "74", x[0]))):
             print(f"{name:7s} {part.full_package_name:15s} {part.desc}")
             if (list_tests):
                 for t in part.tests:
