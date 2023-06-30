@@ -25,7 +25,7 @@ class Part7485(PackageDIP16):
         inputs=[2, 3, 4,  15, 13, 12, 10,  1, 14, 11, 9],
         outputs=[7, 6, 5],
         loops=256,
-        body=[
+        body=lambda: [
             [[ls, eq, gt, *a, *b],
             [
                 (a < b) or ((a == b) and not gt and not eq),
@@ -44,7 +44,7 @@ class Part7485(PackageDIP16):
         inputs=[2, 3, 4,  15, 13, 12, 10,  1, 14, 11, 9],
         outputs=[7, 6, 5],
         loops=256,
-        body=[
+        body=lambda: [
             [[ls, eq, gt, *a, *b],
             [
                 (a < b) or ((a == b) and not gt and not eq),

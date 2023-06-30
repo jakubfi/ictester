@@ -25,7 +25,7 @@ class Part7453(PackageDIP14):
         inputs=[1, 13, 2, 3, 4, 5, 6, 9, 10],
         outputs=[8],
         loops=256,
-        body=[
+        body=lambda: [
             [
                 [*ab, *cd, *ef, 0, *gh], # '0' inserted for NC input 6
                 [~(ab.vand() | cd.vand() | ef.vand() | gh.vand())]

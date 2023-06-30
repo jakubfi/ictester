@@ -31,8 +31,8 @@ class Part74H62(PackageDIP14):
     test_async = Test("Asynchronous operation", Test.COMB,
         inputs=[8,  1, 2,  3, 4, 5,  9, 10, 11,  12, 13],
         outputs=[6],
-        loops = 64,
-        body = [
+        loops=64,
+        body=lambda: [
             [[0, *ab, *cde, *fgh, *ij],  [~(ab.vand() | cde.vand() | fgh.vand() | ij.vand())]]
             for ab in BV.range(0, 4)
             for cde in BV.range(0, 8)

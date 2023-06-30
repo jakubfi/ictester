@@ -25,7 +25,7 @@ class Part74H52(PackageDIP14):
         inputs=[1, 2,  3, 4, 5,  10, 11,  12, 13],
         outputs=[8],
         loops=128,
-        body=[
+        body=lambda: [
             [[*ab, *cde, *fg, *hi], [ab.vand() | cde.vand() | fg.vand() | hi.vand()]]
             for ab in BV.range(0, 4)
             for cde in BV.range(0, 8)

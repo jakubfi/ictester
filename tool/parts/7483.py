@@ -24,7 +24,7 @@ class Part7483(PackageDIP16_vcc5):
     test_all = Test("Complete logic", Test.COMB,
         inputs=[13,  1, 3, 8, 10,  16, 4, 7, 11],
         outputs=[15, 2, 6, 9,  14],
-        body=[
+        body=lambda: [
             [[*c, *a, *b],  [*(a+b+c), (a+b+c).carry]]
             for a in BV.range(0, 16)
             for b in BV.range(0, 16)
