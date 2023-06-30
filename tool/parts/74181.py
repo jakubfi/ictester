@@ -34,7 +34,7 @@ class Part74181(PackageDIP24):
     # ------------------------------------------------------------------------
     def logic_test_gen(s, name, fun):
         # test vectors in [[inputs], [outputs]] order: [[1, s3-0, a3-0, b3-0], [f3-0, a=b]]
-        body = [
+        body = lambda: [
             [
                 [1, *BV.int(s, 4), *a, *b],
                 [*fun(a, b), fun(a, b) == [1, 1, 1, 1]]
@@ -53,7 +53,7 @@ class Part74181(PackageDIP24):
     # ------------------------------------------------------------------------
     def arith_test_gen(s, name, fun):
         # test vectors in [[inputs], [outputs]] order: [[0, s3-0, cin, a3-0, b3-0], [f3-0, cout, a=b]]
-        body = [
+        body = lambda: [
             [
                 [0, *BV.int(s, 4), *~c, *a, *b],
                 [*(fun(a, b) + c), not (fun(a, b) + c).carry, fun(a, b) + c == [1, 1, 1, 1]]

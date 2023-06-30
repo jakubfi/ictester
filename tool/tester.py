@@ -163,6 +163,9 @@ class Tester:
                 print(f" {v[0]} -> {v[1]}")
 
         assert len(body) <= Tester.MAX_LEN
+        for v in body:
+            assert len(test.inputs) == len(v[0])
+            assert len(test.outputs) == len(v[1])
 
         self.send(Tester.CMD_UPLOAD)
         self.send(test.type)

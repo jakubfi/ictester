@@ -159,18 +159,20 @@ class Test():
         assert ttype in [Test.COMB, Test.SEQ, Test.MEM]
         assert inputs
         assert outputs
-        if ttype in [Test.COMB, Test.SEQ]:
-            assert body
-            for v in body:
-                assert len(inputs) == len(v[0])
-                assert len(outputs) == len(v[1])
         self.name = name
         self.type = ttype
         self.subtype = tsubtype
         self.loops = loops
-        self.body = body
+        self._body = body
         self.inputs = inputs
         self.outputs = outputs
+
+    @property
+    def body(self):
+        if callable(self._body):
+            return self._body()
+        else:
+            return self._body
 
     # ------------------------------------------------------------------------
     # Translate integer value into a binary vector
