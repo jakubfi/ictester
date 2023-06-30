@@ -1,3 +1,4 @@
+from binvec import BV
 from prototypes import (PackageDIP16, Pin, Test)
 
 class Part74S405(PackageDIP16):
@@ -24,16 +25,10 @@ class Part74S405(PackageDIP16):
     default_outputs = [7, 9, 10, 11, 12, 13, 14, 15]
 
     test_select = Test("Select", Test.COMB, default_inputs, default_outputs,
-        body=[
-            [[0, 0, 1] + Test.bin2vec(i, 3), Test.bin2vec(~(1<<i), 8)]
-            for i in range(0, 8)
-        ]
+        body=[[[0, 0, 1, *BV.int(i, 3)],  ~BV.bit(i, 8)] for i in range(0, 8)]
     )
-    test_inhibit = Test("Inhibit", Test.COMB, default_inputs, default_outputs,
-        body=[
-            [Test.bin2vec(i, 3) + [0, 0, 0], 8*[1]]
-            for i in set(range(0, 8)) - {1}  # all inhibit combinations
-        ]
+    test_inhibit = Test("Inhibit (all comb.)", Test.COMB, default_inputs, default_outputs,
+        body=[[[*BV.int(i, 3), 0, 0, 0],  8*[1]] for i in set(range(0, 8)) - {1}]
     )
 
     tests = [test_select, test_inhibit]

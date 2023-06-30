@@ -1,4 +1,3 @@
-from functools import reduce
 import inspect
 
 # ------------------------------------------------------------------------
@@ -174,33 +173,3 @@ class Test():
         else:
             return self._body
 
-    # ------------------------------------------------------------------------
-    # Translate integer value into a binary vector
-    # bin2vec(9, 7) -> [0, 0, 0, 1, 0, 0, 1]
-    @staticmethod
-    def bin2vec(val, bitlen):
-        return [
-            (val >> (bitlen-pos-1)) & 1
-            for pos in range(0, bitlen)
-        ]
-
-    # ------------------------------------------------------------------------
-    # Get all bit combinations for given bit length
-    # binary_combinator(2) -> [[0, 0], [0, 1], [1, 0], [1, 1]]
-    @staticmethod
-    def binary_combinator(bitlen):
-        return [
-            Test.bin2vec(v, bitlen)
-            for v in range(0, 2**bitlen)
-        ]
-
-    # ------------------------------------------------------------------------
-    # Prepare test vectors for unit_cnt separate units with input_cnt inputs doing fun
-    # Units are tested in parallel
-    # Four 3-input OR gates: binary_fun_gen(4, 3, lambda a, b: a|b)
-    @staticmethod
-    def binary_fun_gen(unit_cnt, input_cnt, fun, inverted=False):
-        return [
-            [unit_cnt*v, unit_cnt*[reduce(fun, v) if not inverted else not reduce(fun, v)]]
-            for v in Test.binary_combinator(input_cnt)
-        ]

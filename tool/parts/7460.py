@@ -1,3 +1,4 @@
+from binvec import BV
 from prototypes import (PackageDIP14, Pin, Test)
 
 '''
@@ -31,12 +32,7 @@ class Part7460(PackageDIP14):
         inputs=[11, 10,  1, 2, 3, 13,  4, 5, 6, 8],
         outputs=[12, 9],
         loops = 64,
-        body = [
-            [
-                [0, 0] + i + i,
-                [not (i[0] & i[1] & i[2] & i[3]), not (i[0] & i[1] & i[2] & i[3])]
-            ] for i in Test.binary_combinator(4)
-        ]
+        body = [[[0, 0, *i, *i],  [~i.vand(), ~i.vand()]] for i in BV.range(0, 16)]
     )
 
     tests = [test_async]

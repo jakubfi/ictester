@@ -1,3 +1,4 @@
+from binvec import BV
 from prototypes import (PackageDIP14, Pin, Test)
 
 class Part74H87(PackageDIP14):
@@ -22,28 +23,16 @@ class Part74H87(PackageDIP14):
     default_outputs = [3, 6, 9, 12]
 
     test_true = Test("True", Test.COMB, default_inputs, default_outputs,
-        body=[
-            [[0, 1] + Test.bin2vec(i, 4), Test.bin2vec(i, 4)]
-            for i in range(0, 16)
-        ]
+        body=[[[0, 1, *i], i] for i in BV.range(0, 16)]
     )
     test_complement = Test("Complement", Test.COMB, default_inputs, default_outputs,
-        body=[
-            [[0, 0] + Test.bin2vec(i, 4), Test.bin2vec(~i, 4)]
-            for i in range(0, 16)
-        ]
+        body=[[[0, 0, *i], ~i] for i in BV.range(0, 16)]
     )
     test_zero = Test("Zero", Test.COMB, default_inputs, default_outputs,
-        body=[
-            [[1, 1] + Test.bin2vec(i, 4), 4*[0]]
-            for i in range(0, 16)
-        ]
+        body=[[[1, 1, *i], BV.int(0, 4)] for i in BV.range(0, 16)]
     )
     test_one = Test("One", Test.COMB, default_inputs, default_outputs,
-        body=[
-            [[1, 0] + Test.bin2vec(i, 4), 4*[1]]
-            for i in range(0, 16)
-        ]
+        body=[[[1, 0, *i], ~BV.int(0, 4)] for i in BV.range(0, 16)]
     )
 
     tests = [test_true, test_complement, test_zero, test_one]

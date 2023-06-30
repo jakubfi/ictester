@@ -1,3 +1,4 @@
+from binvec import BV
 from prototypes import (PackageDIP16, Pin, Test)
 
 class Part74182(PackageDIP16):
@@ -32,7 +33,7 @@ class Part74182(PackageDIP16):
                 or v[3:] == [0, 0, 0, 0]
                 else [1]
             ]
-            for v in Test.binary_combinator(7)
+            for v in BV.range(0, 128)
         ]
     )
     test_p = Test("~P", Test.COMB,
@@ -41,7 +42,7 @@ class Part74182(PackageDIP16):
         loops=64,
         body=[
             [v, [0] if v == [0, 0, 0, 0] else [1]]
-            for v in Test.binary_combinator(4)
+            for v in BV.range(0, 16)
         ]
     )
     test_cnx = Test("Cn+x", Test.COMB,
@@ -50,7 +51,7 @@ class Part74182(PackageDIP16):
         loops=64,
         body=[
             [v, [1] if not v[0] or v[1:3] == [0, 1] else [0]]
-            for v in Test.binary_combinator(3)
+            for v in BV.range(0, 8)
         ]
     )
     test_cny = Test("Cn+y", Test.COMB,
@@ -59,7 +60,7 @@ class Part74182(PackageDIP16):
         loops=64,
         body=[
             [v, [1] if not v[0] or v[1:3] == [0, 0] or v[2:5] == [0, 0, 1] else [0]]
-            for v in Test.binary_combinator(5)
+            for v in BV.range(0, 32)
         ]
     )
     test_cnz = Test("Cn+z", Test.COMB,
@@ -68,7 +69,7 @@ class Part74182(PackageDIP16):
         loops=64,
         body=[
             [v, [1] if not v[0] or (not v[1] and not v[3]) or v[2:5] == [0, 0, 0] or v[3:] == [0, 0, 0, 1] else [0]]
-            for v in Test.binary_combinator(7)
+            for v in BV.range(0, 128)
         ]
     )
 

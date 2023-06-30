@@ -26,15 +26,15 @@ class Part74151(PackageDIP16):
 
     tests = [
         Test("Select 0", Test.COMB, default_inputs, default_outputs,
-            body=[[[*~BV.bit(addr, 8), *BV.int(addr, 3), 0], [0, 1]] for addr in range(0, 8)]
+            body=[[[*~BV.bit(addr, 8), *BV.int(addr, 3), 0],  [0, 1]] for addr in range(0, 8)]
         ),
         Test("Select 1", Test.COMB, default_inputs, default_outputs,
-            body=[[[*BV.bit(addr, 8), *BV.int(addr, 3), 0], [1, 0]] for addr in range(0, 8)]
+            body=[[[*BV.bit(addr, 8), *BV.int(addr, 3), 0],  [1, 0]] for addr in range(0, 8)]
         ),
         Test("Inhibit 0", Test.COMB, default_inputs, default_outputs,
-            body=[[[*BV.int(0, 8), *BV.int(addr, 3), 1], [0, 1]] for addr in range(0, 8)]
+            body=[[[*BV.int(0, 8), *addr, 1],  [0, 1]] for addr in BV.range(0, 8)]
         ),
         Test("Inhibit 1", Test.COMB, default_inputs, default_outputs,
-            body=[[[*~BV.int(0, 8), *BV.int(addr, 3), 1], [0, 1]] for addr in range(0, 8)]
+            body=[[[*~BV.int(0, 8), *addr, 1],  [0, 1]] for addr in BV.range(0, 8)]
         )
     ]

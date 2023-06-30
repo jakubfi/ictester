@@ -1,3 +1,4 @@
+from binvec import BV
 from prototypes import (PackageDIP16, Pin, Test)
 
 class Part7442(PackageDIP16):
@@ -23,10 +24,7 @@ class Part7442(PackageDIP16):
     test_async = Test("Asynchronous operation", Test.COMB,
         inputs=[12, 13, 14, 15],
         outputs=[11, 10, 9, 7, 6, 5, 4, 3, 2, 1],
-        body=[
-            [Test.bin2vec(i, 4), Test.bin2vec(~(1<<i), 10)]
-            for i in range(0, 2**4)
-        ]
+        body=[[BV.int(i, 4),  ~BV.bit(i, 10)] for i in range(0, 16)]
     )
 
     tests = [test_async]

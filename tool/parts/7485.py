@@ -1,3 +1,4 @@
+from binvec import BV
 from prototypes import (PackageDIP16, Pin, Test)
 
 class Part7485(PackageDIP16):
@@ -20,22 +21,43 @@ class Part7485(PackageDIP16):
         15: Pin("A3", Pin.IN),
     }
 
-    test_all = Test("Full logic", Test.COMB,
+    test_all_0 = Test("Full logic (A=B = 0)", Test.COMB,
         inputs=[2, 3, 4,  15, 13, 12, 10,  1, 14, 11, 9],
         outputs=[7, 6, 5],
         loops=256,
         body=[
-            [[ls, eq, gt] + Test.bin2vec(a, 4) + Test.bin2vec(b, 4), [
-                (a < b) or ((a == b) and (ls or not any([ls, eq, gt]))),
+            [[ls, eq, gt, *a, *b],
+            [
+                (a < b) or ((a == b) and not gt and not eq),
                 (a == b) and eq,
-                (a > b) or ((a == b) and (gt or not any([ls, eq, gt])))
+                (a > b) or ((a == b) and not ls and not eq)
             ]]
-            for a in range(16)
-            for b in range(16)
-            for ls in range(1)
-            for eq in range(1)
-            for gt in range(1)
+            for a in BV.range(0, 16)
+            for b in BV.range(0, 16)
+            for ls in [0, 1]
+            for eq in [0]
+            for gt in [0, 1]
         ]
     )
 
-    tests = [test_all]
+    test_all_1 = Test("Full logic (A=B = 1)", Test.COMB,
+        inputs=[2, 3, 4,  15, 13, 12, 10,  1, 14, 11, 9],
+        outputs=[7, 6, 5],
+        loops=256,
+        body=[
+            [[ls, eq, gt, *a, *b],
+            [
+                (a < b) or ((a == b) and not gt and not eq),
+                (a == b) and eq,
+                (a > b) or ((a == b) and not ls and not eq)
+            ]]
+            for a in BV.range(0, 16)
+            for b in BV.range(0, 16)
+            for ls in [0, 1]
+            for eq in [1]
+            for gt in [0, 1]
+        ]
+    )
+
+    # cannot fit both tests in tester memory, merge when more memory available
+    tests = [test_all_0, test_all_1]

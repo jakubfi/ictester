@@ -1,3 +1,4 @@
+from binvec import BV
 from prototypes import (PackageDIP14, Pin, Test)
 
 class Part74H61(PackageDIP14):
@@ -21,8 +22,8 @@ class Part74H61(PackageDIP14):
     test_async = Test("Asynchronous operation", Test.COMB,
         inputs=[1, 2, 3,  4, 5, 6,  11, 12, 13],
         outputs=[9, 8, 10],
-        loops = 64,
-        body = Test.binary_fun_gen(3, 3, lambda a, b: a & b, inverted=True)
+        loops=64,
+        body=[[3*x, 3*~x.vand()] for x in BV.range(0, 8)]
     )
 
     tests = [test_async]

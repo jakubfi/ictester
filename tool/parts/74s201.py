@@ -1,3 +1,4 @@
+from binvec import BV
 from prototypes import (PackageDIP16, Pin, Test)
 
 class Part74S201(PackageDIP16):
@@ -23,8 +24,8 @@ class Part74S201(PackageDIP16):
     # ------------------------------------------------------------------------
     def for_all_addr(op, s1, s2, s3, i, o):
         return [
-            [[op,  s1, s2, s3] + Test.bin2vec(addr, 8) + [i], [o]]
-            for addr in range(0, 256)
+            [[op, s1, s2, s3, *addr, i], [o]]
+            for addr in BV.range(0, 256)
         ]
 
     default_inputs = [12,  3, 4, 5,  1, 2, 15, 7, 9, 10, 11, 14,  13]

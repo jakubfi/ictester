@@ -26,6 +26,12 @@ class BV(list):
             for v in range(start, stop)
         )
 
+    def even(self):
+        return reduce(lambda a, b: a==b, self)
+
+    def odd(self):
+        return not self.even()
+
     def reversed(self):
         return BV(reversed(self))
 
@@ -58,6 +64,15 @@ class BV(list):
 
     def __xor__(self, obj):
         return BV.int(int(self) ^ int(obj), len(self))
+
+    def __lt__(self, obj):
+        return int(self) < int(BV(obj))
+
+    def __gt__(self, obj):
+        return int(self) > int(BV(obj))
+
+    def __eq__(self, obj):
+        return int(self) == int(BV(obj))
 
     def __str__(self):
         strvec = [int(v) for v in self]

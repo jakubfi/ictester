@@ -1,3 +1,4 @@
+from binvec import BV
 from prototypes import (PackageDIP16, Pin, Test)
 
 class Part74157(PackageDIP16):
@@ -25,16 +26,16 @@ class Part74157(PackageDIP16):
 
     test_inhibit = Test("Inhibit", Test.COMB, default_inputs, default_outputs,
         body=[
-            [[1, addr] + 4 * data, 4*[0]]
+            [[1, addr, *(4*data)],  4*[0]]
             for addr in [0, 1]
-            for data in Test.binary_combinator(2)
+            for data in BV.range(0, 4)
         ]
     )
     test_select = Test("Select", Test.COMB, default_inputs, default_outputs,
         body=[
-            [[0, addr] + 4*data, 4*[data[addr]]]
+            [[0, addr, *(4*data)],  4*[data[addr]]]
             for addr in [0, 1]
-            for data in Test.binary_combinator(2)
+            for data in BV.range(0, 4)
         ]
     )
 

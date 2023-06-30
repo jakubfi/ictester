@@ -1,3 +1,4 @@
+from binvec import BV
 from prototypes import (Test, partimport)
 
 class Part780101(partimport("7489")):
@@ -13,25 +14,25 @@ class Part780101(partimport("7489")):
         def rw_cycle(addr_vec):
             return [
                 # write 1s
-                [addr_vec + [1, 1, 1, 1,  1, 1], [1, 1, 1, 1]],  # NONE: ou = 1
-                [addr_vec + [1, 1, 1, 1,  0, 0], [1, 1, 1, 1]],  # WRITE: ou = 1
-                [addr_vec + [1, 1, 1, 1,  1, 1], [1, 1, 1, 1]],  # NONE: ou = 1
-                [addr_vec + [0, 0, 0, 0,  1, 0], [1, 1, 1, 1]],  # NONE: ou = 1
+                [[*addr_vec, 1, 1, 1, 1,  1, 1], [1, 1, 1, 1]],  # NONE: ou = 1
+                [[*addr_vec, 1, 1, 1, 1,  0, 0], [1, 1, 1, 1]],  # WRITE: ou = 1
+                [[*addr_vec, 1, 1, 1, 1,  1, 1], [1, 1, 1, 1]],  # NONE: ou = 1
+                [[*addr_vec, 0, 0, 0, 0,  1, 0], [1, 1, 1, 1]],  # NONE: ou = 1
                 # read 1s
-                [addr_vec + [1, 1, 1, 1,  0, 1], [0, 0, 0, 0]],  # READ: ou = ~mem word
-                [addr_vec + [1, 1, 1, 1,  1, 1], [1, 1, 1, 1]],  # NONE ou = 1
+                [[*addr_vec, 1, 1, 1, 1,  0, 1], [0, 0, 0, 0]],  # READ: ou = ~mem word
+                [[*addr_vec, 1, 1, 1, 1,  1, 1], [1, 1, 1, 1]],  # NONE ou = 1
                 # write 0s
-                [addr_vec + [0, 0, 0, 0,  1, 1], [1, 1, 1, 1]],  # NONE: ou = 1
-                [addr_vec + [0, 0, 0, 0,  0, 0], [1, 1, 1, 1]],  # WRITE: ou = 1
-                [addr_vec + [0, 0, 0, 0,  1, 1], [1, 1, 1, 1]],  # NONE: ou = 1
-                [addr_vec + [1, 1, 1, 1,  1, 0], [1, 1, 1, 1]],  # NONE: ou = 1
+                [[*addr_vec, 0, 0, 0, 0,  1, 1], [1, 1, 1, 1]],  # NONE: ou = 1
+                [[*addr_vec, 0, 0, 0, 0,  0, 0], [1, 1, 1, 1]],  # WRITE: ou = 1
+                [[*addr_vec, 0, 0, 0, 0,  1, 1], [1, 1, 1, 1]],  # NONE: ou = 1
+                [[*addr_vec, 1, 1, 1, 1,  1, 0], [1, 1, 1, 1]],  # NONE: ou = 1
                 # read 0s
-                [addr_vec + [0, 0, 0, 0,  0, 1], [1, 1, 1, 1]],  # READ: ou = ~mem word
-                [addr_vec + [0, 0, 0, 0,  1, 1], [1, 1, 1, 1]],  # NONE: ou = 1
+                [[*addr_vec, 0, 0, 0, 0,  0, 1], [1, 1, 1, 1]],  # READ: ou = ~mem word
+                [[*addr_vec, 0, 0, 0, 0,  1, 1], [1, 1, 1, 1]],  # NONE: ou = 1
             ]
 
         body = []
-        for v in Test.binary_combinator(4):
+        for v in BV.range(0, 16):
             body.extend(rw_cycle(v))
 
         return Test("Complete array", Test.COMB,

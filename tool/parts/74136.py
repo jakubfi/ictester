@@ -1,6 +1,7 @@
-from prototypes import (PackageDIP14, Pin, Test)
+from binvec import BV
+from prototypes import (Pin, partimport)
 
-class Part74136(PackageDIP14):
+class Part74136(partimport("7486")):
     name = "74136"
     desc = "Quarduple 2-input exclusive-OR gates with open-collector outputs"
     pin_cfg = {
@@ -17,11 +18,3 @@ class Part74136(PackageDIP14):
         12: Pin("4A", Pin.IN),
         13: Pin("4B", Pin.IN),
     }
-
-    tests = [
-        Test("Complete logic", Test.COMB,
-            inputs=[1, 2, 4, 5, 10, 9, 13, 12],
-            outputs=[3, 6, 8, 11],
-            body=Test.binary_fun_gen(4, 2, lambda a, b: a ^ b, inverted=False)
-        )
-    ]
