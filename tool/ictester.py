@@ -4,7 +4,6 @@ import sys
 import argparse
 import math
 import re
-import time
 
 from tester import Tester
 from parts import catalog
@@ -86,9 +85,7 @@ for test_name in all_tests:
     endc = "\n" if args.debug else ""
     print(f" * Testing: {test_name:{longest_desc}s}   {loops} loop{plural}  ... ", end=endc, flush=True)
 
-    start = time.time()
-    res = tester.exec_test(test, loops_pow)
-    elapsed = time.time() - start
+    res, elapsed = tester.exec_test(test, loops_pow)
     total_time += elapsed
 
     if res == Tester.RES_PASS:

@@ -1,6 +1,6 @@
 import serial
+import time
 from prototypes import Pin
-
 
 class Tester:
     CMD_SETUP = 0
@@ -193,7 +193,10 @@ class Tester:
         assert loop_pow < 16
         self.send(Tester.CMD_RUN)
         self.send(loop_pow)
-        return self.recv()
+        start = time.time()
+        result = self.recv()
+        elapsed = time.time() - start
+        return result, elapsed
 
     def exec_test(self, test, loop_pow):
         self.setup(test)
