@@ -71,9 +71,6 @@ class BV(list):
     def __gt__(self, obj):
         return int(self) > int(BV(obj))
 
-    def __eq__(self, obj):
-        return int(self) == int(BV(obj))
-
     def __str__(self):
         strvec = [int(v) for v in self]
         return f"{strvec}"
