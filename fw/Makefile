@@ -103,6 +103,9 @@ writeflash: hex .check-programmer-var
 fuses: .check-programmer-var
 	$(AVRDUDE) $(AVRDUDE_PROGRAMMER) -p $(PROGRAMMER_MCU) -U lfuse:w:0xff:m -U hfuse:w:0xd9:m -U efuse:w:0xff:m
 
+reset: .check-programmer-var
+	$(AVRDUDE) $(AVRDUDE_PROGRAMMER) -p $(PROGRAMMER_MCU)
+
 install: writeflash
 
 $(DUMPTRG): $(TRG) 
