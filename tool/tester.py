@@ -1,6 +1,7 @@
 import serial
 import time
 from prototypes import Pin
+from binvec import BV
 
 class Tester:
     CMD_SETUP = 0
@@ -90,41 +91,31 @@ class Tester:
             print(f"-> {b:>08b} {b}")
         return b
 
-    def v2bin(self, tf):
-        """
-        translate a [True/False] vector to its binary representation
-        """
-        b = 0
-        bit_length = len(tf)
-        for i in range(0, bit_length):
-            b |= int(tf[i]) << (bit_length-i-1)
-        return b
-
     def tests_available(self):
         return [t.name for t in self.part.tests]
 
     def get_output_pins(self, test):
-        return [
+        return int(BV(
             0 if not p else (1 if p in test.outputs else 0)
             for p in Tester.pin_map[self.part.full_package_name]
-        ]
+        ))
 
     def get_input_pins(self, test):
-        return [
+        return int(BV(
             0 if not p else (1 if p in test.inputs else 0)
             for p in Tester.pin_map[self.part.full_package_name]
-        ]
+        ))
 
     def get_pullup_pins(self, test):
-        return [
+        return int(BV(
             0 if not p else (1 if self.part.pins[p].role == Pin.OC else 0)
             for p in Tester.pin_map[self.part.full_package_name]
-        ]
+        ))
 
     def setup(self, test):
-        outputs = self.v2bin(self.get_output_pins(test))
-        inputs = self.v2bin(self.get_input_pins(test))
-        pullup = self.v2bin(self.get_pullup_pins(test))
+        outputs = self.get_output_pins(test)
+        inputs = self.get_input_pins(test)
+        pullup = self.get_pullup_pins(test)
 
         if self.debug:
             print(f"Output pins: A: {outputs>>16:>08b} B: {(outputs>>8) & 0xff:>08b} C: {outputs & 0xff:>08b}")
@@ -143,10 +134,10 @@ class Tester:
         return 0 if pin not in pins else vals[pins.index(pin)]
 
     def vector_by_port(self, pins, vals):
-        return [
+        return int(BV(
             0 if not pin else self.get_pinvalue(pins, vals, pin)
             for pin in Tester.pin_map[self.part.full_package_name]
-        ]
+        ))
 
     def sequentialize(self, v):
         i = v[0]
@@ -181,15 +172,15 @@ class Tester:
         self.send(len(body) >> 8)
         self.send(len(body) & 0xff)
 
-        all_pins = test.inputs + test.outputs
+        if self.debug:
+            print("Ports:")
+
         for v in body:
-            v_port = self.vector_by_port(all_pins, [*v[0], *v[1]])
-            v_port_bin = self.v2bin(v_port)
+            v_port_bin = self.vector_by_port(test.inputs + test.outputs, [*v[0], *v[1]])
             if self.debug:
-                print(f"Ports: "
-                    f"A: {v_port_bin>>16:>08b} "
-                    f"B: {(v_port_bin>>8) & 0xff:>08b} "
-                    f"C: {v_port_bin & 0xff:>08b}"
+                print(f" A: {v_port_bin>>16:>08b} "
+                    f" B: {(v_port_bin>>8) & 0xff:>08b} "
+                    f" C: {v_port_bin & 0xff:>08b}"
                 )
             for shift in [16, 8, 0]:
                 self.send((v_port_bin >> shift) & 0xff)
