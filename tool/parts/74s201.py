@@ -22,6 +22,7 @@ class Part74S201(PackageDIP16):
     }
 
     # ------------------------------------------------------------------------
+    @staticmethod
     def for_all_addr(op, s1, s2, s3, i, o):
         return [
             [[op, s1, s2, s3, *addr, i], [o]]
@@ -33,24 +34,24 @@ class Part74S201(PackageDIP16):
 
     test_rw = Test("R/W all address space", Test.COMB, default_inputs, default_outputs,
         loops=32,
-        body=lambda: for_all_addr(0,  0, 0, 0,  0,  1)  # write '0', output = high impedance
-            + for_all_addr(1,  0, 0, 0,  0,  1)  # read, output = '1'
-            + for_all_addr(0,  0, 0, 0,  1,  1)  # write '1', output = high impedance
-            + for_all_addr(1,  0, 0, 0,  0,  0)  # read, output = '0'
+        body=lambda: Part74S201.for_all_addr(0,  0, 0, 0,  0,  1)  # write '0', output = high impedance
+            + Part74S201.for_all_addr(1,  0, 0, 0,  0,  1)  # read, output = '1'
+            + Part74S201.for_all_addr(0,  0, 0, 0,  1,  1)  # write '1', output = high impedance
+            + Part74S201.for_all_addr(1,  0, 0, 0,  0,  0)  # read, output = '0'
     )
     test_inhibit_read = Test("Inhibit read", Test.COMB, default_inputs, default_outputs,
         loops=32,
-        body=lambda: for_all_addr(0,  0, 0, 0,  1,  1)  # write '1', output = high impedance
-            + for_all_addr(1,  0, 0, 1,  0,  1)  # inhibit read, output = high impedance
-            + for_all_addr(1,  0, 1, 0,  0,  1)  # inhibit read, output = high impedance
-            + for_all_addr(1,  1, 0, 0,  0,  1)  # inhibit read, output = high impedance
+        body=lambda: Part74S201.for_all_addr(0,  0, 0, 0,  1,  1)  # write '1', output = high impedance
+            + Part74S201.for_all_addr(1,  0, 0, 1,  0,  1)  # inhibit read, output = high impedance
+            + Part74S201.for_all_addr(1,  0, 1, 0,  0,  1)  # inhibit read, output = high impedance
+            + Part74S201.for_all_addr(1,  1, 0, 0,  0,  1)  # inhibit read, output = high impedance
     )
     test_inhibit_write = Test("Inhibit write", Test.COMB, default_inputs, default_outputs,
         loops=32,
-        body=lambda: for_all_addr(0,  0, 0, 0,  1,  1)  # write '1', output = high impedance
+        body=lambda: Part74S201.for_all_addr(0,  0, 0, 0,  1,  1)  # write '1', output = high impedance
             + [[[1, 1, 1, 1,  0, 0, 0, 0, 0, 0, 0, 0,  0], [1]]]  # set inhibit
-            + for_all_addr(0,  1, 1, 1,  0,  1)  # inhibit write '1', output = high impedance
-            + for_all_addr(1,  0, 0, 0,  0,  0)  # inhibit read, output = 0
+            + Part74S201.for_all_addr(0,  1, 1, 1,  0,  1)  # inhibit write '1', output = high impedance
+            + Part74S201.for_all_addr(1,  0, 0, 0,  0,  0)  # inhibit read, output = 0
     )
 
     tests = [test_rw, test_inhibit_read, test_inhibit_write]
