@@ -56,19 +56,27 @@ class Tester:
         if len(self.tests_available()) != len(set(self.tests_available())):
             raise RuntimeError(f"Test names for part {part.name} are not unique")
 
+        self.port = port
+        self.speed = speed
         self.debug = debug
         self.serial_debug = serial_debug
-        self.s = serial.Serial(
-            port,
-            baudrate=speed,
-            bytesize=serial.EIGHTBITS,
-            parity=serial.PARITY_NONE,
-            stopbits=serial.STOPBITS_ONE,
-            timeout=None,
-            xonxoff=False,
-            rtscts=False,
-            dsrdtr=False
-        )
+        self._s = None
+
+    @property
+    def s(self):
+        if not self._s:
+            self._s = serial.Serial(
+                self.port,
+                baudrate=self.speed,
+                bytesize=serial.EIGHTBITS,
+                parity=serial.PARITY_NONE,
+                stopbits=serial.STOPBITS_ONE,
+                timeout=None,
+                xonxoff=False,
+                rtscts=False,
+                dsrdtr=False
+            )
+        return self._s
 
     def send(self, b):
         if self.serial_debug:
