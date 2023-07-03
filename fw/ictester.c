@@ -61,41 +61,57 @@ struct pin_coord {
 	int8_t pin;
 } pin_coord;
 
-const struct pin_coord *pin_map;
+const __flash struct pin_coord *pin_map;
 
-const struct pin_coord dip14_to_zif[14] = {
+const __flash struct pin_coord dip14_to_zif[14] = {
 	{0, 0}, {0, 1}, {0, 2}, {0, 3}, {0, 4}, {0, 5}, {-1, -1},
 	{2, 0}, {2, 1}, {2, 2}, {2, 3}, {2, 4}, {2, 5}, {-1, -1}
 };
 
-const struct pin_coord dip14vcc5_to_zif[14] = {
+const __flash struct pin_coord dip14vcc5_to_zif[14] = {
 	{2, 6}, {2, 5}, {2, 4}, {2, 3}, {-1, -1}, {2, 2}, {2, 1},
 	{0, 1}, {0, 2}, {-1, -1}, {0, 3}, {0, 4}, {0, 5}, {0, 6}
 };
 
-const struct pin_coord dip14vcc4_to_zif[14] = {
+const __flash struct pin_coord dip14vcc4_to_zif[14] = {
 	{2, 5}, {2, 4}, {2, 3}, {-1, -1}, {2, 2}, {2, 1}, {2, 0},
 	{0, 0}, {0, 1}, {0, 2}, {-1, -1}, {0, 3}, {0, 4}, {0, 5}
 };
 
-const struct pin_coord dip16_to_zif[16] = {
+const __flash struct pin_coord dip16_to_zif[16] = {
 	{2, 6}, {2, 5}, {2, 4}, {2, 3}, {2, 2}, {2, 1}, {2, 0}, {-1, -1},
 	{0, 6}, {0, 5}, {0, 4}, {0, 3}, {0, 2}, {0, 1}, {0, 0}, {-1, -1}
 };
 
-const struct pin_coord dip16vcc8_to_zif[16] = {
+const __flash struct pin_coord dip16vcc8_to_zif[16] = {
 	{0, 6}, {0, 5}, {0, 4}, {0, 3}, {0, 2}, {0, 1}, {0, 0}, {-1, -1},
 	{2, 6}, {2, 5}, {2, 4}, {2, 3}, {2, 2}, {2, 1}, {2, 0}, {-1, -1}
 };
 
-const struct pin_coord dip16vcc5_to_zif[16] = {
+const __flash struct pin_coord dip16vcc5_to_zif[16] = {
 	{2, 6}, {2, 5}, {2, 4}, {2, 3}, {-1, -1}, {2, 2}, {2, 1}, {2, 0},
 	{0, 0}, {0, 1}, {0, 2}, {-1, -1}, {0, 3}, {0, 4}, {0, 5}, {0, 6}
 };
 
-const struct pin_coord dip24_to_zif[24] = {
+const __flash struct pin_coord dip24_to_zif[24] = {
 	{0, 0}, {0, 1}, {0, 2}, {0, 3}, {0, 4}, {0, 5}, {0, 6}, {0, 7}, {1, 0}, {1, 1}, {1, 2}, {-1, -1},
 	{2, 0}, {2, 1}, {2, 2}, {2, 3}, {2, 4}, {2, 5}, {2, 6}, {2, 7}, {1, 5}, {1, 4}, {1, 3}, {-1, -1}
+};
+
+struct socket_properties {
+	uint8_t pins, gnd, vcc;
+	const __flash struct pin_coord *pin_map;
+};
+
+const __flash struct socket_properties sp[] = {
+	{14, 6, 13, dip14_to_zif},
+	{14, 9, 4, dip14vcc5_to_zif},
+	{14, 10, 3, dip14vcc4_to_zif},
+	{16, 7, 15, dip16_to_zif},
+	{16, 15, 7, dip16vcc8_to_zif},
+	{16, 11, 4, dip16vcc5_to_zif},
+	{24, 11, 23, dip24_to_zif},
+	{-1}
 };
 
 // -----------------------------------------------------------------------
@@ -138,21 +154,14 @@ void handle_dut_setup(void)
 		pin_data[i] = serial_rx_char();
 	}
 
-	// guess which socket to use
-	if ((pin_count == 14) && (pin_data[6] == PIN_GND) && (pin_data[13] == PIN_VCC)) {
-		pin_map = dip14_to_zif;
-	} else if ((pin_count == 14) && (pin_data[9] == PIN_GND) && (pin_data[4] == PIN_VCC)) {
-		pin_map = dip14vcc5_to_zif;
-	} else if ((pin_count == 14) && (pin_data[10] == PIN_GND) && (pin_data[3] == PIN_VCC)) {
-		pin_map = dip14vcc4_to_zif;
-	} else if ((pin_count == 16) && (pin_data[7] == PIN_GND) && (pin_data[15] == PIN_VCC)) {
-		pin_map = dip16_to_zif;
-	} else if ((pin_count == 16) && (pin_data[7] == PIN_VCC) && (pin_data[15] == PIN_GND)) {
-		pin_map = dip16vcc8_to_zif;
-	} else if ((pin_count == 16) && (pin_data[11] == PIN_GND) && (pin_data[4] == PIN_VCC)) {
-		pin_map = dip16vcc5_to_zif;
-	} else if ((pin_count == 24) && (pin_data[11] == PIN_GND) && (pin_data[23] == PIN_VCC)) {
-		pin_map = dip24_to_zif;
+	// find which socket to use
+	const __flash struct socket_properties *tab = sp;
+	while (tab->pins > 0) {
+		if ((pin_count == tab->pins) && (pin_data[tab->gnd] == PIN_GND) && (pin_data[tab->vcc] == PIN_VCC)) {
+			pin_map = tab->pin_map;
+			break;
+		}
+		tab++;
 	}
 
 	// no match for pin count/VCC/GND -> error
