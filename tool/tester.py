@@ -9,12 +9,28 @@ class Tester:
     CMD_TEST_SETUP = 3
     CMD_VECTORS_LOAD = 4
     CMD_RUN = 5
+    CMD_DUT_CONNECT = 6
+    CMD_DUT_DISCONNECT = 7
 
     RESP_HELLO = 129
     RESP_OK = 130
     RESP_PASS = 131
     RESP_FAIL = 132
     RESP_ERR = 133
+
+    error_strings = {
+        0: "Error code was not set",
+        1: "Unknown command",
+        2: "Unsupported package type",
+        3: "Unsupported pin count",
+        4: "Unknown pin function",
+        5: "Unsupported test type",
+        6: "Bad test parameters",
+        7: "Wrong number of test vectors",
+        8: "Missing DUT setup",
+        9: "No test set",
+        10: "No vectors loaded",
+    }
 
     MAX_LEN = 1024
 
