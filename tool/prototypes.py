@@ -32,42 +32,19 @@ class Pin:
 
 # ------------------------------------------------------------------------
 class Part:
+
+    DIP = 1
+    _type_names = ["???", "DIP"]
+
     pincount = 0
     name = None
     tests = None
     missing_tests = None
 
-    DIP = 1
-    _type_names = ["???", "DIP"]
-
     def __init__(self):
-        assert self.pincount
-        assert self.name
-        assert self.desc
-        assert self.tests
-
-        for p in self.pin_cfg:
-            if p in self.package_pins:
-                raise RuntimeError(f"Duplicate pin {p} definition for {self.name}")
-
-        pin_cfg_roles = [p.role for p in self.pin_cfg.values()]
-        if Pin.VCC in pin_cfg_roles or Pin.GND in pin_cfg_roles:
-            raise RuntimeError(f"VCC/GND pins should not be configured for {self.name}. Package classes provide this.")
-
         self.pins = {}
         self.pins.update(self.package_pins)
         self.pins.update(self.pin_cfg)
-
-        if len(self.pins) != self.pincount:
-            raise RuntimeError(f"Number of pins for the part does not match package pincount: {self.pincount}")
-
-        for p in self.pins:
-            if p < 1 or p > self.pincount:
-                raise RuntimeError(f"Wrong pin index for the package: {p}")
-
-        pin_roles = [p.role for p in self.pins.values()]
-        if Pin.VCC not in pin_roles or Pin.GND not in pin_roles:
-            raise RuntimeError("VCC or GND pin missing")
 
     def get_test(self, name):
         return next(t for t in self.tests if t.name == name)
@@ -167,9 +144,6 @@ class TestVector():
         self.output = vector[1]
         self.test = test
 
-        assert len(self.input) == len(test.inputs)
-        assert len(self.output) == len(test.outputs)
-
     def pin(self, pin):
         if pin not in self.test.pins:
             return 0
@@ -189,10 +163,6 @@ class Test():
     MEM = 2
 
     def __init__(self, name, ttype, inputs, outputs, body=[], tsubtype=0, loops=1024):
-        assert name
-        assert ttype in [Test.COMB, Test.SEQ, Test.MEM]
-        assert inputs
-        assert outputs
         self.name = name
         self.type = ttype
         self.subtype = tsubtype
@@ -226,7 +196,7 @@ class Test():
                 self._body_generated = []
                 for t in self._body_data:
                     self._body_generated.extend(self.sequentialize(t))
-                return body
+
         return self._body_generated
 
     @property

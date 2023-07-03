@@ -1,0 +1,37 @@
+#!/usr/bin/env python3
+
+from parts import catalog
+from prototypes import (Test, Pin)
+
+for name, part in catalog.items():
+    print(f"Checking: {name}")
+    assert part.pincount
+    assert part.name
+    assert part.desc
+    assert part.tests
+
+    if len(part.pins) != part.pincount:
+        raise RuntimeError(f"Number of pins doesn't match pin count")
+
+    for p in part.pins:
+        if p < 1 or p > part.pincount:
+            raise RuntimeError(f"Wrong pin index: {p}")
+
+    pin_roles = [p.role for p in part.pins.values()]
+    if Pin.VCC not in pin_roles or Pin.GND not in pin_roles:
+        raise RuntimeError("VCC or GND pin missing")
+
+    test_names = [t.name for t in part.tests]
+    if len(test_names) != len(set(test_names)):
+        raise RuntimeError("Duplicate test names")
+
+    for test in part.tests:
+        assert test.name
+        assert test.type in [Test.COMB, Test.SEQ, Test.MEM]
+        assert test.inputs
+        assert test.outputs
+
+        for v in test.body:
+            assert len(test.inputs) == len(v[0])
+            assert len(test.outputs) == len(v[1])
+
