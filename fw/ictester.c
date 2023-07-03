@@ -188,6 +188,7 @@ void handle_dut_setup(void)
 				port[port_pos].dut_output |= port_val;
 				break;
 			case PIN_OC:
+				port[port_pos].dut_output |= port_val;
 				port[port_pos].dut_pullup |= port_val;
 				break;
 			default:
