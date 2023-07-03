@@ -149,13 +149,13 @@ static uint8_t march_step_rmw(uint8_t dir, uint8_t r, uint8_t w, uint16_t addr_s
 		for (uint16_t addr_row=0 ; addr_row < addr_space; addr_row++) {
 			set_row_addr(addr_row, dir);
 			set_col_addr(addr_col, dir);
-			if ((r != READ_NONE) && (read_data() != r)) return RES_FAIL;
+			if ((r != READ_NONE) && (read_data() != r)) return RESP_FAIL;
 			if (w != WRITE_NONE) write_data(w);
 			CAS_OFF;
 			RAS_OFF;
 		}
 	}
-	return RES_PASS;
+	return RESP_PASS;
 }
 
 // -----------------------------------------------------------------------
@@ -167,7 +167,7 @@ static uint8_t march_step_rw(uint8_t dir, uint8_t r, uint8_t w, uint16_t addr_sp
 			if (r != READ_NONE) {
 				set_row_addr(addr_row, dir);
 				set_col_addr(addr_col, dir);
-				if (read_data() != r) return RES_FAIL;
+				if (read_data() != r) return RESP_FAIL;
 				CAS_OFF;
 				RAS_OFF;
 			}
@@ -182,7 +182,7 @@ static uint8_t march_step_rw(uint8_t dir, uint8_t r, uint8_t w, uint16_t addr_sp
 		}
 	}
 
-	return RES_PASS;
+	return RESP_PASS;
 }
 
 // -----------------------------------------------------------------------
@@ -203,7 +203,7 @@ static uint8_t march_step_page(uint8_t dir, uint8_t r, uint8_t w, uint16_t addr_
 			set_row_addr(addr_row, dir);
 			for (uint16_t addr_col=0 ; addr_col < addr_space; addr_col++) {
 				set_col_addr(addr_col, dir);
-				if (read_data() != r) return RES_FAIL;
+				if (read_data() != r) return RESP_FAIL;
 				CAS_OFF;
 			}
 			RAS_OFF;
@@ -224,7 +224,7 @@ static uint8_t march_step_page(uint8_t dir, uint8_t r, uint8_t w, uint16_t addr_
 		}
 	}
 
-	return RES_PASS;
+	return RESP_PASS;
 }
 
 // -----------------------------------------------------------------------
@@ -241,14 +241,14 @@ uint8_t run_mem(uint8_t test)
 	uint16_t address_space = test & 0b10000000 ? 0x200 : 0x100;
 
 	for (uint8_t i=0 ; i<MARCH_STEPS ; i++) {
-		if (m_fun(march_cm[i].dir, march_cm[i].read, march_cm[i].write, address_space) != RES_PASS) {
+		if (m_fun(march_cm[i].dir, march_cm[i].read, march_cm[i].write, address_space) != RESP_PASS) {
 			CAS_OFF;
 			RAS_OFF;
-			return RES_FAIL;
+			return RESP_FAIL;
 		}
 	}
 
-	return RES_PASS;
+	return RESP_PASS;
 }
 
 // vim: tabstop=4 shiftwidth=4 autoindent

@@ -1,4 +1,3 @@
-from binvec import BV
 from prototypes import (Pin, partimport)
 
 class Part74136(partimport("7486")):

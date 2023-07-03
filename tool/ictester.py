@@ -55,7 +55,7 @@ parser.add_argument('--loops', type=int, help='Loop count (<65536, will be round
 parser.add_argument('--list', action="store_true", help='List all supported parts')
 parser.add_argument('--tests', action="store_true", help='When listing parts, list also tests for each part')
 parser.add_argument('--debug', action="store_true", help='Enable debug output')
-parser.add_argument('--serial_debug', action="store_true", help='Enable serial debug output')
+parser.add_argument('--debug-serial', action="store_true", help='Enable serial debug output')
 parser.add_argument('part', help='Part symbol')
 args = parser.parse_args()
 
@@ -68,7 +68,7 @@ except KeyError:
 
 print_part_info(part)
 
-tester = Tester(part, args.device, 500000, debug=args.debug, serial_debug=args.serial_debug)
+tester = Tester(part, args.device, 500000, debug=args.debug, serial_debug=args.debug_serial)
 all_tests = tester.tests_available()
 test_count = len(all_tests)
 longest_desc = len(max(all_tests, key=len))
@@ -86,9 +86,8 @@ for test_name in all_tests:
     print(f" * Testing: {test_name:{longest_desc}s}   {loops} loop{plural}  ... ", end=endc, flush=True)
 
     res, elapsed = tester.exec_test(test, loops_pow)
-    total_time += elapsed
 
-    if res == Tester.RES_PASS:
+    if res == Tester.RESP_PASS:
         tests_passed += 1
         print(f"\b\b\b\b{OK}PASS{ENDC}  ({elapsed:.2f} sec.)")
     else:
@@ -103,6 +102,6 @@ else:
     result = "PART OK"
     ret = 0
 
-print(f"\n{color}{result}: {tests_passed} of {test_count} tests passed{ENDC}  ({total_time:.2f} sec. total)")
+print(f"\n{color}{result}: {tests_passed} of {test_count} tests passed{ENDC}")
 
 sys.exit(ret)

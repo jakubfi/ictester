@@ -1,55 +1,23 @@
 import serial
 import time
-from prototypes import Pin
+import math
 from binvec import BV
 
-class Tester:
-    CMD_SETUP = 0
-    CMD_UPLOAD = 1
-    CMD_RUN = 2
-    RES_OK = 0
-    RES_ERR = 1
-    RES_PASS = 2
-    RES_FAIL = 3
-    MAX_LEN = 1024
 
-    pin_map = {
-        "DIP14": [
-            0,  0,  6,  5,  4,  3, 2, 1,  # port A[7..0]
-            0,  0,  0,  0,  0,  0, 0, 0,  # port B[7..0]
-            0,  0, 13, 12, 11, 10, 9, 8,  # port C[7..0]
-        ],
-        "DIP14 VCC@pin5": [
-            0, 14, 13, 12, 11,  9,  8,  0,  # port A[7..0]
-            0,  0,  0,  0,  0,  0,  0,  0,  # port B[7..0]
-            0,  1,  2,  3,  4,  6,  7,  0,  # port C[7..0]
-        ],
-        "DIP14 VCC@pin4": [
-            0,  0, 14, 13, 12, 10,  9,  8,  # port A[7..0]
-            0,  0,  0,  0,  0,  0,  0,  0,  # port B[7..0]
-            0,  0,  1,  2,  3,  5,  6,  7,  # port C[7..0]
-        ],
-        "DIP16": [
-            0,  9, 10, 11, 12, 13, 14, 15,  # port A[7..0]
-            0,  0,  0,  0,  0,  0,  0,  0,  # port B[7..0]
-            0,  1,  2,  3,  4,  5,  6,  7,  # port C[7..0]
-        ],
-        "DIP16 VCC@pin8": [
-            0,  1,  2,  3,  4,  5,  6,  7,  # port A[7..0]
-            0,  0,  0,  0,  0,  0,  0,  0,  # port B[7..0]
-            0,  9, 10, 11, 12, 13, 14, 15,  # port C[7..0]
-        ],
-        "DIP16 VCC@pin5": [
-            0, 16, 15, 14, 13, 11, 10,  9,  # port A[7..0]
-            0,  0,  0,  0,  0,  0,  0,  0,  # port B[7..0]
-            0,  1,  2,  3,  4,  6,  7,  8,  # port C[7..0]
-        ],
-        "DIP24": [
-            8,   7,  6,  5,  4,  3,  2,  1,  # port A[7..0]
-            0,   0, 21, 22, 23, 11, 10,  9,  # port B[7..0]
-            20, 19, 18, 17, 16, 15, 14, 13,  # port C[7..0]
-        ],
-    }
+class Tester:
+    CMD_HELLO = 1
+    CMD_DUT_SETUP = 2
+    CMD_TEST_SETUP = 3
+    CMD_VECTORS_LOAD = 4
+    CMD_RUN = 5
+
+    RESP_HELLO = 129
+    RESP_OK = 130
+    RESP_PASS = 131
+    RESP_FAIL = 132
+    RESP_ERR = 133
+
+    MAX_LEN = 1024
 
     def __init__(self, part, port, speed, debug=False, serial_debug=False):
         self.part = part
@@ -85,6 +53,17 @@ class Tester:
         data = bytes([b])
         self.s.write(data)
 
+    def send_16le(self, w):
+        self.send(w & 0xff)
+        self.send((w >> 8) & 0xff)
+
+    def send_vector_as_bytes(self, v):
+        data = int(BV(v))
+        if self.debug:
+            print(f" {data:0{len(v)}b}")
+        for shift in [0, 8, 16][0:math.ceil(len(v)/8)]:
+            self.send((data >> shift) & 0xff)
+
     def recv(self):
         b = ord(self.s.read(1))
         if self.serial_debug:
@@ -94,50 +73,24 @@ class Tester:
     def tests_available(self):
         return [t.name for t in self.part.tests]
 
-    def get_output_pins(self, test):
-        return int(BV(
-            0 if not p else (1 if p in test.outputs else 0)
-            for p in Tester.pin_map[self.part.full_package_name]
-        ))
-
-    def get_input_pins(self, test):
-        return int(BV(
-            0 if not p else (1 if p in test.inputs else 0)
-            for p in Tester.pin_map[self.part.full_package_name]
-        ))
-
-    def get_pullup_pins(self, test):
-        return int(BV(
-            0 if not p else (1 if self.part.pins[p].role == Pin.OC else 0)
-            for p in Tester.pin_map[self.part.full_package_name]
-        ))
-
-    def setup(self, test):
-        outputs = self.get_output_pins(test)
-        inputs = self.get_input_pins(test)
-        pullup = self.get_pullup_pins(test)
-
+    def dut_setup(self):
         if self.debug:
-            print(f"Output pins: A: {outputs>>16:>08b} B: {(outputs>>8) & 0xff:>08b} C: {outputs & 0xff:>08b}")
-            print(f"Input pins:  A: {inputs>>16:>08b} B: {(inputs>>8) & 0xff:>08b} C: {inputs & 0xff:>08b}")
-            print(f"Pullup pins: A: {pullup>>16:>08b} B: {(pullup>>8) & 0xff:>08b} C: {pullup & 0xff:>08b}")
+            print("Pin roles:")
 
-        self.send(Tester.CMD_SETUP)
-        for shift in [16, 8, 0]:
-            self.send((outputs >> shift) & 0xff)
-            self.send((inputs >> shift) & 0xff)
-            self.send((pullup >> shift) & 0xff)
-        if self.recv() != Tester.RES_OK:
-            raise RuntimeError("Setup failed")
+        self.send(Tester.CMD_DUT_SETUP)
+        self.send(self.part.package_type)
+        self.send(self.part.pincount)
+
+        for num, pin in sorted(self.part.pins.items()):
+            if self.debug:
+                print(f" {num:-2}: {pin.role_name}")
+            self.send(pin.role)
+
+        if self.recv() != Tester.RESP_OK:
+            raise RuntimeError("DUT setup failed")
 
     def get_pinvalue(self, pins, vals, pin):
         return 0 if pin not in pins else vals[pins.index(pin)]
-
-    def vector_by_port(self, pins, vals):
-        return int(BV(
-            0 if not pin else self.get_pinvalue(pins, vals, pin)
-            for pin in Tester.pin_map[self.part.full_package_name]
-        ))
 
     def sequentialize(self, v):
         i = v[0]
@@ -147,7 +100,25 @@ class Tester:
             [[x if x in [0, 1] else 1 if x == '+' else 0 for x in i], o],
         ]
 
-    def upload(self, test):
+    def test_setup(self, test):
+        self.send(Tester.CMD_TEST_SETUP)
+        self.send(test.type)
+        self.send(test.subtype)
+
+        if self.debug:
+            print("Pin used by the test:")
+
+        data = [
+            1 if i in test.inputs + test.outputs else 0
+            for i in reversed(range(1, self.part.pincount+1))
+        ]
+        self.send_vector_as_bytes(data)
+
+        if self.recv() != Tester.RESP_OK:
+            raise RuntimeError("Test setup failed")
+
+    def vectors_load(self, test):
+
         if test.type == test.COMB:
             body = test.body
         else:
@@ -156,8 +127,7 @@ class Tester:
                 body.extend(self.sequentialize(t))
 
         if self.debug:
-            print(f"Test len: {len(body)} vectors")
-            print("Test vectors:")
+            print(f"Test vectors ({len(body)}):")
             for v in body:
                 print(f" {v[0]} -> {v[1]}")
 
@@ -166,38 +136,36 @@ class Tester:
             assert len(test.inputs) == len(v[0])
             assert len(test.outputs) == len(v[1])
 
-        self.send(Tester.CMD_UPLOAD)
-        self.send(test.type)
-        self.send(test.subtype)
-        self.send(len(body) >> 8)
-        self.send(len(body) & 0xff)
+        self.send(Tester.CMD_VECTORS_LOAD)
+        self.send_16le(len(body))
 
         if self.debug:
-            print("Ports:")
+            print("Binary vectors:")
 
         for v in body:
-            v_port_bin = self.vector_by_port(test.inputs + test.outputs, [*v[0], *v[1]])
-            if self.debug:
-                print(f" A: {v_port_bin>>16:>08b} "
-                    f" B: {(v_port_bin>>8) & 0xff:>08b} "
-                    f" C: {v_port_bin & 0xff:>08b}"
-                )
-            for shift in [16, 8, 0]:
-                self.send((v_port_bin >> shift) & 0xff)
+            data = [
+                self.get_pinvalue(test.inputs + test.outputs, [*v[0], *v[1]], i)
+                for i in reversed(range(1, self.part.pincount+1))
+            ]
+            self.send_vector_as_bytes(data)
 
-        if self.recv() != Tester.RES_OK:
-            raise RuntimeError("Upload failed")
+        if self.recv() != Tester.RESP_OK:
+            raise RuntimeError("Vectors load failed")
 
     def run(self, loop_pow):
         assert loop_pow < 16
+
         self.send(Tester.CMD_RUN)
         self.send(loop_pow)
+
         start = time.time()
         result = self.recv()
         elapsed = time.time() - start
+
         return result, elapsed
 
     def exec_test(self, test, loop_pow):
-        self.setup(test)
-        self.upload(test)
+        self.dut_setup()
+        self.test_setup(test)
+        self.vectors_load(test)
         return self.run(loop_pow)

@@ -2,10 +2,11 @@
 #define __RESULTS_H__
 
 enum result {
-	RES_OK		= 0,
-	RES_ERR		= 1,
-	RES_PASS	= 2,
-	RES_FAIL	= 3,
+	RESP_HELLO			= 129,
+	RESP_OK				= 130,
+	RESP_PASS			= 131,
+	RESP_FAIL			= 132,
+	RESP_ERR			= 133,
 };
 
 #endif
