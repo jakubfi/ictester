@@ -92,15 +92,12 @@ class Tester:
         if self.recv() != Tester.RESP_OK:
             raise RuntimeError("DUT setup failed")
 
-    def get_pinvalue(self, pins, vals, pin):
-        return 0 if pin not in pins else vals[pins.index(pin)]
-
     def test_setup(self, test):
         self.send([Tester.CMD_TEST_SETUP, test.type, test.subtype])
 
         data = [
-            1 if i in test.inputs + test.outputs else 0
-            for i in reversed(range(1, self.part.pincount+1))
+            1 if i in test.pins else 0
+            for i in reversed(sorted(self.part.pins))
         ]
         if self.debug:
             print(f"Pin used by the test: {data}")
@@ -112,13 +109,10 @@ class Tester:
     def vectors_load(self, test):
         if self.debug:
             print(f"Test vectors ({len(test.body)}):")
-            for v in test.body:
-                print(f" {v[0]} -> {v[1]}")
+            for v in test.vectors:
+                print(f" {v}")
 
         assert len(test.body) <= Tester.MAX_LEN
-        for v in test.body:
-            assert len(test.inputs) == len(v[0])
-            assert len(test.outputs) == len(v[1])
 
         self.send([Tester.CMD_VECTORS_LOAD])
         self.send(BV.int(len(test.body), 16))
@@ -126,11 +120,8 @@ class Tester:
         if self.debug:
             print("Binary vectors:")
 
-        for v in test.body:
-            data = [
-                self.get_pinvalue(test.inputs + test.outputs, [*v[0], *v[1]], i)
-                for i in reversed(range(1, self.part.pincount+1))
-            ]
+        for v in test.vectors:
+            data = v.by_pins(reversed(sorted(self.part.pins)))
             if self.debug:
                 print(f" {data}")
             self.send(BV(data))

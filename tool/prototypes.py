@@ -161,6 +161,28 @@ class PackageDIP24(Part):
 
 
 # ------------------------------------------------------------------------
+class TestVector():
+    def __init__(self, vector, test):
+        self.input = vector[0]
+        self.output = vector[1]
+        self.test = test
+
+        assert len(self.input) == len(test.inputs)
+        assert len(self.output) == len(test.outputs)
+
+    def pin(self, pin):
+        if pin not in self.test.pins:
+            return 0
+        else:
+            return [*self.input, *self.output][self.test.pins.index(pin)]
+
+    def by_pins(self, pins):
+        return [self.pin(i) for i in pins]
+
+    def __str__(self):
+        return f"{self.input} -> {self.output}"
+
+# ------------------------------------------------------------------------
 class Test():
     COMB = 0
     SEQ = 1
@@ -206,3 +228,12 @@ class Test():
                     self._body_generated.extend(self.sequentialize(t))
                 return body
         return self._body_generated
+
+    @property
+    def pins(self):
+        return self.inputs + self.outputs
+
+    @property
+    def vectors(self):
+        for v in self.body:
+            yield TestVector(v, self)
