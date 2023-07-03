@@ -175,14 +175,34 @@ class Test():
         self.type = ttype
         self.subtype = tsubtype
         self.loops = loops
-        self._body = body
+        self._body_source = body
+        self._body_generated = None
         self.inputs = inputs
         self.outputs = outputs
 
     @property
-    def body(self):
-        if callable(self._body):
-            return self._body()
+    def _body_data(self):
+        if callable(self._body_source):
+            return self._body_source()
         else:
-            return self._body
+            return self._body_source
 
+    def sequentialize(self, v):
+        i = v[0]
+        o = v[1]
+        return [
+            [[x if x in [0, 1] else 0 if x == '+' else 1 for x in i], o],
+            [[x if x in [0, 1] else 1 if x == '+' else 0 for x in i], o],
+        ]
+
+    @property
+    def body(self):
+        if not self._body_generated:
+            if self.type == Test.COMB:
+                self._body_generated = self._body_data
+            else:
+                self._body_generated = []
+                for t in self._body_data:
+                    self._body_generated.extend(self.sequentialize(t))
+                return body
+        return self._body_generated

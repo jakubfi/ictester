@@ -95,14 +95,6 @@ class Tester:
     def get_pinvalue(self, pins, vals, pin):
         return 0 if pin not in pins else vals[pins.index(pin)]
 
-    def sequentialize(self, v):
-        i = v[0]
-        o = v[1]
-        return [
-            [[x if x in [0, 1] else 0 if x == '+' else 1 for x in i], o],
-            [[x if x in [0, 1] else 1 if x == '+' else 0 for x in i], o],
-        ]
-
     def test_setup(self, test):
         self.send([Tester.CMD_TEST_SETUP, test.type, test.subtype])
 
@@ -118,30 +110,23 @@ class Tester:
             raise RuntimeError("Test setup failed")
 
     def vectors_load(self, test):
-        if test.type == test.COMB:
-            body = test.body
-        else:
-            body = []
-            for t in test.body:
-                body.extend(self.sequentialize(t))
-
         if self.debug:
-            print(f"Test vectors ({len(body)}):")
-            for v in body:
+            print(f"Test vectors ({len(test.body)}):")
+            for v in test.body:
                 print(f" {v[0]} -> {v[1]}")
 
-        assert len(body) <= Tester.MAX_LEN
-        for v in body:
+        assert len(test.body) <= Tester.MAX_LEN
+        for v in test.body:
             assert len(test.inputs) == len(v[0])
             assert len(test.outputs) == len(v[1])
 
         self.send([Tester.CMD_VECTORS_LOAD])
-        self.send(BV.int(len(body), 16))
+        self.send(BV.int(len(test.body), 16))
 
         if self.debug:
             print("Binary vectors:")
 
-        for v in body:
+        for v in test.body:
             data = [
                 self.get_pinvalue(test.inputs + test.outputs, [*v[0], *v[1]], i)
                 for i in reversed(range(1, self.part.pincount+1))
