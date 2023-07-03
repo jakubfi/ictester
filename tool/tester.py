@@ -1,6 +1,5 @@
 import serial
 import time
-import math
 from binvec import BV
 
 
@@ -48,21 +47,11 @@ class Tester:
         return self._s
 
     def send(self, b):
+        b = bytes(b)
         if self.serial_debug:
-            print(f"<- {b:>08b} {b}")
-        data = bytes([b])
-        self.s.write(data)
-
-    def send_16le(self, w):
-        self.send(w & 0xff)
-        self.send((w >> 8) & 0xff)
-
-    def send_vector_as_bytes(self, v):
-        data = int(BV(v))
-        if self.debug:
-            print(f" {data:0{len(v)}b}")
-        for shift in [0, 8, 16][0:math.ceil(len(v)/8)]:
-            self.send((data >> shift) & 0xff)
+            data = [f"{x:08b} ({chr(x)})" for x in b]
+            print(f"<- {data}")
+        self.s.write(b)
 
     def recv(self):
         b = ord(self.s.read(1))
@@ -74,17 +63,15 @@ class Tester:
         return [t.name for t in self.part.tests]
 
     def dut_setup(self):
+        self.send([Tester.CMD_DUT_SETUP, self.part.package_type,  self.part.pincount])
+
         if self.debug:
             print("Pin roles:")
-
-        self.send(Tester.CMD_DUT_SETUP)
-        self.send(self.part.package_type)
-        self.send(self.part.pincount)
 
         for num, pin in sorted(self.part.pins.items()):
             if self.debug:
                 print(f" {num:-2}: {pin.role_name}")
-            self.send(pin.role)
+            self.send([pin.role])
 
         if self.recv() != Tester.RESP_OK:
             raise RuntimeError("DUT setup failed")
@@ -101,24 +88,20 @@ class Tester:
         ]
 
     def test_setup(self, test):
-        self.send(Tester.CMD_TEST_SETUP)
-        self.send(test.type)
-        self.send(test.subtype)
-
-        if self.debug:
-            print("Pin used by the test:")
+        self.send([Tester.CMD_TEST_SETUP, test.type, test.subtype])
 
         data = [
             1 if i in test.inputs + test.outputs else 0
             for i in reversed(range(1, self.part.pincount+1))
         ]
-        self.send_vector_as_bytes(data)
+        if self.debug:
+            print(f"Pin used by the test: {data}")
+        self.send(BV(data))
 
         if self.recv() != Tester.RESP_OK:
             raise RuntimeError("Test setup failed")
 
     def vectors_load(self, test):
-
         if test.type == test.COMB:
             body = test.body
         else:
@@ -136,8 +119,8 @@ class Tester:
             assert len(test.inputs) == len(v[0])
             assert len(test.outputs) == len(v[1])
 
-        self.send(Tester.CMD_VECTORS_LOAD)
-        self.send_16le(len(body))
+        self.send([Tester.CMD_VECTORS_LOAD])
+        self.send(BV.int(len(body), 16))
 
         if self.debug:
             print("Binary vectors:")
@@ -147,7 +130,9 @@ class Tester:
                 self.get_pinvalue(test.inputs + test.outputs, [*v[0], *v[1]], i)
                 for i in reversed(range(1, self.part.pincount+1))
             ]
-            self.send_vector_as_bytes(data)
+            if self.debug:
+                print(f" {data}")
+            self.send(BV(data))
 
         if self.recv() != Tester.RESP_OK:
             raise RuntimeError("Vectors load failed")
@@ -155,8 +140,7 @@ class Tester:
     def run(self, loop_pow):
         assert loop_pow < 16
 
-        self.send(Tester.CMD_RUN)
-        self.send(loop_pow)
+        self.send([Tester.CMD_RUN, loop_pow])
 
         start = time.time()
         result = self.recv()

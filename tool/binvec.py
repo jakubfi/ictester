@@ -83,3 +83,7 @@ class BV(list):
             p += 1
         x += self.carry * 2**p
         return x
+
+    def __bytes__(self):
+        val = int(self)
+        return bytes([(val >> shift) & 0xff for shift in range(0, len(self), 8)])
