@@ -6,6 +6,7 @@ import math
 import re
 
 from tester import Tester
+from transport import Transport
 from parts import catalog
 
 
@@ -68,7 +69,8 @@ except KeyError:
 
 print_part_info(part)
 
-tester = Tester(part, args.device, 500000, debug=args.debug, serial_debug=args.debug_serial)
+transport = Transport(args.device, 500000, debug=args.debug_serial)
+tester = Tester(part, transport, debug=args.debug)
 all_tests = tester.tests_available()
 test_count = len(all_tests)
 longest_desc = len(max(all_tests, key=len))
