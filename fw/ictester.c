@@ -111,7 +111,7 @@ const __flash struct socket_properties sp[] = {
 	{16, 15, 7, dip16vcc8_to_zif},
 	{16, 11, 4, dip16vcc5_to_zif},
 	{24, 11, 23, dip24_to_zif},
-	{-1}
+	{-1, -1, -1, NULL}
 };
 
 // -----------------------------------------------------------------------
@@ -156,7 +156,7 @@ void handle_dut_setup(void)
 
 	// find which socket to use
 	const __flash struct socket_properties *tab = sp;
-	while (tab->pins > 0) {
+	while (tab->pin_map) {
 		if ((pin_count == tab->pins) && (pin_data[tab->gnd] == PIN_GND) && (pin_data[tab->vcc] == PIN_VCC)) {
 			pin_map = tab->pin_map;
 			break;
