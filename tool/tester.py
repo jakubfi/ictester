@@ -96,10 +96,11 @@ class Tester:
         if self.tr.recv() != Tester.RESP_OK:
             raise RuntimeError("Vectors load failed")
 
-    def run(self, loop_pow):
-        assert loop_pow < 16
+    def run(self, loops):
+        assert 1 <= loops <= 0xffff
 
-        self.tr.send([Tester.CMD_RUN, loop_pow])
+        self.tr.send([Tester.CMD_RUN])
+        self.tr.send(BV.int(loops, 16))
 
         start = time.time()
         result = self.tr.recv()
@@ -107,11 +108,11 @@ class Tester:
 
         return result, elapsed
 
-    def exec_test(self, test, loop_pow):
+    def exec_test(self, test, loops):
         self.dut_setup()
         self.test_setup(test)
         self.vectors_load(test)
-        res = self.run(loop_pow)
+        res = self.run(loops)
         if self.debug:
             print(f"Bytes sent: {self.tr.bytes_sent}, received: {self.tr.bytes_received}")
         return res

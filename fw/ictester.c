@@ -3,7 +3,6 @@
 #include <inttypes.h>
 #include <stdbool.h>
 #include <stdlib.h>
-#include <math.h>
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <avr/cpufunc.h>
@@ -326,8 +325,7 @@ void run(void)
 {
 	uint8_t res = RESP_PASS;
 
-	uint8_t test_pow = serial_rx_char();
-	int test_loops = pow(2, test_pow);
+	uint16_t test_loops = serial_rx_16le();
 
 	if (test_type == TYPE_MEM) {
 		mem_setup();

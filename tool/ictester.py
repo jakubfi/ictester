@@ -52,13 +52,16 @@ if '--list' in sys.argv:
 
 parser = argparse.ArgumentParser(description='IC tester controller')
 parser.add_argument('--device', default="/dev/ttyUSB1", help='Serial port where the IC tester is connected')
-parser.add_argument('--loops', type=int, help='Loop count (<65536, will be rounded to the nearest power of 2)')
+parser.add_argument('--loops', type=int, default=None, help='Loop count (1..65535)')
 parser.add_argument('--list', action="store_true", help='List all supported parts')
 parser.add_argument('--tests', action="store_true", help='When listing parts, list also tests for each part')
 parser.add_argument('--debug', action="store_true", help='Enable debug output')
 parser.add_argument('--debug-serial', action="store_true", help='Enable serial debug output')
 parser.add_argument('part', help='Part symbol')
 args = parser.parse_args()
+
+if args.loops is not None and (args.loops <= 0 or args.loops > 65535):
+    parser.error("Loops should be between 1 and 65535")
 
 try:
     part = catalog[args.part.upper()]
@@ -80,14 +83,13 @@ total_time = 0
 print()
 for test_name in all_tests:
     test = tester.part.get_test(test_name)
-    loops_pow = round((math.log2(args.loops if args.loops else test.loops)))
-    loops = 2 ** loops_pow
+    loops = args.loops if args.loops is not None else test.loops
 
     plural = "s" if loops != 1 else ""
     endc = "\n" if args.debug else ""
     print(f" * Testing: {test_name:{longest_desc}s}   {loops} loop{plural}  ... ", end=endc, flush=True)
 
-    res, elapsed = tester.exec_test(test, loops_pow)
+    res, elapsed = tester.exec_test(test, loops)
 
     if res == Tester.RESP_PASS:
         tests_passed += 1
