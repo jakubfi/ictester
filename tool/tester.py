@@ -60,7 +60,7 @@ class Tester:
             raise RuntimeError("DUT setup failed")
 
     def test_setup(self, test):
-        self.tr.send([Tester.CMD_TEST_SETUP, test.type, test.subtype])
+        self.tr.send([Tester.CMD_TEST_SETUP, test.type, *test.params])
 
         data = [
             1 if i in test.pins else 0

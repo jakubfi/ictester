@@ -162,10 +162,15 @@ class Test():
     SEQ = 1
     MEM = 2
 
-    def __init__(self, name, ttype, inputs, outputs, body=[], tsubtype=0, loops=1024):
+    TEST_LOGIC_74 = 1
+    TEST_DRAM_41 = 2
+
+    MAX_TEST_PARAMS = 4
+
+    def __init__(self, name, ttype, inputs, outputs, params=[], body=[], loops=1024):
         self.name = name
         self.type = ttype
-        self.subtype = tsubtype
+        self.params = params + [0] * (self.MAX_TEST_PARAMS - len(params))
         self.loops = loops
         self._body_source = body
         self._body_generated = None

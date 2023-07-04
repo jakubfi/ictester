@@ -30,6 +30,9 @@ for name, part in catalog.items():
         assert test.type in [Test.COMB, Test.SEQ, Test.MEM]
         assert test.inputs
         assert test.outputs
+        assert len(test.params) == Test.MAX_TEST_PARAMS
+        for param in test.params:
+            assert param in range(0, 256)
 
         for v in test.body:
             assert len(test.inputs) == len(v[0])

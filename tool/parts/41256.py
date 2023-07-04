@@ -1,10 +1,11 @@
 from prototypes import (PackageDIP16_rotated, Pin, Test)
 
 class Part41256(PackageDIP16_rotated):
-    SIZE_256 = 1 << 7
-    MEM_TEST_MARCH_C_MINUS_RMW = SIZE_256 |0
-    MEM_TEST_MARCH_C_MINUS_RW = SIZE_256 |1
-    MEM_TEST_MARCH_C_MINUS_PAGE = SIZE_256 |2
+    SIZE_64 = 1
+    SIZE_256 = 2
+    MEM_TEST_MARCH_C_MINUS_RMW = 1
+    MEM_TEST_MARCH_C_MINUS_RW = 2
+    MEM_TEST_MARCH_C_MINUS_PAGE = 3
 
     name = "41256"
     desc = "262144 x 1bit DRAM memory"
@@ -30,15 +31,15 @@ class Part41256(PackageDIP16_rotated):
 
     tests = [
         Test("MARCH C- Read-Modify-Write mode", Test.MEM, default_inputs, default_outputs,
-            tsubtype=MEM_TEST_MARCH_C_MINUS_RMW,
+            params=[SIZE_256, MEM_TEST_MARCH_C_MINUS_RMW],
             loops=1,
         ),
         Test("MARCH C- Read+Write mode", Test.MEM, default_inputs, default_outputs,
-            tsubtype=MEM_TEST_MARCH_C_MINUS_RW,
+            params=[SIZE_256, MEM_TEST_MARCH_C_MINUS_RW],
             loops=1,
         ),
         Test("MARCH C- Page access mode", Test.MEM, default_inputs, default_outputs,
-            tsubtype=MEM_TEST_MARCH_C_MINUS_PAGE,
+            params=[SIZE_256, MEM_TEST_MARCH_C_MINUS_PAGE],
             loops=1,
         ),
     ]

@@ -14,6 +14,7 @@
 #include "mem.h"
 
 #define MAX_TEST_SIZE 1024
+#define MAX_TEST_PARAMS 4
 
 enum cmd {
 	CMD_HELLO			= 1,
@@ -52,7 +53,7 @@ uint8_t package_type;
 uint8_t pin_count;
 uint8_t dut_pin_bytes;
 uint8_t test_type;
-uint8_t test_subtype;
+uint8_t test_params[MAX_TEST_PARAMS];
 uint16_t test_len;
 uint8_t test[MAX_TEST_SIZE][3];
 
@@ -124,16 +125,17 @@ void reply(uint8_t res)
 void deconfigure(void)
 {
 	DDRA = 0;
-	DDRB = 0;
-	DDRC = 0;
 	PORTA = 0;
+	DDRB = 0;
 	PORTB = 0;
+	DDRC = 0;
 	PORTC = 0;
 }
 
 // -----------------------------------------------------------------------
 void setup(void)
 {
+	// DUT input == MCU output
 	DDRA = port[0].dut_input;
 	DDRB = port[1].dut_input;
 	DDRC = port[2].dut_input;
@@ -212,7 +214,9 @@ void handle_dut_setup(void)
 void handle_test_setup(void)
 {
 	test_type = serial_rx_char();
-	test_subtype = serial_rx_char();
+	for (uint8_t i=0 ; i< MAX_TEST_PARAMS ; i++) {
+		test_params[i] = serial_rx_char();
+	}
 
 	// reset port masks
 	port[0].test_pin_mask = 0;
@@ -333,7 +337,7 @@ void run(void)
 
 	for (int rep=0 ; rep<test_loops ; rep++) {
 		if (test_type == TYPE_MEM) {
-			res = run_mem(test_subtype);
+			res = run_mem(test_params);
 		} else {
 			res = run_logic();
 		}
