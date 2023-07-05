@@ -20,15 +20,16 @@ class Tester:
     error_strings = {
         0: "Error code was not set",
         1: "Unknown command",
-        2: "Unsupported package type",
-        3: "Unsupported pin count",
-        4: "Unknown pin function",
-        5: "Unsupported test type",
-        6: "Bad test parameters",
-        7: "Wrong number of test vectors",
-        8: "Missing DUT setup",
-        9: "No test set",
-        10: "No vectors loaded",
+        2: "Missing DUT setup",
+        3: "No test set",
+        4: "No vectors loaded",
+        5: "Unsupported package type",
+        6: "Unsupported pin count",
+        7: "Unknown pin function",
+        8: "Unsupported pin setup",
+        9: "Unsupported test type",
+        10: "Bad test parameters",
+        11: "Wrong number of test vectors",
     }
 
     MAX_LEN = 1024
