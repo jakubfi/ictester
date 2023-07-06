@@ -32,7 +32,7 @@ class Tester:
         11: "Wrong number of test vectors",
     }
 
-    MAX_LEN = 1024
+    MAX_VECTORS = 1024
 
     def __init__(self, part, transport, debug=False):
         self.part = part
@@ -80,7 +80,7 @@ class Tester:
             for v in test.vectors:
                 print(f" {v}")
 
-        assert len(test.body) <= Tester.MAX_LEN
+        assert len(test.body) <= Tester.MAX_VECTORS
 
         self.tr.send([Tester.CMD_VECTORS_LOAD])
         self.tr.send(BV.int(len(test.body), 16))

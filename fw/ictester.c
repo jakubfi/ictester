@@ -12,22 +12,28 @@
 #include "serial.h"
 #include "mem.h"
 
-#define MAX_TEST_SIZE 1024
+#define MAX_VECTORS 1024
 
+// --- DUT SETUP
 struct port {
 	uint8_t dut_input;
 	uint8_t dut_output;
 	uint8_t dut_pullup;
 	uint8_t test_pin_mask;
 } port[3];
-
 uint8_t package_type;
 uint8_t pin_count;
 uint8_t dut_pin_bytes;
+
+// --- TEST SETUP
 uint8_t test_type;
 uint8_t test_params[MAX_TEST_PARAMS];
-uint16_t test_len;
-uint8_t test[MAX_TEST_SIZE][3];
+
+// --- VECTORS
+uint16_t vectors_count;
+uint8_t vectors[MAX_VECTORS][3];
+
+// --- DUT -> PORTS mapping
 
 struct pin_coord {
 	int8_t port;
@@ -217,32 +223,32 @@ void handle_test_setup(void)
 // -----------------------------------------------------------------------
 void handle_vectors_load(void)
 {
-	test_len = serial_rx_16le();
+	vectors_count = serial_rx_16le();
 
 	// receive all vectors
-	for (uint16_t pos=0 ; pos<test_len ; pos++) {
+	for (uint16_t pos=0 ; pos<vectors_count ; pos++) {
 		for (uint8_t i=0 ; i<dut_pin_bytes ; i++) {
-			test[pos][i] = serial_rx_char();
+			vectors[pos][i] = serial_rx_char();
 		}
 	}
 
 	// reorder bits in each vector to match port connections
-	for (uint16_t pos=0 ; pos<test_len ; pos++) {
+	for (uint16_t pos=0 ; pos<vectors_count ; pos++) {
 		// convert received bytes into temporary 32-bit number
 		uint32_t bitvector = 0;
 		for (uint8_t i=0 ; i<dut_pin_bytes ; i++) {
-			bitvector |= (uint32_t)test[pos][i] << (i*8);
+			bitvector |= (uint32_t)vectors[pos][i] << (i*8);
 		}
 		// clear received vector data
 		for (uint8_t i=0 ; i<3 ; i++) {
-			test[pos][i] = 0;
+			vectors[pos][i] = 0;
 		}
 		// fill in bits in correct positions
 		for (uint8_t pin=0 ; pin<pin_count ; pin++) {
 			int8_t port_pos = pin_map[pin].port;
 			if (port_pos >= 0) {
 				uint8_t bit_val = (bitvector >> pin) & 1;
-				test[pos][port_pos] |= bit_val << pin_map[pin].pin;
+				vectors[pos][port_pos] |= bit_val << pin_map[pin].pin;
 			}
 		}
 	}
@@ -252,18 +258,18 @@ void handle_vectors_load(void)
 // -----------------------------------------------------------------------
 static inline void logic_port_setup(uint16_t pos)
 {
-	PORTA = ((test[pos][0] & port[0].dut_input) | port[0].dut_pullup);
-	PORTB = ((test[pos][1] & port[1].dut_input) | port[1].dut_pullup);
-	PORTC = ((test[pos][2] & port[2].dut_input) | port[2].dut_pullup);
+	PORTA = ((vectors[pos][0] & port[0].dut_input) | port[0].dut_pullup);
+	PORTB = ((vectors[pos][1] & port[1].dut_input) | port[1].dut_pullup);
+	PORTC = ((vectors[pos][2] & port[2].dut_input) | port[2].dut_pullup);
 }
 
 // -----------------------------------------------------------------------
 static inline bool logic_port_check(uint16_t pos)
 {
 	if ((test_type == TYPE_COMB) || (pos % 2)) {
-		if ((PINA ^ test[pos][0]) & port[0].test_pin_mask) return false;
-		if ((PINB ^ test[pos][1]) & port[1].test_pin_mask) return false;
-		if ((PINC ^ test[pos][2]) & port[2].test_pin_mask) return false;
+		if ((PINA ^ vectors[pos][0]) & port[0].test_pin_mask) return false;
+		if ((PINB ^ vectors[pos][1]) & port[1].test_pin_mask) return false;
+		if ((PINC ^ vectors[pos][2]) & port[2].test_pin_mask) return false;
 	}
 
 	return true;
@@ -276,7 +282,7 @@ uint8_t run_logic(void)
 	// Treat them separately to not slow down the test loop
 	// ICs sensitive to that are: 7447, 74H62, 7489, 74156, 74170, 780101
 	if (port[0].dut_pullup | port[1].dut_pullup | port[2].dut_pullup) {
-		for (uint16_t pos=0 ; pos<test_len ; pos++) {
+		for (uint16_t pos=0 ; pos<vectors_count ; pos++) {
 			logic_port_setup(pos);
 			_NOP(); _NOP(); _NOP(); _NOP(); _NOP();
 			_NOP(); _NOP(); _NOP(); _NOP(); _NOP();
@@ -284,7 +290,7 @@ uint8_t run_logic(void)
 		}
 	} else {
 		// ~3.9us per test cycle
-		for (uint16_t pos=0 ; pos<test_len ; pos++) {
+		for (uint16_t pos=0 ; pos<vectors_count ; pos++) {
 			logic_port_setup(pos);
 			if (!logic_port_check(pos)) return RESP_FAIL;
 		}
