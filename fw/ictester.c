@@ -8,38 +8,11 @@
 #include <avr/cpufunc.h>
 #include <util/delay.h>
 
-#include "results.h"
+#include "protocol.h"
 #include "serial.h"
 #include "mem.h"
 
 #define MAX_TEST_SIZE 1024
-#define MAX_TEST_PARAMS 4
-
-enum cmd {
-	CMD_HELLO			= 1,
-	CMD_DUT_SETUP		= 2,
-	CMD_TEST_SETUP		= 3,
-	CMD_VECTORS_LOAD	= 4,
-	CMD_TEST_RUN		= 5,
-	CMD_DUT_CONNECT		= 6,
-	CMD_DUT_DISCONNECT	= 7,
-};
-
-enum test_type {
-	TYPE_COMB	= 0,
-	TYPE_SEQ	= 1,
-	TYPE_MEM	= 2,
-	TYPE_MAX	= TYPE_MEM,
-};
-
-enum pin_type {
-	PIN_IN	= 1,
-	PIN_OUT	= 2,
-	PIN_OC	= 3,
-	PIN_VCC	= 4,
-	PIN_GND	= 5,
-	PIN_NC	= 6,
-};
 
 struct port {
 	uint8_t dut_input;
@@ -150,7 +123,7 @@ void handle_dut_setup(void)
 	// receive DUT configuration
 	package_type = serial_rx_char();
 	pin_count = serial_rx_char();
-	dut_pin_bytes = (pin_count+7) / 8;
+	dut_pin_bytes = (pin_count+7) / 8; // round up to full byte
 	for (uint8_t i=0 ; i<pin_count ; i++) {
 		pin_data[i] = serial_rx_char();
 	}

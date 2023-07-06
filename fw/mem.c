@@ -7,7 +7,7 @@
 #include <avr/cpufunc.h>
 #include <util/delay.h>
 
-#include "results.h"
+#include "protocol.h"
 
 //    pin:  7    6    5    4    3    2    1    0
 // port A:  -   A8*  Di  ~WE ~RAS   A0   A2   A1
