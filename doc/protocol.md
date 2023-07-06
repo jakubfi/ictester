@@ -114,13 +114,15 @@ Valid responses:
 * `RESP_OK` - test setup successfull
 * `RESP_ERR` - test setup failed
 
-### 74x logic tests
+### Logic IC test
 
-  * `TEST_LOGIC_74` (1)
+Designed to test 74 logic (both combinatorial and sequential), but suitable for many other families.
+
+  * `TEST_LOGIC` (1)
     * does not use (ignores) test parameters
     * requires test vectors
 
-### 4164 and 41256 DRAM memory tests
+### 4164 and 41256 DRAM memory test
 
   * `TEST_DRAM_41` (2)
     * uses following test parameters:
@@ -211,7 +213,7 @@ but not all features available in the hardware may be available to the software.
 
 * 1 BYTE: response: `RESP_FAIL`
 * `x` BYTES: failure description. Depends on the test type:
-  * `TEST_LOGIC_74`
+  * `TEST_LOGIC`
     * 2 BYTES: vector number that test failed on (little-endian)
     * `n` bytes of pin data - failing vector. Format as in the test configuration.
   * `TEST_DRAM_41`
