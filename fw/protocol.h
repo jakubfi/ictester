@@ -52,6 +52,8 @@ enum pin_type {
 	PIN_NC	= 6,
 };
 
+void reply(uint8_t res);
+
 #endif
 
 // vim: tabstop=4 shiftwidth=4 autoindent
