@@ -82,7 +82,6 @@ all: $(TRG)
 disasm: $(DUMPTRG) stats
 
 stats: $(TRG)
-	$(OBJDUMP) -h $(TRG)
 	$(SIZE) $(TRG) 
 
 hex: $(HEXTRG)
