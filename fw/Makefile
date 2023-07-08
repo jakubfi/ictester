@@ -10,31 +10,24 @@ HEXFORMAT=ihex
 
 # compiler
 CFLAGS=-I. $(INC) -g -mmcu=$(MCU) -O$(OPTLEVEL) \
-        -std=gnu99 $(DEFINES)                   \
+        -std=gnu99 $(DEFINES) -flto             \
 	--param=min-pagesize=0                  \
 	-fpack-struct -fshort-enums             \
 	-funsigned-bitfields -funsigned-char    \
-	-Wall -Wstrict-prototypes               \
-	-Wa,-ahlms=$(firstword                  \
-	$(filter %.lst, $(<:.c=.lst)))
+	-Wall -Wstrict-prototypes
 
 # c++ specific flags
-CPPFLAGS=-fno-exceptions               \
-	-Wa,-ahlms=$(firstword         \
-	$(filter %.lst, $(<:.cpp=.lst))\
-	$(filter %.lst, $(<:.cc=.lst)) \
-	$(filter %.lst, $(<:.C=.lst)))
+CPPFLAGS=-fno-exceptions
 
 # assembler
 ASMFLAGS =-I. $(INC) -mmcu=$(MCU)        \
-	-x assembler-with-cpp            \
+	-x assembler-with-cpp -flto      \
 	-Wa,-gstabs,-ahlms=$(firstword   \
 		$(<:.S=.lst) $(<.s=.lst))
 
-
 # linker
 LDFLAGS=-Wl,-Map,$(TRG).map -mmcu=$(MCU) \
-	-lm $(LIBS)
+	-flto -lm $(LIBS)
 
 ##### executables ####
 CC=avr-gcc
