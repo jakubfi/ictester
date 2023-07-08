@@ -15,9 +15,9 @@ class Pin:
     IN = 1      # regular TTL input
     OUT = 2     # regular TTL output
     OC = 3      # open-collector output
-    VCC = 4     # +5V power
-    GND = 5     # ground
-    NC = 6      # unused pin
+    VCC = 128     # +5V power
+    GND = 129     # ground
+    NC = 255      # unused pin
 
     _role_names = ["???", "IN", "OUT", "OC", "VCC", "GND", "NC"]
 

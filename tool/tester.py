@@ -11,11 +11,11 @@ class Tester:
     CMD_DUT_CONNECT = 6
     CMD_DUT_DISCONNECT = 7
 
-    RESP_HELLO = 129
-    RESP_OK = 130
-    RESP_PASS = 131
-    RESP_FAIL = 132
-    RESP_ERR = 133
+    RESP_HELLO = 128
+    RESP_OK = 129
+    RESP_PASS = 130
+    RESP_FAIL = 131
+    RESP_ERR = 132
 
     error_strings = {
         0: "Error code was not set",

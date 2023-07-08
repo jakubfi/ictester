@@ -26,11 +26,11 @@ Available responses:
 
 | Response             | Value | Meaning                       |
 |----------------------|-------|-------------------------------|
-| `RESP_HELLO`         | 129   | Tester information            |
-| `RESP_OK`            | 130   | Command executed              |
-| `RESP_PASS`          | 131   | Test finished successfully    |
-| `RESP_FAIL`          | 132   | Test finished with failure    |
-| `RESP_ERR`           | 133   | Error                         |
+| `RESP_HELLO`         | 128   | Tester information            |
+| `RESP_OK`            | 129   | Command executed              |
+| `RESP_PASS`          | 130   | Test finished successfully    |
+| `RESP_FAIL`          | 131   | Test finished with failure    |
+| `RESP_ERR`           | 132   | Error                         |
 
 
 # Commands
@@ -60,9 +60,9 @@ It lets the tester know how to address pins of the DUT and what are the pins' fu
 | `DUT_PIN_IN`     | 1     | TTL input                  | output              |
 | `DUT_PIN_OUT`    | 2     | TTL output                 | input               |
 | `DUT_PIN_OC`     | 3     | open-collector output      | input with pullup   |
-| `DUT_PIN_VCC5`   | 4     | +5V                        | disconnected or HiZ |
-| `DUT_PIN_GND`    | 5     | GND                        | disconnected or HiZ |
-| `DUT_PIN_NC`     | 6     | not connected              | disconnected or HiZ |
+| `DUT_PIN_VCC`    | 128   | +5V                        | disconnected or HiZ |
+| `DUT_PIN_GND`    | 129   | GND                        | disconnected or HiZ |
+| `DUT_PIN_NC`     | 255   | not connected              | disconnected or HiZ |
 
 Valid responses:
 

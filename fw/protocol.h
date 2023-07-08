@@ -14,11 +14,11 @@ enum commands {
 };
 
 enum responses {
-	RESP_HELLO	= 129,
-	RESP_OK		= 130,
-	RESP_PASS	= 131,
-	RESP_FAIL	= 132,
-	RESP_ERR	= 133,
+	RESP_HELLO	= 128,
+	RESP_OK		= 129,
+	RESP_PASS	= 130,
+	RESP_FAIL	= 131,
+	RESP_ERR	= 132,
 };
 
 enum error_types {
@@ -47,9 +47,9 @@ enum pin_type {
 	PIN_IN	= 1,
 	PIN_OUT	= 2,
 	PIN_OC	= 3,
-	PIN_VCC	= 4,
-	PIN_GND	= 5,
-	PIN_NC	= 6,
+	PIN_VCC	= 128,
+	PIN_GND	= 129,
+	PIN_NC	= 255,
 };
 
 void reply(uint8_t res);
