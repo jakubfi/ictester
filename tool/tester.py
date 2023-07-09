@@ -26,10 +26,11 @@ class Tester:
         5: "Unsupported package type",
         6: "Unsupported pin count",
         7: "Unknown pin function",
-        8: "Unsupported pin setup",
-        9: "Unsupported test type",
-        10: "Bad test parameters",
-        11: "Wrong number of test vectors",
+        8: "Bad pin function combination",
+        9: "Unsupported pin setup",
+        10: "Unsupported test type",
+        11: "Bad test parameters",
+        12: "Wrong number of test vectors",
     }
 
     MAX_VECTORS = 1024

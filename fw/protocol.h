@@ -30,10 +30,11 @@ enum error_types {
 	ERR_PACKAGE		= 5,
 	ERR_PIN_CNT		= 6,
 	ERR_PIN_FUNC	= 7,
-	ERR_PIN_SETUP	= 8,
-	ERR_TEST_TYPE	= 9,
-	ERR_PARAMS		= 10,
-	ERR_VECT_NUM	= 11,
+	ERR_PIN_COMB	= 8,
+	ERR_PIN_SETUP	= 9,
+	ERR_TEST_TYPE	= 10,
+	ERR_PARAMS		= 11,
+	ERR_VECT_NUM	= 12,
 };
 
 enum test_type {

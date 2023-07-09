@@ -200,10 +200,11 @@ but not all features available in the hardware may be available to the software.
 | `ERR_PACKAGE`   | 5     | Unsupported package type                          |
 | `ERR_PIN_CNT`   | 6     | Unsupported pin count                             |
 | `ERR_PIN_FUNC`  | 7     | Unknown pin function                              |
-| `ERR_PIN_SETUP` | 8     | Unsupported pin setup                             |
-| `ERR_TEST_TYPE` | 9     | Unsupported test type                             |
-| `ERR_PARAMS`    | 10    | Bad test parameters                               |
-| `ERR_VECT_NUM`  | 11    | Wrong number of test vectors (<1 or too many)     |
+| `ERR_PIN_COMB`  | 8     | Bad pin function combination (eg. VCC+GND)        |
+| `ERR_PIN_SETUP` | 9     | Unsupported pin setup                             |
+| `ERR_TEST_TYPE` | 10    | Unsupported test type                             |
+| `ERR_PARAMS`    | 11    | Bad test parameters                               |
+| `ERR_VECT_NUM`  | 12    | Wrong number of test vectors (<1 or too many)     |
 
 ## Test PASS
 
