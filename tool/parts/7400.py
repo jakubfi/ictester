@@ -24,5 +24,14 @@ class Part7400(PackageDIP14):
             inputs=[1, 2, 4, 5, 10, 9, 13, 12],
             outputs=[3, 6, 8, 11],
             body=[[4*v, 4*~v.vand()] for v in BV.range(0, 4)]
+            # 'body' can also be written as, and is equivalent to:
+            # body=[
+            #     [[0, 0,  0, 0,  0, 0,  0, 0], [1, 1, 1, 1]],
+            #     [[0, 1,  0, 1,  0, 1,  0, 1], [1, 1, 1, 1]],
+            #     [[1, 0,  1, 0,  1, 0,  1, 0], [1, 1, 1, 1]],
+            #     [[1, 1,  1, 1,  1, 1,  1, 1], [0, 0, 0, 0]],
+            # ]
         )
     ]
+
+
