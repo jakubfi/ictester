@@ -37,7 +37,7 @@ class Part74181(PackageDIP24):
         body = lambda: [
             [
                 [1, *BV.int(s, 4), *a, *b],
-                [*fun(a, b), fun(a, b) == [1, 1, 1, 1]]
+                [*fun(a, b)]
             ]
             for a in BV.range(0, 16)
             for b in BV.range(0, 16)
@@ -45,7 +45,7 @@ class Part74181(PackageDIP24):
 
         return Test(name, Test.COMB,
             inputs=[8,  3, 4, 5, 6,  19, 21, 23, 2,  18, 20, 22, 1],
-            outputs=[13, 11, 10, 9, 14],
+            outputs=[13, 11, 10, 9],
             loops=32,
             body=body,
         )
@@ -56,7 +56,7 @@ class Part74181(PackageDIP24):
         body = lambda: [
             [
                 [0, *BV.int(s, 4), *~c, *a, *b],
-                [*(fun(a, b) + c), not (fun(a, b) + c).carry, fun(a, b) + c == [1, 1, 1, 1]]
+                [*(fun(a, b) + c), not (fun(a, b) + c).carry]
             ]
             for a in BV.range(0, 16)
             for b in BV.range(0, 16)
@@ -64,7 +64,7 @@ class Part74181(PackageDIP24):
         ]
         return Test(name, Test.COMB,
             inputs=[8,  3, 4, 5, 6,  7,  19, 21, 23, 2,  18, 20, 22, 1],
-            outputs=[13, 11, 10, 9, 16, 14],
+            outputs=[13, 11, 10, 9, 16],
             loops=32,
             body=body
         )
@@ -102,5 +102,14 @@ class Part74181(PackageDIP24):
         arith_test_gen(13, "Arithmetic: F = (A|B)+A", lambda a, b: (a | b) + a),
         arith_test_gen(14, "Arithmetic: F = (A|~B)+A", lambda a, b: (a | ~b) + a),
         arith_test_gen(15, "Arithmetic: F = A-1", lambda a, b: a + 15),
+        Test("A==B", Test.COMB,
+            inputs=[8,  3, 4, 5, 6,  7,  19, 21, 23, 2,  18, 20, 22, 1],
+            outputs=[13, 11, 10, 9,  14],
+            body=[
+                [[1, *BV.int(15, 4), 0, *a, *BV.int(0, 4)], [*a, *a.vand()]]
+                for a in BV.range(0, 16)
+            ]
+        )
+
         # TODO: G, P (X, Y)
     ]
