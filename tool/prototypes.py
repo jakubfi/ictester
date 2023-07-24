@@ -15,13 +15,21 @@ class Pin:
     IN = 1      # regular TTL input
     OUT = 2     # regular TTL output
     OC = 3      # open-collector output
-    VCC = 128     # +5V power
-    GND = 129     # ground
-    NC = 255      # unused pin
+    VCC = 128   # +5V power
+    GND = 129   # ground
+    NC = 255    # unused pin
 
-    _role_names = ["???", "IN", "OUT", "OC", "VCC", "GND", "NC"]
+    _role_names = {
+        IN: "IN",
+        OUT: "OUT",
+        OC: "OC",
+        VCC: "VCC",
+        GND: "GND",
+        NC: "NC",
+    }
 
     def __init__(self, name, role):
+        assert role in self._role_names
         self.name = name
         self.role = role
 
@@ -34,7 +42,10 @@ class Pin:
 class Part:
 
     DIP = 1
-    _type_names = ["???", "DIP"]
+
+    _type_names = {
+        DIP: "DIP",
+    }
 
     pincount = 0
     name = None
