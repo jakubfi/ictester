@@ -1,5 +1,5 @@
-fw/*.lst
-fw/*.o
+*.lst
+*.o
 fw/*.out
 fw/*.hex
 fw/*.out.map
@@ -7,3 +7,4 @@ fw/*.out.map
 __pycache__
 *.swp
 /.vscode
+fw-tl866

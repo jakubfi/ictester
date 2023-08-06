@@ -4,12 +4,13 @@
 #include <avr/io.h>
 #include <avr/cpufunc.h>
 
+#include "zif.h"
 #include "protocol.h"
-#include "portmap.h"
 #include "serial.h"
 
 #define MAX_VECTORS 1024
 
+extern uint8_t pin_count;
 uint16_t vectors_count;
 uint8_t vectors[MAX_VECTORS][3];
 
@@ -47,10 +48,10 @@ void handle_vectors_load(uint8_t pin_count)
 		}
 		// fill in bits in correct positions
 		for (uint8_t pin=0 ; pin<pin_count ; pin++) {
-			int8_t port_pos = mcu_port(pin);
+			int8_t port_pos = mcu_port(zif_pos(pin_count, pin));
 			if (port_pos >= 0) {
 				uint8_t bit_val = (bitvector >> pin) & 1;
-				vectors[pos][port_pos] |= bit_val << mcu_port_pin(pin);
+				vectors[pos][port_pos] |= bit_val << mcu_port_pin(zif_pos(pin_count, pin));
 			}
 		}
 	}
@@ -58,43 +59,19 @@ void handle_vectors_load(uint8_t pin_count)
 }
 
 // -----------------------------------------------------------------------
-static inline void logic_port_setup(uint16_t pos)
-{
-	PORTA = ((vectors[pos][0] & port[0].dut_input) | port[0].dut_pullup);
-	PORTB = ((vectors[pos][1] & port[1].dut_input) | port[1].dut_pullup);
-	PORTC = ((vectors[pos][2] & port[2].dut_input) | port[2].dut_pullup);
-}
-
-// -----------------------------------------------------------------------
-static inline bool logic_port_check(uint16_t pos)
-{
-	if ((test_type == TYPE_COMB) || (pos % 2)) {
-		if ((PINA ^ vectors[pos][0]) & port[0].used_outputs) return false;
-		if ((PINB ^ vectors[pos][1]) & port[1].used_outputs) return false;
-		if ((PINC ^ vectors[pos][2]) & port[2].used_outputs) return false;
-	}
-
-	return true;
-}
-
-// -----------------------------------------------------------------------
 uint8_t run_logic(void)
 {
-	// Seems that due to weak pull-ups in atmega, OC outputs take much longer to set up
-	// Treat them separately to not slow down the test loop
-	// ICs sensitive to that are: 7447, 74H62, 7489, 74156, 74170, 780101
-	if (port[0].dut_pullup | port[1].dut_pullup | port[2].dut_pullup) {
-		for (uint16_t pos=0 ; pos<vectors_count ; pos++) {
-			logic_port_setup(pos);
-			_NOP(); _NOP(); _NOP(); _NOP(); _NOP();
-			_NOP(); _NOP(); _NOP(); _NOP(); _NOP();
-			if (!logic_port_check(pos)) return RESP_FAIL;
-		}
-	} else {
-		// ~3.9us per test cycle
-		for (uint16_t pos=0 ; pos<vectors_count ; pos++) {
-			logic_port_setup(pos);
-			if (!logic_port_check(pos)) return RESP_FAIL;
+	for (uint16_t pos=0 ; pos<vectors_count ; pos++) {
+		// set outputs
+		PORTA = ((vectors[pos][0] & port[0].dut_input) | port[0].dut_pullup);
+		PORTB = ((vectors[pos][1] & port[1].dut_input) | port[1].dut_pullup);
+		PORTC = ((vectors[pos][2] & port[2].dut_input) | port[2].dut_pullup);
+
+		// read outputs
+		if ((test_type == TYPE_COMB) || (pos % 2)) {
+			if ((PINA ^ vectors[pos][0]) & port[0].used_outputs) return RESP_FAIL;
+			if ((PINB ^ vectors[pos][1]) & port[1].used_outputs) return RESP_FAIL;
+			if ((PINC ^ vectors[pos][2]) & port[2].used_outputs) return RESP_FAIL;
 		}
 	}
 

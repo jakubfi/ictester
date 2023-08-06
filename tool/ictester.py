@@ -21,7 +21,7 @@ def list_parts(list_tests=False):
 
     for family, parts in sorted(families.items()):
         for name, part in sorted(parts, key=lambda x: int(re.sub("74[HSL]+", "74", x[0]))):
-            print(f"{name:7s} {part.full_package_name:15s} {part.desc}")
+            print(f"{name:7s} {part.package_name:6s} {part.desc}")
             if (list_tests):
                 for t in part.tests:
                     # NOTE: hack to work around sequentialize()
@@ -30,11 +30,9 @@ def list_parts(list_tests=False):
 
 # ------------------------------------------------------------------------
 def print_part_info(part):
-    print(f"Part: {part.name}, {part.full_package_name} - {part.desc}")
+    print(f"Part: {part.name}, {part.package_name} - {part.desc}")
     if part.missing_tests:
         print(f"{WARN}WARNING: missing tests: {part.missing_tests}{ENDC}")
-    if part.unusual_power:
-        print(f"{WARN}WARNING: unusual pins used for power. Make sure to use the correct socket and orientation.{ENDC}")
 
 
 # ------------------------------------------------------------------------

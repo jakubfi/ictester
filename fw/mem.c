@@ -1,5 +1,3 @@
-#define F_CPU	16000000UL
-
 #include <inttypes.h>
 #include <stdbool.h>
 #include <avr/io.h>

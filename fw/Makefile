@@ -1,8 +1,10 @@
-MCU=atmega644
-DEFINES=-DF_CPU=16000000UL
-PROGRAMMER_MCU=m644
+MCU=atmega1284p
+DEFINES=-DF_CPU=20000000UL
+PROGRAMMER_MCU=m1284p
 PROJECTNAME=ictester
-PRJSRC=ictester.c serial.c portmap.c protocol.c logic.c mem.c
+PRJSRC=ictester.c serial.c zif.c led.c protocol.c logic.c mem.c \
+       external/pololu-led-strip-avr/led_strip.c \
+       external/fleury-i2cmaster/i2cmaster_a.S external/fleury-i2cmaster/i2cmaster_b.S
 INC=
 LIBS=
 OPTLEVEL=3
@@ -23,7 +25,7 @@ CPPFLAGS=-fno-exceptions
 ASMFLAGS =-I. $(INC) -mmcu=$(MCU)        \
 	-x assembler-with-cpp -flto      \
 	-Wa,-gstabs,-ahlms=$(firstword   \
-		$(<:.S=.lst) $(<.s=.lst))
+	$(<:.S=.lst) $(<.s=.lst))
 
 # linker
 LDFLAGS=-Wl,-Map,$(TRG).map -mmcu=$(MCU) \
@@ -143,14 +145,10 @@ $(TRG): $(OBJDEPS)
 # hex files from elf
 #####  Generating a gdb initialisation file    #####
 .out.hex:
-	$(OBJCOPY) -j .text                    \
-		-j .data                       \
-		-O $(HEXFORMAT) $< $@
+	$(OBJCOPY) -j .text -j .data -O $(HEXFORMAT) $< $@
 
 .out.ee.hex:
-	$(OBJCOPY) -j .eeprom                  \
-		--change-section-lma .eeprom=0 \
-		-O $(HEXFORMAT) $< $@
+	$(OBJCOPY) -j .eeprom --change-section-lma .eeprom=0 -O $(HEXFORMAT) $< $@
 
 
 #####  Generating a gdb initialisation file    #####
@@ -161,8 +159,7 @@ gdbinit: $(GDBINITFILE)
 $(GDBINITFILE): $(TRG)
 	@echo "file $(TRG)" > $(GDBINITFILE)
 	
-	@echo "target remote localhost:1212" \
-		                >> $(GDBINITFILE)
+	@echo "target remote localhost:1212" >> $(GDBINITFILE)
 	
 	@echo "load"        >> $(GDBINITFILE) 
 	@echo "break main"  >> $(GDBINITFILE)

@@ -1,22 +1,22 @@
-from prototypes import (PackageDIP16_vcc5, Pin, Test)
+from prototypes import (PackageDIP16_vcc5_gnd13, Pin, Test)
 
-class Part74H106(PackageDIP16_vcc5):
+class Part74H106(PackageDIP16_vcc5_gnd13):
     name = "74H106"
     desc = "Dual J-K flip-flops with preset and clear"
     pin_cfg = {
         1: Pin("1CLK", Pin.IN),
-        2: Pin("~1PRE", Pin.OUT),
-        3: Pin("~1CLR", Pin.OUT),
+        2: Pin("~1PRE", Pin.IN),
+        3: Pin("~1CLR", Pin.IN),
         4: Pin("1J", Pin.IN),
-        6: Pin("2CLK", Pin.OUT),
+        6: Pin("2CLK", Pin.IN),
         7: Pin("~2PRE", Pin.IN),
         8: Pin("~2CLR", Pin.IN),
         9: Pin("2J", Pin.IN),
-        10: Pin("~2Q", Pin.IN),
-        11: Pin("2Q", Pin.IN),
-        13: Pin("2K", Pin.IN),  # WARNING: 12 swapped with 13 due to device not supporting the pinout!!!
-        14: Pin("~1Q", Pin.IN),
-        15: Pin("1Q", Pin.IN),
+        10: Pin("~2Q", Pin.OUT),
+        11: Pin("2Q", Pin.OUT),
+        12: Pin("2K", Pin.IN),
+        14: Pin("~1Q", Pin.OUT),
+        15: Pin("1Q", Pin.OUT),
         16: Pin("1K", Pin.IN),
     }
 

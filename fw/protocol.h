@@ -44,10 +44,18 @@ enum test_type {
 	TYPE_MAX	= TYPE_MEM,
 };
 
+enum package_type {
+	PACKAGE_DIP = 1,
+};
+
 enum pin_type {
 	PIN_IN	= 1,
 	PIN_OUT	= 2,
 	PIN_OC	= 3,
+	PIN_3ST	= 4,
+	PIN_OE = 5,
+	PIN_C = 6,
+	PIN_RC = 7,
 	PIN_VCC	= 128,
 	PIN_GND	= 129,
 	PIN_NC	= 255,

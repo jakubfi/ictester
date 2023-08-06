@@ -15,6 +15,10 @@ class Pin:
     IN = 1      # regular TTL input
     OUT = 2     # regular TTL output
     OC = 3      # open-collector output
+    ST3 = 4     # 3-state output
+    OE = 5      # open-emitter
+    C = 6       # univibrator C connection
+    RC = 7      # univibrator R/C connection
     VCC = 128   # +5V power
     GND = 129   # ground
     NC = 255    # unused pin
@@ -23,6 +27,10 @@ class Pin:
         IN: "IN",
         OUT: "OUT",
         OC: "OC",
+        ST3: "3ST",
+        OE: "OE",
+        C: "C",
+        RC: "RC",
         VCC: "VCC",
         GND: "GND",
         NC: "NC",
@@ -65,17 +73,9 @@ class Part:
         return f"{self._type_names[self.package_type]}{self.pincount}"
 
     @property
-    def unusual_power(self):
-        return self.pins[max(self.pins)].role != Pin.VCC
-
-    @property
     def package_variant(self):
         vcc_pin = next(k for k, v in self.pins.items() if v.role == Pin.VCC)
         return f"VCC@pin{vcc_pin}"
-
-    @property
-    def full_package_name(self):
-        return f"{self.package_name} {self.package_variant}" if self.unusual_power else self.package_name
 
 
 # ------------------------------------------------------------------------
@@ -135,6 +135,16 @@ class PackageDIP16_vcc5(Part):
     package_pins = {
         5: Pin("VCC", Pin.VCC),
         12: Pin("GND", Pin.GND),
+    }
+
+
+# ------------------------------------------------------------------------
+class PackageDIP16_vcc5_gnd13(Part):
+    pincount = 16
+    package_type = Part.DIP
+    package_pins = {
+        5: Pin("VCC", Pin.VCC),
+        13: Pin("GND", Pin.GND),
     }
 
 
