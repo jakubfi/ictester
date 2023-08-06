@@ -134,10 +134,11 @@ void handle_test_setup(void)
 
 	// fill in port masks
 	for (uint8_t i=0 ; i<pin_count ; i++) {
-		int8_t port_pos = mcu_port(zif_pos(pin_count, i));
+		uint8_t zif_pin = zif_pos(pin_count, i);
+		int8_t port_pos = mcu_port(zif_pin);
 		if (port_pos >= 0) {
 			uint8_t pin_used = (pin_usage[i/8] >> (i%8)) & 1;
-			uint8_t pin_mask = pin_used << mcu_port_pin(zif_pos(pin_count, i));
+			uint8_t pin_mask = pin_used << mcu_port_pin(zif_pin);
 			port[port_pos].used_outputs |= port[port_pos].dut_output & pin_mask;
 		}
 	}

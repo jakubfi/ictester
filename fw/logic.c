@@ -48,10 +48,11 @@ void handle_vectors_load(uint8_t pin_count)
 		}
 		// fill in bits in correct positions
 		for (uint8_t pin=0 ; pin<pin_count ; pin++) {
-			int8_t port_pos = mcu_port(zif_pos(pin_count, pin));
+			uint8_t zif_pin = zif_pos(pin_count, pin);
+			int8_t port_pos = mcu_port(zif_pin);
 			if (port_pos >= 0) {
 				uint8_t bit_val = (bitvector >> pin) & 1;
-				vectors[pos][port_pos] |= bit_val << mcu_port_pin(zif_pos(pin_count, pin));
+				vectors[pos][port_pos] |= bit_val << mcu_port_pin(zif_pin);
 			}
 		}
 	}
