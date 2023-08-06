@@ -39,7 +39,7 @@ void led_ok(void)
 {
 	rgb_color color;
 	color.red = 0;
-	color.green = 10;
+	color.green = 5;
 	color.blue = 0;
 	led_strip_write(&color, 1);
 }
@@ -48,7 +48,7 @@ void led_ok(void)
 void led_fail(void)
 {
 	rgb_color color;
-	color.red = 10;
+	color.red = 5;
 	color.green = 0;
 	color.blue = 0;
 	led_strip_write(&color, 1);
@@ -58,8 +58,8 @@ void led_fail(void)
 void led_active(void)
 {
 	rgb_color color;
-	color.red = 10;
-	color.green = 3;
+	color.red = 5;
+	color.green = 2;
 	color.blue = 0;
 	led_strip_write(&color, 1);
 }
@@ -68,9 +68,9 @@ void led_active(void)
 void led_comm(void)
 {
 	rgb_color color;
-	color.red = 10;
+	color.red = 4;
 	color.green = 0;
-	color.blue = 10;
+	color.blue = 3;
 	led_strip_write(&color, 1);
 }
 
