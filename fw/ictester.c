@@ -165,13 +165,18 @@ void handle_run(void)
 		mem_setup();
 	}
 
-	for (int rep=0 ; rep<test_loops ; rep++) {
-		if (test_type == TYPE_MEM) {
-			res = run_mem(test_params);
-		} else {
-			res = run_logic();
+	if (test_type == TYPE_MEM) {
+		for (uint16_t rep=0 ; rep<test_loops ; rep++) {
+			if (run_mem(test_params) != RESP_PASS) goto fin;
 		}
-		if (res != RESP_PASS) goto fin;
+	} else if (pin_count <= 16) {
+		for (uint16_t rep=0 ; rep<test_loops ; rep++) {
+			if (run_logic2() != RESP_PASS) goto fin;
+		}
+	} else {
+		for (uint16_t rep=0 ; rep<test_loops ; rep++) {
+			if (run_logic3() != RESP_PASS) goto fin;
+		}
 	}
 
 fin:

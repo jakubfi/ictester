@@ -60,15 +60,29 @@ void handle_vectors_load(uint8_t pin_count)
 }
 
 // -----------------------------------------------------------------------
-uint8_t run_logic(void)
+uint8_t run_logic2(void)
 {
 	for (uint16_t pos=0 ; pos<vectors_count ; pos++) {
-		// set outputs
+		PORTB = ((vectors[pos][1] & port[1].dut_input) | port[1].dut_pullup);
+		PORTC = ((vectors[pos][2] & port[2].dut_input) | port[2].dut_pullup);
+
+		if ((test_type == TYPE_COMB) || (pos % 2)) {
+			if ((PINB ^ vectors[pos][1]) & port[1].used_outputs) return RESP_FAIL;
+			if ((PINC ^ vectors[pos][2]) & port[2].used_outputs) return RESP_FAIL;
+		}
+	}
+
+	return RESP_PASS;
+}
+
+// -----------------------------------------------------------------------
+uint8_t run_logic3(void)
+{
+	for (uint16_t pos=0 ; pos<vectors_count ; pos++) {
 		PORTA = ((vectors[pos][0] & port[0].dut_input) | port[0].dut_pullup);
 		PORTB = ((vectors[pos][1] & port[1].dut_input) | port[1].dut_pullup);
 		PORTC = ((vectors[pos][2] & port[2].dut_input) | port[2].dut_pullup);
 
-		// read outputs
 		if ((test_type == TYPE_COMB) || (pos % 2)) {
 			if ((PINA ^ vectors[pos][0]) & port[0].used_outputs) return RESP_FAIL;
 			if ((PINB ^ vectors[pos][1]) & port[1].used_outputs) return RESP_FAIL;
