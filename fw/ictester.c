@@ -152,16 +152,16 @@ void handle_run(void)
 
 	uint16_t test_loops = serial_rx_16le();
 
-	// TODO: should be generalized in the end
 	led_active();
+
+	mcu_port_setup();
+	if (!zif_connect()) {
+		res = RESP_ERR;
+		goto fin;
+	}
+
 	if (test_type == TYPE_MEM) {
 		mem_setup();
-	} else {
-		mcu_port_setup();
-		if (!zif_connect()) {
-			res = RESP_ERR;
-			goto fin;
-		}
 	}
 
 	for (int rep=0 ; rep<test_loops ; rep++) {

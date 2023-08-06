@@ -8,24 +8,24 @@
 #include "protocol.h"
 
 //    pin:  7    6    5    4    3    2    1    0
-// port A:  -   A8*  Di  ~WE ~RAS   A0   A2   A1
-// port C: NC   A7   A5   A4   A3   A6   Do ~CAS
+// port C:  -   A1   A2   A0 ~RAS  ~WE   Di   A8*
+// port B:  - ~CAS   Do   A6   A3   A4   A5   A7
 //
 // *only for 41256
 
-#define PORT_RAS	PORTA
-#define PORT_WE		PORTA
-#define PORT_DIN	PORTA
-#define PORT_CAS	PORTC
-#define PIN_DOUT	PINC
-#define PORT_ADDR_L		PORTA
-#define PORT_ADDR_H		PORTC
+#define PORT_RAS	PORTC
+#define PORT_WE		PORTC
+#define PORT_DIN	PORTC
+#define PORT_CAS	PORTB
+#define PIN_DOUT	PINB
+#define PORT_ADDR_L		PORTC
+#define PORT_ADDR_H		PORTB
 
-#define BIT_WE		4
+#define BIT_WE		2
 #define BIT_RAS		3
-#define BIT_CAS		0
-#define BIT_DO		1
-#define BIT_DI		5
+#define BIT_CAS		6
+#define BIT_DO		5
+#define BIT_DI		1
 
 #define VAL_WE		(1 << BIT_WE)
 #define VAL_RAS		(1 << BIT_RAS)
@@ -42,10 +42,10 @@
 
 #define READ_ZERO 0
 #define READ_ONE  VAL_DO
-#define READ_NONE 2
+#define READ_NONE 255
 #define WRITE_ZERO 0
 #define WRITE_ONE  VAL_DI
-#define WRITE_NONE 2
+#define WRITE_NONE 255
 #define DIR_UP 0
 #define DIR_DOWN 1
 
@@ -76,11 +76,9 @@ typedef uint8_t (*march_fun)(uint8_t dir, uint8_t r, uint8_t w, uint16_t addr_sp
 // -----------------------------------------------------------------------
 void mem_setup(void)
 {
-	DDRA  = 0b11111111;
-	PORTA = 0b00011000;
-
-	DDRC  = 0b11111101;
-	PORTC = 0b00000001;
+	CAS_OFF;
+	RAS_OFF;
+	WE_OFF;
 
 	// wait 500us after power-up (100-120us typical, but some chips apparently require 500us)
 	_delay_us(500);
@@ -96,13 +94,13 @@ void mem_setup(void)
 // -----------------------------------------------------------------------
 static inline uint8_t addr_low(uint16_t addr)
 {
-	return (addr & 0b111) | ((addr & 0b100000000) >> 2);
+	return ((addr & 0b11100000) >> 1) | ((addr & 0b100000000) >> 8);
 }
 
 // -----------------------------------------------------------------------
 static inline uint8_t addr_high(uint16_t addr)
 {
-	return (addr & 0b11111000) >> 1;
+	return addr & 0b11111;
 }
 
 // -----------------------------------------------------------------------
