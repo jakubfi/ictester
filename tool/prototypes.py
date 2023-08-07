@@ -159,6 +159,16 @@ class PackageDIP24(Part):
 
 
 # ------------------------------------------------------------------------
+class PackageDIP20(Part):
+    pincount = 20
+    package_type = Part.DIP
+    package_pins = {
+        10: Pin("GND", Pin.GND),
+        20: Pin("VCC", Pin.VCC),
+    }
+
+
+# ------------------------------------------------------------------------
 class TestVector():
     def __init__(self, vector, test):
         self.input = vector[0]
