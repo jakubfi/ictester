@@ -5,10 +5,10 @@ from binvec import BV
 class Tester:
     CMD_HELLO = 1
     CMD_DUT_SETUP = 2
-    CMD_TEST_SETUP = 3
-    CMD_VECTORS_LOAD = 4
-    CMD_RUN = 5
-    CMD_DUT_CONNECT = 6
+    CMD_DUT_CONNECT = 3
+    CMD_TEST_SETUP = 4
+    CMD_VECTORS_LOAD = 5
+    CMD_RUN = 6
     CMD_DUT_DISCONNECT = 7
 
     RESP_HELLO = 128

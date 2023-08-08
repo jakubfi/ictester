@@ -16,10 +16,10 @@ Available commands:
 |----------------------|-------|---------------------------------------------------|
 | `CMD_HELLO`          | 1     | Check comms and get tester information            |
 | `CMD_DUT_SETUP`      | 2     | Configure tester for the DUT                      |
-| `CMD_TEST_SETUP`     | 3     | Setup the test                                    |
-| `CMD_VECTORS_LOAD`   | 4     | Load test vectors (optional, if used by the test) |
-| `CMD_TEST_RUN`       | 5     | Connect the DUT, run the test, disconnect DUT     |
-| `CMD_DUT_CONNECT`    | 6     | Connect the DUT to the tester, power it up        |
+| `CMD_DUT_CONNECT`    | 3     | Connect the DUT to the tester, power it up        |
+| `CMD_TEST_SETUP`     | 4     | Setup the test                                    |
+| `CMD_VECTORS_LOAD`   | 5     | Load test vectors (optional, if used by the test) |
+| `CMD_TEST_RUN`       | 6     | Run the test                                      |
 | `CMD_DUT_DISCONNECT` | 7     | Power down the DUT, disconnect from the tester    |
 
 Available responses:
@@ -88,8 +88,6 @@ Valid responses:
 
 This command causes the tester to configure it's pin connections and apply power to the DUT. Requires the DUT to be set up first.
 
-This command is intended to power up the DUT without running any test. No need to "DUT Connect" before running a test.
-
 * 1 BYTE: command: `CMD_DUT_CONNECT`
 
 Valid responses:
@@ -101,8 +99,6 @@ Valid responses:
 ## DUT Disconnect
 
 This command causes the tester to power down the DUT and deconfigure it's pin connections.
-
-This command is intended to power down the DUT after it has been powered up with "DUT Connect" command.
 
 * 1 BYTE: command: `CMD_DUT_DISCONNECT`
 
@@ -167,7 +163,7 @@ Valid responses:
 
 ## Run Test
 
-Connect the DUT, run the uploaded test, disconnect the DUT. Requires test to be set and vectors to be uploaded (if required by the test).
+Run the uploaded test. Requires test to be set and vectors to be uploaded (if required by the test).
 
 * 1 BYTE: command: `CMD_TEST_RUN`
 * 2 BYTES: `l` = number of loops, "0" for infinite testing (little-endian).
