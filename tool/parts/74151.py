@@ -1,24 +1,24 @@
 from binvec import BV
-from prototypes import (PackageDIP16, Pin, Test)
+from prototypes import (PackageDIP16, Pin, PinType, Test)
 
 class Part74151(PackageDIP16):
     name = "74151"
     desc = "Data selectors/multiplexers"
     pin_cfg = {
-        1: Pin("D3", Pin.IN),
-        2: Pin("D2", Pin.IN),
-        3: Pin("D1", Pin.IN),
-        4: Pin("D0", Pin.IN),
-        5: Pin("Y", Pin.OUT),
-        6: Pin("W", Pin.OUT),
-        7: Pin("~G", Pin.IN),
-        9: Pin("C", Pin.IN),
-        10: Pin("B", Pin.IN),
-        11: Pin("A", Pin.IN),
-        12: Pin("D7", Pin.IN),
-        13: Pin("D6", Pin.IN),
-        14: Pin("D5", Pin.IN),
-        15: Pin("D4", Pin.IN),
+        1: Pin("D3", PinType.IN),
+        2: Pin("D2", PinType.IN),
+        3: Pin("D1", PinType.IN),
+        4: Pin("D0", PinType.IN),
+        5: Pin("Y", PinType.OUT),
+        6: Pin("W", PinType.OUT),
+        7: Pin("~G", PinType.IN),
+        9: Pin("C", PinType.IN),
+        10: Pin("B", PinType.IN),
+        11: Pin("A", PinType.IN),
+        12: Pin("D7", PinType.IN),
+        13: Pin("D6", PinType.IN),
+        14: Pin("D5", PinType.IN),
+        15: Pin("D4", PinType.IN),
     }
 
     default_inputs = [12, 13, 14, 15, 1, 2, 3, 4,  9, 10, 11,  7]

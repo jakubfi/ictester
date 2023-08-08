@@ -1,21 +1,21 @@
-from prototypes import (PackageDIP14_vcc5, Pin, Test)
+from prototypes import (PackageDIP14_vcc5, Pin, PinType, Test)
 
 class Part7490(PackageDIP14_vcc5):
     name = "7490"
     desc = "Decade counter"
     pin_cfg = {
-        1: Pin("CKB", Pin.IN),
-        2: Pin("R0(1)", Pin.IN),
-        3: Pin("R0(2)", Pin.IN),
-        4: Pin("NC", Pin.NC),
-        6: Pin("R9(1)", Pin.IN),
-        7: Pin("R9(2)", Pin.IN),
-        8: Pin("QC", Pin.OUT),
-        9: Pin("QB", Pin.OUT),
-        11: Pin("QD", Pin.OUT),
-        12: Pin("QA", Pin.OUT),
-        13: Pin("NC", Pin.NC),
-        14: Pin("CKA", Pin.IN),
+        1: Pin("CKB", PinType.IN),
+        2: Pin("R0(1)", PinType.IN),
+        3: Pin("R0(2)", PinType.IN),
+        4: Pin("NC", PinType.NC),
+        6: Pin("R9(1)", PinType.IN),
+        7: Pin("R9(2)", PinType.IN),
+        8: Pin("QC", PinType.OUT),
+        9: Pin("QB", PinType.OUT),
+        11: Pin("QD", PinType.OUT),
+        12: Pin("QA", PinType.OUT),
+        13: Pin("NC", PinType.NC),
+        14: Pin("CKA", PinType.IN),
     }
 
     default_inputs = [2, 3,  6, 7,  14, 1]

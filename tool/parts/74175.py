@@ -1,23 +1,23 @@
-from prototypes import (PackageDIP16, Pin, Test)
+from prototypes import (PackageDIP16, Pin, PinType, Test)
 
 class Part74175(PackageDIP16):
     name = "74175"
     desc = "Quad D-type filp-flops"
     pin_cfg = {
-        1: Pin("~CLR", Pin.IN),
-        2: Pin("1Q", Pin.OUT),
-        3: Pin("~1Q", Pin.OUT),
-        4: Pin("1D", Pin.IN),
-        5: Pin("2D", Pin.IN),
-        6: Pin("~2Q", Pin.OUT),
-        7: Pin("2Q", Pin.OUT),
-        9: Pin("CLK", Pin.IN),
-        10: Pin("3Q", Pin.OUT),
-        11: Pin("~3Q", Pin.OUT),
-        12: Pin("3D", Pin.IN),
-        13: Pin("4D", Pin.IN),
-        14: Pin("~4Q", Pin.OUT),
-        15: Pin("4Q", Pin.OUT),
+        1: Pin("~CLR", PinType.IN),
+        2: Pin("1Q", PinType.OUT),
+        3: Pin("~1Q", PinType.OUT),
+        4: Pin("1D", PinType.IN),
+        5: Pin("2D", PinType.IN),
+        6: Pin("~2Q", PinType.OUT),
+        7: Pin("2Q", PinType.OUT),
+        9: Pin("CLK", PinType.IN),
+        10: Pin("3Q", PinType.OUT),
+        11: Pin("~3Q", PinType.OUT),
+        12: Pin("3D", PinType.IN),
+        13: Pin("4D", PinType.IN),
+        14: Pin("~4Q", PinType.OUT),
+        15: Pin("4Q", PinType.OUT),
     }
 
     default_inputs = [1, 9,  4, 5, 12, 13]

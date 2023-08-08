@@ -1,23 +1,23 @@
-from prototypes import (PackageDIP16, Pin, Test)
+from prototypes import (PackageDIP16, Pin, PinType, Test)
 
 class Part74166(PackageDIP16):
     name = "74166"
     desc = "Parallel-load 8-bit shift register"
     pin_cfg = {
-        1: Pin("SER", Pin.IN),
-        2: Pin("A", Pin.IN),
-        3: Pin("B", Pin.IN),
-        4: Pin("C", Pin.IN),
-        5: Pin("D", Pin.IN),
-        6: Pin("CLK INH", Pin.IN),
-        7: Pin("CLK", Pin.OUT),
-        9: Pin("~CLR", Pin.OUT),
-        10: Pin("E", Pin.IN),
-        11: Pin("F", Pin.IN),
-        12: Pin("G", Pin.IN),
-        13: Pin("QH", Pin.IN),
-        14: Pin("H", Pin.IN),
-        15: Pin("SH/~LD", Pin.IN),
+        1: Pin("SER", PinType.IN),
+        2: Pin("A", PinType.IN),
+        3: Pin("B", PinType.IN),
+        4: Pin("C", PinType.IN),
+        5: Pin("D", PinType.IN),
+        6: Pin("CLK INH", PinType.IN),
+        7: Pin("CLK", PinType.OUT),
+        9: Pin("~CLR", PinType.OUT),
+        10: Pin("E", PinType.IN),
+        11: Pin("F", PinType.IN),
+        12: Pin("G", PinType.IN),
+        13: Pin("QH", PinType.IN),
+        14: Pin("H", PinType.IN),
+        15: Pin("SH/~LD", PinType.IN),
     }
 
     default_inputs = [9, 15, 6, 7, 1, 2, 3, 4, 5, 10, 11, 12, 14]

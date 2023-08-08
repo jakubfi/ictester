@@ -1,32 +1,32 @@
 from binvec import BV
-from prototypes import (PackageDIP24, Pin, Test)
+from prototypes import (PackageDIP24, Pin, PinType, Test)
 
 class Part74154(PackageDIP24):
     name = "74154"
     desc = "4-Line-to-16-Line Decoders/Demultiplexers"
     pin_cfg = {
-        1: Pin("O0", Pin.OUT),
-        2: Pin("O1", Pin.OUT),
-        3: Pin("O2", Pin.OUT),
-        4: Pin("O3", Pin.OUT),
-        5: Pin("O4", Pin.OUT),
-        6: Pin("O5", Pin.OUT),
-        7: Pin("O6", Pin.OUT),
-        8: Pin("O7", Pin.OUT),
-        9: Pin("O8", Pin.OUT),
-        10: Pin("O9", Pin.OUT),
-        11: Pin("O10", Pin.OUT),
-        13: Pin("O11", Pin.OUT),
-        14: Pin("O12", Pin.OUT),
-        15: Pin("O13", Pin.OUT),
-        16: Pin("O14", Pin.OUT),
-        17: Pin("O15", Pin.OUT),
-        18: Pin("G1", Pin.IN),
-        19: Pin("G2", Pin.IN),
-        20: Pin("D", Pin.IN),
-        21: Pin("C", Pin.IN),
-        22: Pin("B", Pin.IN),
-        23: Pin("A", Pin.IN),
+        1: Pin("O0", PinType.OUT),
+        2: Pin("O1", PinType.OUT),
+        3: Pin("O2", PinType.OUT),
+        4: Pin("O3", PinType.OUT),
+        5: Pin("O4", PinType.OUT),
+        6: Pin("O5", PinType.OUT),
+        7: Pin("O6", PinType.OUT),
+        8: Pin("O7", PinType.OUT),
+        9: Pin("O8", PinType.OUT),
+        10: Pin("O9", PinType.OUT),
+        11: Pin("O10", PinType.OUT),
+        13: Pin("O11", PinType.OUT),
+        14: Pin("O12", PinType.OUT),
+        15: Pin("O13", PinType.OUT),
+        16: Pin("O14", PinType.OUT),
+        17: Pin("O15", PinType.OUT),
+        18: Pin("G1", PinType.IN),
+        19: Pin("G2", PinType.IN),
+        20: Pin("D", PinType.IN),
+        21: Pin("C", PinType.IN),
+        22: Pin("B", PinType.IN),
+        23: Pin("A", PinType.IN),
     }
 
     default_inputs = [18, 19,  20, 21, 22, 23]

@@ -1,21 +1,21 @@
-from prototypes import (PackageDIP14_vcc4, Pin, Test)
+from prototypes import (PackageDIP14_vcc4, Pin, PinType, Test)
 
 class Part7473(PackageDIP14_vcc4):
     name = "7473"
     desc = "Dual J−K Flip−Flop with Clear"
     pin_cfg = {
-        1: Pin("1CLK", Pin.IN),
-        2: Pin("~1CLR", Pin.IN),
-        3: Pin("1K", Pin.IN),
-        5: Pin("2CLK", Pin.IN),
-        6: Pin("~2CLR", Pin.IN),
-        7: Pin("2J", Pin.IN),
-        8: Pin("~2Q", Pin.OUT),
-        9: Pin("2Q", Pin.OUT),
-        10: Pin("2K", Pin.IN),
-        12: Pin("1Q", Pin.OUT),
-        13: Pin("~1Q", Pin.OUT),
-        14: Pin("1J", Pin.IN),
+        1: Pin("1CLK", PinType.IN),
+        2: Pin("~1CLR", PinType.IN),
+        3: Pin("1K", PinType.IN),
+        5: Pin("2CLK", PinType.IN),
+        6: Pin("~2CLR", PinType.IN),
+        7: Pin("2J", PinType.IN),
+        8: Pin("~2Q", PinType.OUT),
+        9: Pin("2Q", PinType.OUT),
+        10: Pin("2K", PinType.IN),
+        12: Pin("1Q", PinType.OUT),
+        13: Pin("~1Q", PinType.OUT),
+        14: Pin("1J", PinType.IN),
     }
 
     test_all = Test("Sync/Async operation", Test.SEQ,

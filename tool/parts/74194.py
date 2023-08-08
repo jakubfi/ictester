@@ -1,23 +1,23 @@
-from prototypes import (PackageDIP16, Pin, Test)
+from prototypes import (PackageDIP16, Pin, PinType, Test)
 
 class Part74194(PackageDIP16):
     name = "74194"
     desc = "4-bit bidirectional universal shift register"
     pin_cfg = {
-        1: Pin("~CLR", Pin.IN),
-        2: Pin("SR SER", Pin.IN),
-        3: Pin("A", Pin.IN),
-        4: Pin("B", Pin.IN),
-        5: Pin("C", Pin.IN),
-        6: Pin("D", Pin.IN),
-        7: Pin("SL SER", Pin.IN),
-        9: Pin("S0", Pin.IN),
-        10: Pin("S1", Pin.IN),
-        11: Pin("CLK", Pin.IN),
-        12: Pin("QD", Pin.OUT),
-        13: Pin("QC", Pin.OUT),
-        14: Pin("QB", Pin.OUT),
-        15: Pin("QA", Pin.OUT),
+        1: Pin("~CLR", PinType.IN),
+        2: Pin("SR SER", PinType.IN),
+        3: Pin("A", PinType.IN),
+        4: Pin("B", PinType.IN),
+        5: Pin("C", PinType.IN),
+        6: Pin("D", PinType.IN),
+        7: Pin("SL SER", PinType.IN),
+        9: Pin("S0", PinType.IN),
+        10: Pin("S1", PinType.IN),
+        11: Pin("CLK", PinType.IN),
+        12: Pin("QD", PinType.OUT),
+        13: Pin("QC", PinType.OUT),
+        14: Pin("QB", PinType.OUT),
+        15: Pin("QA", PinType.OUT),
     }
 
     default_inputs = [1,  10, 9,  11,  7, 2,  3, 4, 5, 6]

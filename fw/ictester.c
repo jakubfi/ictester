@@ -81,26 +81,28 @@ void handle_dut_setup(void)
 		int8_t port_pos = mcu_port(zif_pin);
 		uint8_t port_val = 1 << mcu_port_pin(zif_pin);
 		switch (pin_data[i]) {
-			case PIN_IN:
+			case ZIF_OUT:
 				port[port_pos].dut_input |= port_val;
 				break;
-			case PIN_OUT:
+			case ZIF_IN:
 				port[port_pos].dut_output |= port_val;
-				// TODO: configurable weak pullups on all DUT outputs
+				break;
+			case ZIF_IN_PU_WEAK:
+				port[port_pos].dut_output |= port_val;
 				port[port_pos].dut_pullup |= port_val;
 				break;
-			case PIN_OC:
+			case ZIF_IN_PU_STRONG:
 				port[port_pos].dut_output |= port_val;
-				zif_func(PIN_OC, zif_pin);
+				zif_func(ZIF_IN_PU_STRONG, zif_pin);
 				break;
-			case PIN_VCC:
-				if (!zif_func(PIN_VCC, zif_pin)) {
+			case ZIF_VCC:
+				if (!zif_func(ZIF_VCC, zif_pin)) {
 					res = RESP_ERR;
 					goto fin;
 				}
 				break;
-			case PIN_GND:
-				if (!zif_func(PIN_GND, zif_pin)) {
+			case ZIF_GND:
+				if (!zif_func(ZIF_GND, zif_pin)) {
 					res = RESP_ERR;
 					goto fin;
 				}

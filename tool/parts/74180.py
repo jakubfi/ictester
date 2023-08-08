@@ -1,22 +1,22 @@
 from binvec import BV
-from prototypes import (PackageDIP14, Pin, Test)
+from prototypes import (PackageDIP14, Pin, PinType, Test)
 
 class Part74180(PackageDIP14):
     name = "74180"
     desc = "9-bit odd/even parity generator/checker"
     pin_cfg = {
-        1: Pin("G", Pin.IN),
-        2: Pin("H", Pin.IN),
-        3: Pin("EVEN", Pin.IN),
-        4: Pin("ODD", Pin.IN),
-        5: Pin("sumEVEN", Pin.OUT),
-        6: Pin("sumODD", Pin.OUT),
-        8: Pin("A", Pin.IN),
-        9: Pin("B", Pin.IN),
-        10: Pin("C", Pin.IN),
-        11: Pin("D", Pin.IN),
-        12: Pin("E", Pin.IN),
-        13: Pin("F", Pin.IN),
+        1: Pin("G", PinType.IN),
+        2: Pin("H", PinType.IN),
+        3: Pin("EVEN", PinType.IN),
+        4: Pin("ODD", PinType.IN),
+        5: Pin("sumEVEN", PinType.OUT),
+        6: Pin("sumODD", PinType.OUT),
+        8: Pin("A", PinType.IN),
+        9: Pin("B", PinType.IN),
+        10: Pin("C", PinType.IN),
+        11: Pin("D", PinType.IN),
+        12: Pin("E", PinType.IN),
+        13: Pin("F", PinType.IN),
     }
 
     default_inputs = [8, 9, 10, 11, 12, 13, 1, 2,  3, 4]

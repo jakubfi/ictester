@@ -1,21 +1,21 @@
-from prototypes import (PackageDIP14, Pin, Test)
+from prototypes import (PackageDIP14, Pin, PinType, Test)
 
 class Part74125(PackageDIP14):
     name = "74125"
     desc = "Quarduple bus buffers with 3-state outputs"
     pin_cfg = {
-        1: Pin("~1G", Pin.IN),
-        2: Pin("1A", Pin.IN),
-        3: Pin("1Y", Pin.OC),
-        4: Pin("~2G", Pin.IN),
-        5: Pin("2A", Pin.IN),
-        6: Pin("2Y", Pin.OC),
-        8: Pin("3Y", Pin.OC),
-        9: Pin("3A", Pin.IN),
-        10: Pin("~3G", Pin.IN),
-        11: Pin("4Y", Pin.OC),
-        12: Pin("4A", Pin.IN),
-        13: Pin("~4G", Pin.IN),
+        1: Pin("~1G", PinType.IN),
+        2: Pin("1A", PinType.IN),
+        3: Pin("1Y", PinType.OC),
+        4: Pin("~2G", PinType.IN),
+        5: Pin("2A", PinType.IN),
+        6: Pin("2Y", PinType.OC),
+        8: Pin("3Y", PinType.OC),
+        9: Pin("3A", PinType.IN),
+        10: Pin("~3G", PinType.IN),
+        11: Pin("4Y", PinType.OC),
+        12: Pin("4A", PinType.IN),
+        13: Pin("~4G", PinType.IN),
     }
 
     test_all = Test("Complete logic", Test.COMB,

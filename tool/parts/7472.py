@@ -1,21 +1,21 @@
-from prototypes import (PackageDIP14, Pin, Test)
+from prototypes import (PackageDIP14, Pin, PinType, Test)
 
 class Part7472(PackageDIP14):
     name = "7472"
     desc = "And-gated J-K master-slave flip-flops with preset and clear"
     pin_cfg = {
-        1: Pin("NC", Pin.NC),
-        2: Pin("~CLR", Pin.IN),
-        3: Pin("J1", Pin.IN),
-        4: Pin("J2", Pin.IN),
-        5: Pin("J3", Pin.IN),
-        6: Pin("~Q", Pin.IN),
-        8: Pin("Q", Pin.OUT),
-        9: Pin("K1", Pin.OUT),
-        10: Pin("K2", Pin.IN),
-        11: Pin("K3", Pin.IN),
-        12: Pin("CLK", Pin.IN),
-        13: Pin("~PRE", Pin.IN),
+        1: Pin("NC", PinType.NC),
+        2: Pin("~CLR", PinType.IN),
+        3: Pin("J1", PinType.IN),
+        4: Pin("J2", PinType.IN),
+        5: Pin("J3", PinType.IN),
+        6: Pin("~Q", PinType.IN),
+        8: Pin("Q", PinType.OUT),
+        9: Pin("K1", PinType.OUT),
+        10: Pin("K2", PinType.IN),
+        11: Pin("K3", PinType.IN),
+        12: Pin("CLK", PinType.IN),
+        13: Pin("~PRE", PinType.IN),
     }
 
     default_inputs = [3, 4, 5,  9, 10, 11,  13, 2, 12]

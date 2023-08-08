@@ -1,23 +1,23 @@
-from prototypes import (PackageDIP16_vcc5_gnd13, Pin, Test)
+from prototypes import (PackageDIP16_vcc5_gnd13, Pin, PinType, Test)
 
 class Part74H106(PackageDIP16_vcc5_gnd13):
     name = "74H106"
     desc = "Dual J-K flip-flops with preset and clear"
     pin_cfg = {
-        1: Pin("1CLK", Pin.IN),
-        2: Pin("~1PRE", Pin.IN),
-        3: Pin("~1CLR", Pin.IN),
-        4: Pin("1J", Pin.IN),
-        6: Pin("2CLK", Pin.IN),
-        7: Pin("~2PRE", Pin.IN),
-        8: Pin("~2CLR", Pin.IN),
-        9: Pin("2J", Pin.IN),
-        10: Pin("~2Q", Pin.OUT),
-        11: Pin("2Q", Pin.OUT),
-        12: Pin("2K", Pin.IN),
-        14: Pin("~1Q", Pin.OUT),
-        15: Pin("1Q", Pin.OUT),
-        16: Pin("1K", Pin.IN),
+        1: Pin("1CLK", PinType.IN),
+        2: Pin("~1PRE", PinType.IN),
+        3: Pin("~1CLR", PinType.IN),
+        4: Pin("1J", PinType.IN),
+        6: Pin("2CLK", PinType.IN),
+        7: Pin("~2PRE", PinType.IN),
+        8: Pin("~2CLR", PinType.IN),
+        9: Pin("2J", PinType.IN),
+        10: Pin("~2Q", PinType.OUT),
+        11: Pin("2Q", PinType.OUT),
+        12: Pin("2K", PinType.IN),
+        14: Pin("~1Q", PinType.OUT),
+        15: Pin("1Q", PinType.OUT),
+        16: Pin("1K", PinType.IN),
     }
 
     test_all = Test("Complete logic", Test.COMB,

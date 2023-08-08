@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 from parts import catalog
-from prototypes import (Test, Pin)
+from prototypes import (Test, PinType)
 
 for name, part in catalog.items():
     print(f"Checking: {name}")
@@ -18,7 +18,7 @@ for name, part in catalog.items():
             raise RuntimeError(f"Wrong pin index: {p}")
 
     pin_roles = [p.role for p in part.pins.values()]
-    if Pin.VCC not in pin_roles or Pin.GND not in pin_roles:
+    if PinType.VCC not in pin_roles or PinType.GND not in pin_roles:
         raise RuntimeError("VCC or GND pin missing")
 
     test_names = [t.name for t in part.tests]

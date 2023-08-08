@@ -1,22 +1,22 @@
 from binvec import BV
-from prototypes import (PackageDIP14, Pin, Test)
+from prototypes import (PackageDIP14, Pin, PinType, Test)
 
 class Part7402(PackageDIP14):
     name = "7402"
     desc = "Quad 2-input positive-NOR gates"
     pin_cfg = {
-        1: Pin("1Y", Pin.OUT),
-        2: Pin("1A", Pin.IN),
-        3: Pin("1B", Pin.IN),
-        4: Pin("2Y", Pin.OUT),
-        5: Pin("2A", Pin.IN),
-        6: Pin("2B", Pin.IN),
-        8: Pin("3A", Pin.IN),
-        9: Pin("3B", Pin.IN),
-        10: Pin("3Y", Pin.OUT),
-        11: Pin("4A", Pin.IN),
-        12: Pin("4B", Pin.IN),
-        13: Pin("4Y", Pin.OUT),
+        1: Pin("1Y", PinType.OUT),
+        2: Pin("1A", PinType.IN),
+        3: Pin("1B", PinType.IN),
+        4: Pin("2Y", PinType.OUT),
+        5: Pin("2A", PinType.IN),
+        6: Pin("2B", PinType.IN),
+        8: Pin("3A", PinType.IN),
+        9: Pin("3B", PinType.IN),
+        10: Pin("3Y", PinType.OUT),
+        11: Pin("4A", PinType.IN),
+        12: Pin("4B", PinType.IN),
+        13: Pin("4Y", PinType.OUT),
     }
 
     tests = [

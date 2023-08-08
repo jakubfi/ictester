@@ -85,13 +85,13 @@ bool zif_func(uint8_t func, uint8_t pin)
 	const __flash struct switch_coord *coord;
 
 	switch (func) {
-		case PIN_VCC:
+		case ZIF_VCC:
 			coord = zif_vcc_coord;
 			break;
-		case PIN_GND:
+		case ZIF_GND:
 			coord = zif_gnd_coord;
 			break;
-		case PIN_OC:
+		case ZIF_IN_PU_STRONG:
 			coord = zif_pu_coord;
 			break;
 		default:

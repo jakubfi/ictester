@@ -1,23 +1,23 @@
-from prototypes import (PackageDIP16, Pin, Test)
+from prototypes import (PackageDIP16, Pin, PinType, Test)
 
 class Part74112(PackageDIP16):
     name = "74112"
     desc = "Dual J-K negative edge triggered flip-flops with preset and clear"
     pin_cfg = {
-        1: Pin("1CLK", Pin.IN),
-        2: Pin("1K", Pin.IN),
-        3: Pin("1J", Pin.IN),
-        4: Pin("~1PRE", Pin.IN),
-        5: Pin("1Q", Pin.OUT),
-        6: Pin("~1Q", Pin.OUT),
-        7: Pin("~2Q", Pin.OUT),
-        9: Pin("2Q", Pin.OUT),
-        10: Pin("~2PRE", Pin.IN),
-        11: Pin("2J", Pin.IN),
-        12: Pin("2K", Pin.IN),
-        13: Pin("2CLK", Pin.IN),
-        14: Pin("~2CLR", Pin.IN),
-        15: Pin("~1CLR", Pin.IN),
+        1: Pin("1CLK", PinType.IN),
+        2: Pin("1K", PinType.IN),
+        3: Pin("1J", PinType.IN),
+        4: Pin("~1PRE", PinType.IN),
+        5: Pin("1Q", PinType.OUT),
+        6: Pin("~1Q", PinType.OUT),
+        7: Pin("~2Q", PinType.OUT),
+        9: Pin("2Q", PinType.OUT),
+        10: Pin("~2PRE", PinType.IN),
+        11: Pin("2J", PinType.IN),
+        12: Pin("2K", PinType.IN),
+        13: Pin("2CLK", PinType.IN),
+        14: Pin("~2CLR", PinType.IN),
+        15: Pin("~1CLR", PinType.IN),
     }
 
     test_all = Test("Complete logic", Test.COMB,

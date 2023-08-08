@@ -1,23 +1,23 @@
-from prototypes import (PackageDIP16, Pin, Test)
+from prototypes import (PackageDIP16, Pin, PinType, Test)
 
 class Part74193(PackageDIP16):
     name = "74193"
     desc = "Synchronous 4-bit up/down binary counter (dual clock with clear)"
     pin_cfg = {
-        1: Pin("B", Pin.IN),
-        2: Pin("QB", Pin.OUT),
-        3: Pin("QA", Pin.OUT),
-        4: Pin("DOWN", Pin.IN),
-        5: Pin("UP", Pin.IN),
-        6: Pin("QC", Pin.OUT),
-        7: Pin("QD", Pin.OUT),
-        9: Pin("D", Pin.IN),
-        10: Pin("C", Pin.IN),
-        11: Pin("~LOAD", Pin.IN),
-        12: Pin("~CO", Pin.OUT),
-        13: Pin("~BO", Pin.OUT),
-        14: Pin("CLR", Pin.IN),
-        15: Pin("A", Pin.IN),
+        1: Pin("B", PinType.IN),
+        2: Pin("QB", PinType.OUT),
+        3: Pin("QA", PinType.OUT),
+        4: Pin("DOWN", PinType.IN),
+        5: Pin("UP", PinType.IN),
+        6: Pin("QC", PinType.OUT),
+        7: Pin("QD", PinType.OUT),
+        9: Pin("D", PinType.IN),
+        10: Pin("C", PinType.IN),
+        11: Pin("~LOAD", PinType.IN),
+        12: Pin("~CO", PinType.OUT),
+        13: Pin("~BO", PinType.OUT),
+        14: Pin("CLR", PinType.IN),
+        15: Pin("A", PinType.IN),
     }
 
     test_all = Test("Complete logic", Test.SEQ,

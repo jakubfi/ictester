@@ -1,23 +1,23 @@
-from prototypes import (PackageDIP16_vcc5, Pin, Test)
+from prototypes import (PackageDIP16_vcc5, Pin, PinType, Test)
 
 class Part7496(PackageDIP16_vcc5):
     name = "7496"
     desc = "5-bit shift register"
     pin_cfg = {
-        1: Pin("CLK", Pin.IN),
-        2: Pin("A", Pin.IN),
-        3: Pin("B", Pin.IN),
-        4: Pin("C", Pin.IN),
-        6: Pin("D", Pin.IN),
-        7: Pin("E", Pin.IN),
-        8: Pin("PRE", Pin.IN),
-        9: Pin("SER", Pin.IN),
-        10: Pin("QE", Pin.OUT),
-        11: Pin("QD", Pin.OUT),
-        13: Pin("QC", Pin.OUT),
-        14: Pin("QB", Pin.OUT),
-        15: Pin("QA", Pin.OUT),
-        16: Pin("CLR", Pin.IN),
+        1: Pin("CLK", PinType.IN),
+        2: Pin("A", PinType.IN),
+        3: Pin("B", PinType.IN),
+        4: Pin("C", PinType.IN),
+        6: Pin("D", PinType.IN),
+        7: Pin("E", PinType.IN),
+        8: Pin("PRE", PinType.IN),
+        9: Pin("SER", PinType.IN),
+        10: Pin("QE", PinType.OUT),
+        11: Pin("QD", PinType.OUT),
+        13: Pin("QC", PinType.OUT),
+        14: Pin("QB", PinType.OUT),
+        15: Pin("QA", PinType.OUT),
+        16: Pin("CLR", PinType.IN),
     }
 
     default_inputs = [16, 8,  2, 3, 4, 6, 7,  1, 9]

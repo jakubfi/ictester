@@ -1,23 +1,23 @@
-from prototypes import (PackageDIP16, Pin, Test)
+from prototypes import (PackageDIP16, Pin, PinType, Test)
 
 class Part7447(PackageDIP16):
     name = "7447"
     desc = "BCD-to-seven-segment decoders/drivers"
     pin_cfg = {
-        1: Pin("B", Pin.IN),
-        2: Pin("C", Pin.IN),
-        3: Pin("~LT", Pin.IN),
-        4: Pin("~BI/~RBO", Pin.IN),
-        5: Pin("~RBI", Pin.IN),
-        6: Pin("D", Pin.IN),
-        7: Pin("A", Pin.IN),
-        9: Pin("e", Pin.OC),
-        10: Pin("d", Pin.OC),
-        11: Pin("c", Pin.OC),
-        12: Pin("b", Pin.OC),
-        13: Pin("a", Pin.OC),
-        14: Pin("g", Pin.OC),
-        15: Pin("f", Pin.OC),
+        1: Pin("B", PinType.IN),
+        2: Pin("C", PinType.IN),
+        3: Pin("~LT", PinType.IN),
+        4: Pin("~BI/~RBO", PinType.IN),
+        5: Pin("~RBI", PinType.IN),
+        6: Pin("D", PinType.IN),
+        7: Pin("A", PinType.IN),
+        9: Pin("e", PinType.OC),
+        10: Pin("d", PinType.OC),
+        11: Pin("c", PinType.OC),
+        12: Pin("b", PinType.OC),
+        13: Pin("a", PinType.OC),
+        14: Pin("g", PinType.OC),
+        15: Pin("f", PinType.OC),
     }
 
     test_async = Test("Asynchronous operation", Test.COMB,

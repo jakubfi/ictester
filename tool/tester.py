@@ -51,12 +51,12 @@ class Tester:
         self.tr.send([Tester.CMD_DUT_SETUP, self.part.package_type,  self.part.pincount])
 
         if self.debug:
-            print("Pin roles:")
+            print("DUT pin definitions:")
 
         for num, pin in sorted(self.part.pins.items()):
             if self.debug:
-                print(f" {num:-2}: {pin.role_name}")
-            self.tr.send([pin.role])
+                print(f'{num:-3} {pin.name:6} {pin.role.name:5} ZIF {pin.zif_func.name}')
+            self.tr.send([pin.zif_func.value])
 
         if self.tr.recv() != Tester.RESP_OK:
             raise RuntimeError("DUT setup failed")
@@ -69,7 +69,9 @@ class Tester:
             for i in reversed(sorted(self.part.pins))
         ]
         if self.debug:
-            print(f"Pin used by the test: {data}")
+            print(f"Test pin usage map: {data}")
+            print(f"DUT inputs: {test.inputs}")
+            print(f"DUT outputs: {test.outputs}")
         self.tr.send(BV(data))
 
         if self.tr.recv() != Tester.RESP_OK:

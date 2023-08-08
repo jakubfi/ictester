@@ -1,24 +1,24 @@
 from binvec import BV
-from prototypes import (PackageDIP16, Pin, Test)
+from prototypes import (PackageDIP16, Pin, PinType, Test)
 
 class Part74S405(PackageDIP16):
     name = "74S405"
     desc = "1-from-8 binary decoder"
     pin_cfg = {
-        1: Pin("A0", Pin.IN),
-        2: Pin("A1", Pin.IN),
-        3: Pin("A2", Pin.IN),
-        4: Pin("~E1", Pin.IN),
-        5: Pin("~E2", Pin.IN),
-        6: Pin("E3", Pin.IN),
-        7: Pin("O7", Pin.OUT),
-        9: Pin("O6", Pin.OUT),
-        10: Pin("O5", Pin.OUT),
-        11: Pin("O4", Pin.OUT),
-        12: Pin("O3", Pin.OUT),
-        13: Pin("O2", Pin.OUT),
-        14: Pin("O1", Pin.OUT),
-        15: Pin("O0", Pin.OUT),
+        1: Pin("A0", PinType.IN),
+        2: Pin("A1", PinType.IN),
+        3: Pin("A2", PinType.IN),
+        4: Pin("~E1", PinType.IN),
+        5: Pin("~E2", PinType.IN),
+        6: Pin("E3", PinType.IN),
+        7: Pin("O7", PinType.OUT),
+        9: Pin("O6", PinType.OUT),
+        10: Pin("O5", PinType.OUT),
+        11: Pin("O4", PinType.OUT),
+        12: Pin("O3", PinType.OUT),
+        13: Pin("O2", PinType.OUT),
+        14: Pin("O1", PinType.OUT),
+        15: Pin("O0", PinType.OUT),
     }
 
     default_inputs = [4, 5, 6,  3, 2, 1]

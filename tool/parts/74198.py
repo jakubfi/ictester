@@ -1,31 +1,31 @@
-from prototypes import (PackageDIP24, Pin, Test)
+from prototypes import (PackageDIP24, Pin, PinType, Test)
 
 class Part74198(PackageDIP24):
     name = "74198"
     desc = "8-bit shift registers"
     pin_cfg = {
-        1: Pin("S0", Pin.IN),
-        2: Pin("SR SER", Pin.IN),
-        3: Pin("A", Pin.IN),
-        4: Pin("QA", Pin.OUT),
-        5: Pin("B", Pin.IN),
-        6: Pin("QB", Pin.OUT),
-        7: Pin("C", Pin.IN),
-        8: Pin("QC", Pin.OUT),
-        9: Pin("D", Pin.IN),
-        10: Pin("QD", Pin.OUT),
-        11: Pin("CLK", Pin.IN),
-        13: Pin("~CLR", Pin.IN),
-        14: Pin("QE", Pin.OUT),
-        15: Pin("E", Pin.IN),
-        16: Pin("QF", Pin.OUT),
-        17: Pin("F", Pin.IN),
-        18: Pin("QG", Pin.OUT),
-        19: Pin("G", Pin.IN),
-        20: Pin("QH", Pin.OUT),
-        21: Pin("H", Pin.IN),
-        22: Pin("SL SER", Pin.IN),
-        23: Pin("S1", Pin.IN),
+        1: Pin("S0", PinType.IN),
+        2: Pin("SR SER", PinType.IN),
+        3: Pin("A", PinType.IN),
+        4: Pin("QA", PinType.OUT),
+        5: Pin("B", PinType.IN),
+        6: Pin("QB", PinType.OUT),
+        7: Pin("C", PinType.IN),
+        8: Pin("QC", PinType.OUT),
+        9: Pin("D", PinType.IN),
+        10: Pin("QD", PinType.OUT),
+        11: Pin("CLK", PinType.IN),
+        13: Pin("~CLR", PinType.IN),
+        14: Pin("QE", PinType.OUT),
+        15: Pin("E", PinType.IN),
+        16: Pin("QF", PinType.OUT),
+        17: Pin("F", PinType.IN),
+        18: Pin("QG", PinType.OUT),
+        19: Pin("G", PinType.IN),
+        20: Pin("QH", PinType.OUT),
+        21: Pin("H", PinType.IN),
+        22: Pin("SL SER", PinType.IN),
+        23: Pin("S1", PinType.IN),
     }
 
     default_inputs = [13,  23, 1,  11,  22, 2,  3, 5, 7, 9, 15, 17, 19, 21]

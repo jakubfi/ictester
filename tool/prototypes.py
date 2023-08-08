@@ -1,4 +1,6 @@
 import inspect
+from enum import Enum
+
 
 # ------------------------------------------------------------------------
 def partimport(part_name):
@@ -10,40 +12,50 @@ def partimport(part_name):
     assert len(class_list) == 1
     return class_list[0][1]
 
+
+# ------------------------------------------------------------------------
+PinType = Enum("PinType", ["IN", "OUT", "OC", "ST3", "OE", "C", "RC", "VCC", "GND", "NC"])
+ZIFFunc = Enum("ZIFFunc", names=[
+        ("OUT", 1),
+        ("IN", 2),
+        ("IN_PU_STRONG", 3),
+        ("IN_PU_WEAK", 4),
+        ("OUT_SINK", 5),
+        ("C", 6),
+        ("OUT_SOURCE", 7),
+        ("VCC", 128),
+        ("GND", 129),
+        ("IN_HIZ", 255),
+    ]
+)
+
+
 # ------------------------------------------------------------------------
 class Pin:
-    IN = 1      # regular TTL input
-    OUT = 2     # regular TTL output
-    OC = 3      # open-collector output
-    ST3 = 4     # 3-state output
-    OE = 5      # open-emitter
-    C = 6       # univibrator C connection
-    RC = 7      # univibrator R/C connection
-    VCC = 128   # +5V power
-    GND = 129   # ground
-    NC = 255    # unused pin
 
-    _role_names = {
-        IN: "IN",
-        OUT: "OUT",
-        OC: "OC",
-        ST3: "3ST",
-        OE: "OE",
-        C: "C",
-        RC: "RC",
-        VCC: "VCC",
-        GND: "GND",
-        NC: "NC",
+    _pin_zif_funcs = {
+        PinType.IN:  [ZIFFunc.OUT],
+        PinType.OUT: [ZIFFunc.IN_PU_WEAK, ZIFFunc.IN_PU_STRONG, ZIFFunc.IN],
+        PinType.OC:  [ZIFFunc.IN_PU_STRONG, ZIFFunc.IN_PU_WEAK, ZIFFunc.IN],
+        PinType.ST3: [ZIFFunc.IN_PU_WEAK, ZIFFunc.IN, ZIFFunc.IN_PU_STRONG],
+        PinType.OE:  [ZIFFunc.OUT_SINK],
+        PinType.C:   [ZIFFunc.C],
+        PinType.RC:  [ZIFFunc.IN_PU_STRONG],
+        PinType.VCC: [ZIFFunc.VCC],
+        PinType.GND: [ZIFFunc.GND],
+        PinType.NC:  [ZIFFunc.IN_HIZ],
     }
 
-    def __init__(self, name, role):
-        assert role in self._role_names
+    def __init__(self, name, role, zif_func=None):
+        assert role in self._pin_zif_funcs
         self.name = name
         self.role = role
-
-    @property
-    def role_name(self):
-        return self._role_names[self.role]
+        if zif_func:
+            self.zif_func = zif_func
+        else:
+            self.zif_func = self._pin_zif_funcs[role][0]
+        if self.zif_func not in self._pin_zif_funcs[role]:
+            raise ValueError(f"ZIF function: {self.zif_func.name} cannot be assigned to pin type: {self.role.name}")
 
 
 # ------------------------------------------------------------------------
@@ -74,7 +86,7 @@ class Part:
 
     @property
     def package_variant(self):
-        vcc_pin = next(k for k, v in self.pins.items() if v.role == Pin.VCC)
+        vcc_pin = next(k for k, v in self.pins.items() if v.role == PinType.VCC)
         return f"VCC@pin{vcc_pin}"
 
 
@@ -83,8 +95,8 @@ class PackageDIP14(Part):
     pincount = 14
     package_type = Part.DIP
     package_pins = {
-        7: Pin("GND", Pin.GND),
-        14: Pin("VCC", Pin.VCC),
+        7: Pin("GND", PinType.GND),
+        14: Pin("VCC", PinType.VCC),
     }
 
 
@@ -93,8 +105,8 @@ class PackageDIP14_vcc5(Part):
     pincount = 14
     package_type = Part.DIP
     package_pins = {
-        5: Pin("VCC", Pin.VCC),
-        10: Pin("GND", Pin.GND),
+        5: Pin("VCC", PinType.VCC),
+        10: Pin("GND", PinType.GND),
     }
 
 
@@ -103,8 +115,8 @@ class PackageDIP14_vcc4(Part):
     pincount = 14
     package_type = Part.DIP
     package_pins = {
-        4: Pin("VCC", Pin.VCC),
-        11: Pin("GND", Pin.GND),
+        4: Pin("VCC", PinType.VCC),
+        11: Pin("GND", PinType.GND),
     }
 
 
@@ -113,8 +125,8 @@ class PackageDIP16(Part):
     pincount = 16
     package_type = Part.DIP
     package_pins = {
-        8: Pin("GND", Pin.GND),
-        16: Pin("VCC", Pin.VCC),
+        8: Pin("GND", PinType.GND),
+        16: Pin("VCC", PinType.VCC),
     }
 
 
@@ -123,8 +135,8 @@ class PackageDIP16_rotated(Part):
     pincount = 16
     package_type = Part.DIP
     package_pins = {
-        8: Pin("VCC", Pin.VCC),
-        16: Pin("GND", Pin.GND),
+        8: Pin("VCC", PinType.VCC),
+        16: Pin("GND", PinType.GND),
     }
 
 
@@ -133,8 +145,8 @@ class PackageDIP16_vcc5(Part):
     pincount = 16
     package_type = Part.DIP
     package_pins = {
-        5: Pin("VCC", Pin.VCC),
-        12: Pin("GND", Pin.GND),
+        5: Pin("VCC", PinType.VCC),
+        12: Pin("GND", PinType.GND),
     }
 
 
@@ -143,8 +155,8 @@ class PackageDIP16_vcc5_gnd13(Part):
     pincount = 16
     package_type = Part.DIP
     package_pins = {
-        5: Pin("VCC", Pin.VCC),
-        13: Pin("GND", Pin.GND),
+        5: Pin("VCC", PinType.VCC),
+        13: Pin("GND", PinType.GND),
     }
 
 
@@ -153,8 +165,8 @@ class PackageDIP24(Part):
     pincount = 24
     package_type = Part.DIP
     package_pins = {
-        12: Pin("GND", Pin.GND),
-        24: Pin("VCC", Pin.VCC),
+        12: Pin("GND", PinType.GND),
+        24: Pin("VCC", PinType.VCC),
     }
 
 
@@ -163,8 +175,8 @@ class PackageDIP20(Part):
     pincount = 20
     package_type = Part.DIP
     package_pins = {
-        10: Pin("GND", Pin.GND),
-        20: Pin("VCC", Pin.VCC),
+        10: Pin("GND", PinType.GND),
+        20: Pin("VCC", PinType.VCC),
     }
 
 

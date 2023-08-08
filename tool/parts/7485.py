@@ -1,24 +1,24 @@
 from binvec import BV
-from prototypes import (PackageDIP16, Pin, Test)
+from prototypes import (PackageDIP16, Pin, PinType, Test)
 
 class Part7485(PackageDIP16):
     name = "7485"
     desc = "4-bit magnitude comparator"
     pin_cfg = {
-        1: Pin("B3", Pin.IN),
-        2: Pin("A<Bin", Pin.IN),
-        3: Pin("A=Bin", Pin.IN),
-        4: Pin("A>Bin", Pin.IN),
-        5: Pin("A>Bout", Pin.OUT),
-        6: Pin("A=Bout", Pin.OUT),
-        7: Pin("A<Bout", Pin.OUT),
-        9: Pin("B0", Pin.IN),
-        10: Pin("A0", Pin.IN),
-        11: Pin("B1", Pin.IN),
-        12: Pin("A1", Pin.IN),
-        13: Pin("A2", Pin.IN),
-        14: Pin("B2", Pin.IN),
-        15: Pin("A3", Pin.IN),
+        1: Pin("B3", PinType.IN),
+        2: Pin("A<Bin", PinType.IN),
+        3: Pin("A=Bin", PinType.IN),
+        4: Pin("A>Bin", PinType.IN),
+        5: Pin("A>Bout", PinType.OUT),
+        6: Pin("A=Bout", PinType.OUT),
+        7: Pin("A<Bout", PinType.OUT),
+        9: Pin("B0", PinType.IN),
+        10: Pin("A0", PinType.IN),
+        11: Pin("B1", PinType.IN),
+        12: Pin("A1", PinType.IN),
+        13: Pin("A2", PinType.IN),
+        14: Pin("B2", PinType.IN),
+        15: Pin("A3", PinType.IN),
     }
 
     test_all_0 = Test("Full logic (A=B = 0)", Test.COMB,

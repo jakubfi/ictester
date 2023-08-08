@@ -1,24 +1,24 @@
 from binvec import BV
-from prototypes import (PackageDIP16, Pin, Test)
+from prototypes import (PackageDIP16, Pin, PinType, Test)
 
 class Part74182(PackageDIP16):
     name = "74182"
     desc = "Look-ahead carry generator"
     pin_cfg = {
-        1: Pin("~G1", Pin.IN),
-        2: Pin("~P1", Pin.IN),
-        3: Pin("~G0", Pin.IN),
-        4: Pin("~P0", Pin.IN),
-        5: Pin("~G3", Pin.IN),
-        6: Pin("~P3", Pin.IN),
-        7: Pin("~P", Pin.OUT),
-        9: Pin("Cn+z", Pin.OUT),
-        10: Pin("~G", Pin.OUT),
-        11: Pin("Cn+y", Pin.OUT),
-        12: Pin("Cn+x", Pin.OUT),
-        13: Pin("Cn", Pin.IN),
-        14: Pin("~G2", Pin.IN),
-        15: Pin("~P2", Pin.IN),
+        1: Pin("~G1", PinType.IN),
+        2: Pin("~P1", PinType.IN),
+        3: Pin("~G0", PinType.IN),
+        4: Pin("~P0", PinType.IN),
+        5: Pin("~G3", PinType.IN),
+        6: Pin("~P3", PinType.IN),
+        7: Pin("~P", PinType.OUT),
+        9: Pin("Cn+z", PinType.OUT),
+        10: Pin("~G", PinType.OUT),
+        11: Pin("Cn+y", PinType.OUT),
+        12: Pin("Cn+x", PinType.OUT),
+        13: Pin("Cn", PinType.IN),
+        14: Pin("~G2", PinType.IN),
+        15: Pin("~P2", PinType.IN),
     }
 
     test_g = Test("~G", Test.COMB,

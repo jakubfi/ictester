@@ -47,36 +47,26 @@ Tester always responds with `RESP_HELLO`, described in later section.
 
 ## DUT Setup
 
-Before any other command, DUT setup needs to be performed with this command.
-It lets the tester know how to address pins of the DUT and what are the pins' functions.
+Before any other command, tester needs to be set up for the specific DUT.
+This command informs the tester how to address DUT pins and sets ZIF socket pin functions for the DUT.
 
 * 1 BYTE: command: `CMD_DUT_SETUP`
 * 1 BYTE: `t` = package type  (1=DIP)
 * 1 BYTE: `p` = number of all DUT pins ([14, 16, 20, 24])
-* `p` BYTES: `p` pin descriptions, 1 byte each, starting from pin 1. See table below.
+* `p` BYTES: `p` ZIF pin functions for each DUT pin. 1 byte each, starting from pin 1. See table below.
 
-| Pin Type         | Value | DUT Pin Function           | On MCU Side                  |
-|------------------|-------|----------------------------|------------------------------|
-| `DUT_PIN_IN`     | 1     | TTL input                  | output                       |
-| `DUT_PIN_OUT`    | 2     | TTL output                 | input (with weak pullup)     |
-| `DUT_PIN_OC`     | 3     | open-collector output      | input with strong pullup     |
-| `DUT_PIN_3ST`    | 4     | 3-state output             | input with weak pullup       |
-| `DUT_PIN_OE`     | 5     | open-emitter               | output driven low (sink)     |
-| `DUT_PIN_C`      | 6     | univibrator C connection   | high impedance               |
-| `DUT_PIN_RC`     | 7     | univibrator R/C connection | high impedance               |
-| `DUT_PIN_VCC`    | 128   | +5V                        | high impedance               |
-| `DUT_PIN_GND`    | 129   | GND                        | high impedance               |
-| `DUT_PIN_NC`     | 255   | not connected              | high impedance               |
-
-Few notes about pin types:
-
-* All outputs by default have weak pullups connected to make sure MCU inputs are driven
-  in case of broken internal IC connections. This can be disabled.
-* 3-state outputs aren't really fully tested. Weak pullup ensures reading "1" when output is in HiZ state,
-  which allows for catching at least some faults.
-* Open-emmiters are "X" outputs of gate expanders (eg. 74H62 or 7460). Pulled low with output driven
-  low (sink) on MCU side.
-* C and R/C univibrator connections have to be active at the same time.
+| ZIF Function        | Value | MCU Pin Function               | SW Function      | Default DUT use            |
+|---------------------|-------|--------------------------------|------------------|----------------------------|
+| `ZIF_OUT`           | 1     | output                         | -                | TTL input                  |
+| `ZIF_IN`            | 2     | input                          | -                | TTL output                 |
+| `ZIF_IN_PU_STRONG`  | 3     | input                          | pull-up 4k7      | open-collector output      |
+| `ZIF_IN_PU_WEAK`    | 4     | input with weak pullup (>100k) | -                | 3-state output             |
+| `ZIF_OUT_SINK`      | 5     | output driven low (sink)       | -                | open-emitter               |
+| `ZIF_C`             | 6     | high impedance                 | capacitor 470p   | univibrator C connection   |
+| `ZIF_OUT_SOURCE`    | 7     | output driven high (sink)      | -                | -                          |
+| `ZIF_VCC`           | 128   | high impedance                 | VDUT (+5V)       | +5V                        |
+| `ZIF_GND`           | 129   | high impedance                 | GND              | GND                        |
+| `ZIF_HIZ`           | 255   | high impedance                 | -                | not connected, unused      |
 
 Valid responses:
 

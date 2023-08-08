@@ -1,24 +1,24 @@
 from binvec import BV
-from prototypes import (PackageDIP16, Pin, Test)
+from prototypes import (PackageDIP16, Pin, PinType, Test)
 
 class Part74155(PackageDIP16):
     name = "74155"
     desc = "Dual 2-line to 4-line decoders/demultiplexers"
     pin_cfg = {
-        1: Pin("1C", Pin.IN),
-        2: Pin("~1G", Pin.IN),
-        3: Pin("B", Pin.IN),
-        4: Pin("1Y3", Pin.OUT),
-        5: Pin("1Y2", Pin.OUT),
-        6: Pin("1Y1", Pin.OUT),
-        7: Pin("1Y0", Pin.OUT),
-        9: Pin("2Y0", Pin.OUT),
-        10: Pin("2Y1", Pin.OUT),
-        11: Pin("2Y2", Pin.OUT),
-        12: Pin("2Y3", Pin.OUT),
-        13: Pin("A", Pin.IN),
-        14: Pin("~2G", Pin.IN),
-        15: Pin("~2C", Pin.IN),
+        1: Pin("1C", PinType.IN),
+        2: Pin("~1G", PinType.IN),
+        3: Pin("B", PinType.IN),
+        4: Pin("1Y3", PinType.OUT),
+        5: Pin("1Y2", PinType.OUT),
+        6: Pin("1Y1", PinType.OUT),
+        7: Pin("1Y0", PinType.OUT),
+        9: Pin("2Y0", PinType.OUT),
+        10: Pin("2Y1", PinType.OUT),
+        11: Pin("2Y2", PinType.OUT),
+        12: Pin("2Y3", PinType.OUT),
+        13: Pin("A", PinType.IN),
+        14: Pin("~2G", PinType.IN),
+        15: Pin("~2C", PinType.IN),
     }
 
     default_inputs = [3, 13,  2, 1,  14, 15]

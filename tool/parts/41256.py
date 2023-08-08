@@ -1,4 +1,4 @@
-from prototypes import (PackageDIP16_rotated, Pin, Test)
+from prototypes import (PackageDIP16_rotated, Pin, PinType, Test)
 
 class Part41256(PackageDIP16_rotated):
     SIZE_64 = 1
@@ -10,20 +10,20 @@ class Part41256(PackageDIP16_rotated):
     name = "41256"
     desc = "262144 x 1bit DRAM memory"
     pin_cfg = {
-        1: Pin("A8", Pin.IN),
-        2: Pin("Din", Pin.IN),
-        3: Pin("~WE", Pin.IN),
-        4: Pin("~RAS", Pin.IN),
-        5: Pin("A0", Pin.IN),
-        6: Pin("A2", Pin.IN),
-        7: Pin("A1", Pin.IN),
-        9: Pin("A7", Pin.IN),
-        10: Pin("A5", Pin.IN),
-        11: Pin("A4", Pin.IN),
-        12: Pin("A3", Pin.IN),
-        13: Pin("A6", Pin.IN),
-        14: Pin("Dout", Pin.OUT),
-        15: Pin("~CAS", Pin.IN),
+        1: Pin("A8", PinType.IN),
+        2: Pin("Din", PinType.IN),
+        3: Pin("~WE", PinType.IN),
+        4: Pin("~RAS", PinType.IN),
+        5: Pin("A0", PinType.IN),
+        6: Pin("A2", PinType.IN),
+        7: Pin("A1", PinType.IN),
+        9: Pin("A7", PinType.IN),
+        10: Pin("A5", PinType.IN),
+        11: Pin("A4", PinType.IN),
+        12: Pin("A3", PinType.IN),
+        13: Pin("A6", PinType.IN),
+        14: Pin("Dout", PinType.OUT),
+        15: Pin("~CAS", PinType.IN),
     }
 
     default_inputs = [1, 2, 3, 4, 5, 6, 7, 9, 10, 11, 12, 13, 15]

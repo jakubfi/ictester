@@ -1,24 +1,24 @@
 from binvec import BV
-from prototypes import (PackageDIP16, Pin, Test)
+from prototypes import (PackageDIP16, Pin, PinType, Test)
 
 class Part7489(PackageDIP16):
     name = "7489"
     desc = "64-bit random-access read/write memory"
     pin_cfg = {
-        1: Pin("A0", Pin.IN),
-        2: Pin("~ME", Pin.IN),
-        3: Pin("~WE", Pin.IN),
-        4: Pin("D1", Pin.IN),
-        5: Pin("~Q1", Pin.OC),
-        6: Pin("D2", Pin.IN),
-        7: Pin("~Q2", Pin.OC),
-        9: Pin("~Q3", Pin.OC),
-        10: Pin("D3", Pin.IN),
-        11: Pin("~Q4", Pin.OC),
-        12: Pin("D4", Pin.IN),
-        13: Pin("A3", Pin.IN),
-        14: Pin("A2", Pin.IN),
-        15: Pin("A1", Pin.IN),
+        1: Pin("A0", PinType.IN),
+        2: Pin("~ME", PinType.IN),
+        3: Pin("~WE", PinType.IN),
+        4: Pin("D1", PinType.IN),
+        5: Pin("~Q1", PinType.OC),
+        6: Pin("D2", PinType.IN),
+        7: Pin("~Q2", PinType.OC),
+        9: Pin("~Q3", PinType.OC),
+        10: Pin("D3", PinType.IN),
+        11: Pin("~Q4", PinType.OC),
+        12: Pin("D4", PinType.IN),
+        13: Pin("A3", PinType.IN),
+        14: Pin("A2", PinType.IN),
+        15: Pin("A1", PinType.IN),
     }
 
     # ------------------------------------------------------------------------

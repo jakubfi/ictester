@@ -1,21 +1,21 @@
-from prototypes import (PackageDIP14, Pin, Test)
+from prototypes import (PackageDIP14, Pin, PinType, Test)
 
 class Part74164(PackageDIP14):
     name = "74164"
     desc = "8-bit parallel-out serial shift register"
     pin_cfg = {
-        1: Pin("A", Pin.IN),
-        2: Pin("B", Pin.IN),
-        3: Pin("QA", Pin.IN),
-        4: Pin("QB", Pin.IN),
-        5: Pin("QC", Pin.IN),
-        6: Pin("QD", Pin.IN),
-        8: Pin("CLK", Pin.IN),
-        9: Pin("~CLR", Pin.IN),
-        10: Pin("QE", Pin.IN),
-        11: Pin("QF", Pin.OUT),
-        12: Pin("QG", Pin.OUT),
-        13: Pin("QH", Pin.OUT),
+        1: Pin("A", PinType.IN),
+        2: Pin("B", PinType.IN),
+        3: Pin("QA", PinType.IN),
+        4: Pin("QB", PinType.IN),
+        5: Pin("QC", PinType.IN),
+        6: Pin("QD", PinType.IN),
+        8: Pin("CLK", PinType.IN),
+        9: Pin("~CLR", PinType.IN),
+        10: Pin("QE", PinType.IN),
+        11: Pin("QF", PinType.OUT),
+        12: Pin("QG", PinType.OUT),
+        13: Pin("QH", PinType.OUT),
     }
 
     test_all = Test("Complete logic", Test.SEQ,

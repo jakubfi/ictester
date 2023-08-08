@@ -1,19 +1,19 @@
-from prototypes import (Pin, partimport)
+from prototypes import (Pin, PinType, partimport)
 
 class Part7405(partimport("7404")):
     name = "7405"
     desc = "Hex inverters with open collector outputs"
     pin_cfg = {
-        1: Pin("1A", Pin.IN),
-        2: Pin("1Y", Pin.OC),
-        3: Pin("2A", Pin.IN),
-        4: Pin("2Y", Pin.OC),
-        5: Pin("3A", Pin.IN),
-        6: Pin("3Y", Pin.OC),
-        8: Pin("6Y", Pin.OC),
-        9: Pin("6A", Pin.IN),
-        10: Pin("5Y", Pin.OC),
-        11: Pin("5A", Pin.IN),
-        12: Pin("4Y", Pin.OC),
-        13: Pin("4A", Pin.IN),
+        1: Pin("1A", PinType.IN),
+        2: Pin("1Y", PinType.OC),
+        3: Pin("2A", PinType.IN),
+        4: Pin("2Y", PinType.OC),
+        5: Pin("3A", PinType.IN),
+        6: Pin("3Y", PinType.OC),
+        8: Pin("6Y", PinType.OC),
+        9: Pin("6A", PinType.IN),
+        10: Pin("5Y", PinType.OC),
+        11: Pin("5A", PinType.IN),
+        12: Pin("4Y", PinType.OC),
+        13: Pin("4A", PinType.IN),
     }

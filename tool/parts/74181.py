@@ -1,32 +1,32 @@
 from binvec import BV
-from prototypes import (PackageDIP24, Pin, Test)
+from prototypes import (PackageDIP24, Pin, PinType, Test)
 
 class Part74181(PackageDIP24):
     name = "74181"
     desc = "Arithmetic logic units/function generators"
     pin_cfg = {
-        1: Pin("B0", Pin.IN),
-        2: Pin("A0", Pin.IN),
-        3: Pin("S3", Pin.IN),
-        4: Pin("S2", Pin.IN),
-        5: Pin("S1", Pin.IN),
-        6: Pin("S0", Pin.IN),
-        7: Pin("~Cn", Pin.IN),
-        8: Pin("M", Pin.IN),
-        9: Pin("F0", Pin.OUT),
-        10: Pin("F1", Pin.OUT),
-        11: Pin("F2", Pin.OUT),
-        13: Pin("F3", Pin.OUT),
-        14: Pin("A=B", Pin.OC),  # A=B is really (F0 & F1 & F2 & F3)
-        15: Pin("X", Pin.OUT),
-        16: Pin("~Cn+4", Pin.OUT),
-        17: Pin("Y", Pin.OUT),
-        18: Pin("B3", Pin.IN),
-        19: Pin("A3", Pin.IN),
-        20: Pin("B2", Pin.IN),
-        21: Pin("A2", Pin.IN),
-        22: Pin("B1", Pin.IN),
-        23: Pin("A1", Pin.IN),
+        1: Pin("B0", PinType.IN),
+        2: Pin("A0", PinType.IN),
+        3: Pin("S3", PinType.IN),
+        4: Pin("S2", PinType.IN),
+        5: Pin("S1", PinType.IN),
+        6: Pin("S0", PinType.IN),
+        7: Pin("~Cn", PinType.IN),
+        8: Pin("M", PinType.IN),
+        9: Pin("F0", PinType.OUT),
+        10: Pin("F1", PinType.OUT),
+        11: Pin("F2", PinType.OUT),
+        13: Pin("F3", PinType.OUT),
+        14: Pin("A=B", PinType.OC),  # A=B is really (F0 & F1 & F2 & F3)
+        15: Pin("X", PinType.OUT),
+        16: Pin("~Cn+4", PinType.OUT),
+        17: Pin("Y", PinType.OUT),
+        18: Pin("B3", PinType.IN),
+        19: Pin("A3", PinType.IN),
+        20: Pin("B2", PinType.IN),
+        21: Pin("A2", PinType.IN),
+        22: Pin("B1", PinType.IN),
+        23: Pin("A1", PinType.IN),
     }
 
     missing_tests = "outputs G, P are not tested"

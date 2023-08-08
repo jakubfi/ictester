@@ -1,24 +1,24 @@
 from binvec import BV
-from prototypes import (PackageDIP16, Pin, Test)
+from prototypes import (PackageDIP16, Pin, PinType, Test)
 
 class Part74S201(PackageDIP16):
     name = "74S201"
     desc = "256-bit high-performance random-access memory"
     pin_cfg = {
-        1: Pin("A0", Pin.IN),
-        2: Pin("A1", Pin.IN),
-        3: Pin("~S1", Pin.IN),
-        4: Pin("~S2", Pin.IN),
-        5: Pin("~S3", Pin.IN),
-        6: Pin("~Q", Pin.OC),
-        7: Pin("A3", Pin.IN),
-        9: Pin("A4", Pin.IN),
-        10: Pin("A5", Pin.IN),
-        11: Pin("A6", Pin.IN),
-        12: Pin("R/~W", Pin.IN),
-        13: Pin("D", Pin.IN),
-        14: Pin("A7", Pin.IN),
-        15: Pin("A2", Pin.IN),
+        1: Pin("A0", PinType.IN),
+        2: Pin("A1", PinType.IN),
+        3: Pin("~S1", PinType.IN),
+        4: Pin("~S2", PinType.IN),
+        5: Pin("~S3", PinType.IN),
+        6: Pin("~Q", PinType.OC),
+        7: Pin("A3", PinType.IN),
+        9: Pin("A4", PinType.IN),
+        10: Pin("A5", PinType.IN),
+        11: Pin("A6", PinType.IN),
+        12: Pin("R/~W", PinType.IN),
+        13: Pin("D", PinType.IN),
+        14: Pin("A7", PinType.IN),
+        15: Pin("A2", PinType.IN),
     }
 
     # ------------------------------------------------------------------------

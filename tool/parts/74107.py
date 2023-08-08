@@ -1,21 +1,21 @@
-from prototypes import (PackageDIP14, Pin, Test)
+from prototypes import (PackageDIP14, Pin, PinType, Test)
 
 class Part74107(PackageDIP14):
     name = "74107"
     desc = "Dual J-K flip-flops with clear"
     pin_cfg = {
-        1: Pin("1J", Pin.IN),
-        2: Pin("~1Q", Pin.OUT),
-        3: Pin("1Q", Pin.OUT),
-        4: Pin("1K", Pin.IN),
-        5: Pin("2Q", Pin.OUT),
-        6: Pin("~2Q", Pin.OUT),
-        8: Pin("2J", Pin.IN),
-        9: Pin("2CLK", Pin.IN),
-        10: Pin("~2CLR", Pin.IN),
-        11: Pin("2K", Pin.IN),
-        12: Pin("1CLK", Pin.IN),
-        13: Pin("~1CLR", Pin.IN),
+        1: Pin("1J", PinType.IN),
+        2: Pin("~1Q", PinType.OUT),
+        3: Pin("1Q", PinType.OUT),
+        4: Pin("1K", PinType.IN),
+        5: Pin("2Q", PinType.OUT),
+        6: Pin("~2Q", PinType.OUT),
+        8: Pin("2J", PinType.IN),
+        9: Pin("2CLK", PinType.IN),
+        10: Pin("~2CLR", PinType.IN),
+        11: Pin("2K", PinType.IN),
+        12: Pin("1CLK", PinType.IN),
+        13: Pin("~1CLR", PinType.IN),
     }
 
     test_all = Test("Complete logic", Test.SEQ,

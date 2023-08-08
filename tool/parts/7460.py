@@ -1,5 +1,5 @@
 from binvec import BV
-from prototypes import (PackageDIP14, Pin, Test)
+from prototypes import (PackageDIP14, Pin, PinType, Test)
 
 '''
 NOTE on testing expanders:
@@ -14,18 +14,18 @@ class Part7460(PackageDIP14):
     name = "7460"
     desc = "Dual 4-input expanders"
     pin_cfg = {
-        1: Pin("1A", Pin.IN),
-        2: Pin("1B", Pin.IN),
-        3: Pin("1C", Pin.IN),
-        4: Pin("2A", Pin.IN),
-        5: Pin("2B", Pin.IN),
-        6: Pin("2C", Pin.IN),
-        8: Pin("2D", Pin.IN),
-        9: Pin("~2X", Pin.OC),
-        10: Pin("2X", Pin.IN),
-        11: Pin("1X", Pin.IN),
-        12: Pin("~1X", Pin.OC),
-        13: Pin("1D", Pin.IN),
+        1: Pin("1A", PinType.IN),
+        2: Pin("1B", PinType.IN),
+        3: Pin("1C", PinType.IN),
+        4: Pin("2A", PinType.IN),
+        5: Pin("2B", PinType.IN),
+        6: Pin("2C", PinType.IN),
+        8: Pin("2D", PinType.IN),
+        9: Pin("~2X", PinType.OC),
+        10: Pin("2X", PinType.IN),
+        11: Pin("1X", PinType.IN),
+        12: Pin("~1X", PinType.OC),
+        13: Pin("1D", PinType.IN),
     }
 
     test_async = Test("Asynchronous operation", Test.COMB,

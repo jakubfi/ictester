@@ -1,23 +1,23 @@
-from prototypes import (PackageDIP16, Pin, Test)
+from prototypes import (PackageDIP16, Pin, PinType, Test)
 
 class Part74170(PackageDIP16):
     name = "74170"
     desc = "4-by-4 register file with open-collector outputs"
     pin_cfg = {
-        1: Pin("D2", Pin.IN),
-        2: Pin("D3", Pin.IN),
-        3: Pin("D4", Pin.IN),
-        4: Pin("RB", Pin.IN),
-        5: Pin("RA", Pin.IN),
-        6: Pin("Q4", Pin.OC),
-        7: Pin("Q3", Pin.OC),
-        9: Pin("Q2", Pin.OC),
-        10: Pin("Q1", Pin.OC),
-        11: Pin("~GR", Pin.IN),
-        12: Pin("~GW", Pin.IN),
-        13: Pin("WB", Pin.IN),
-        14: Pin("WA", Pin.IN),
-        15: Pin("D1", Pin.IN),
+        1: Pin("D2", PinType.IN),
+        2: Pin("D3", PinType.IN),
+        3: Pin("D4", PinType.IN),
+        4: Pin("RB", PinType.IN),
+        5: Pin("RA", PinType.IN),
+        6: Pin("Q4", PinType.OC),
+        7: Pin("Q3", PinType.OC),
+        9: Pin("Q2", PinType.OC),
+        10: Pin("Q1", PinType.OC),
+        11: Pin("~GR", PinType.IN),
+        12: Pin("~GW", PinType.IN),
+        13: Pin("WB", PinType.IN),
+        14: Pin("WA", PinType.IN),
+        15: Pin("D1", PinType.IN),
     }
 
     default_inputs = [13, 14, 12,  4, 5, 11,  15, 1, 2, 3]

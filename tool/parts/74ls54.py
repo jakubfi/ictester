@@ -1,22 +1,22 @@
 from binvec import BV
-from prototypes import (PackageDIP14, Pin, Test)
+from prototypes import (PackageDIP14, Pin, PinType, Test)
 
 class Part74LS54(PackageDIP14):
     name = "74LS54"
     desc = "4-wide And-Or-Invert gate"
     pin_cfg = {
-        1: Pin("A", Pin.IN),
-        2: Pin("B", Pin.IN),
-        3: Pin("C", Pin.IN),
-        4: Pin("D", Pin.IN),
-        5: Pin("E", Pin.IN),
-        6: Pin("Y", Pin.OUT),
-        8: Pin("NC", Pin.NC),
-        9: Pin("F", Pin.IN),
-        10: Pin("G", Pin.IN),
-        11: Pin("H", Pin.IN),
-        12: Pin("I", Pin.IN),
-        13: Pin("J", Pin.IN),
+        1: Pin("A", PinType.IN),
+        2: Pin("B", PinType.IN),
+        3: Pin("C", PinType.IN),
+        4: Pin("D", PinType.IN),
+        5: Pin("E", PinType.IN),
+        6: Pin("Y", PinType.OUT),
+        8: Pin("NC", PinType.NC),
+        9: Pin("F", PinType.IN),
+        10: Pin("G", PinType.IN),
+        11: Pin("H", PinType.IN),
+        12: Pin("I", PinType.IN),
+        13: Pin("J", PinType.IN),
     }
 
     test_async = Test("Asynchronous operation", Test.COMB,

@@ -1,24 +1,24 @@
 from binvec import BV
-from prototypes import (PackageDIP16_vcc5, Pin, Test)
+from prototypes import (PackageDIP16_vcc5, Pin, PinType, Test)
 
 class Part7483(PackageDIP16_vcc5):
     name = "7483"
     desc = "4-bit binary full adder with fast carry"
     pin_cfg = {
-        1: Pin("A4", Pin.IN),
-        2: Pin("S3", Pin.OUT),
-        3: Pin("A3", Pin.IN),
-        4: Pin("B3", Pin.IN),
-        6: Pin("S2", Pin.OUT),
-        7: Pin("B2", Pin.IN),
-        8: Pin("A2", Pin.IN),
-        9: Pin("S1", Pin.OUT),
-        10: Pin("A1", Pin.IN),
-        11: Pin("B1", Pin.IN),
-        13: Pin("C0", Pin.IN),
-        14: Pin("C4", Pin.OUT),
-        15: Pin("S4", Pin.OUT),
-        16: Pin("B4", Pin.IN),
+        1: Pin("A4", PinType.IN),
+        2: Pin("S3", PinType.OUT),
+        3: Pin("A3", PinType.IN),
+        4: Pin("B3", PinType.IN),
+        6: Pin("S2", PinType.OUT),
+        7: Pin("B2", PinType.IN),
+        8: Pin("A2", PinType.IN),
+        9: Pin("S1", PinType.OUT),
+        10: Pin("A1", PinType.IN),
+        11: Pin("B1", PinType.IN),
+        13: Pin("C0", PinType.IN),
+        14: Pin("C4", PinType.OUT),
+        15: Pin("S4", PinType.OUT),
+        16: Pin("B4", PinType.IN),
     }
 
     test_all = Test("Complete logic", Test.COMB,

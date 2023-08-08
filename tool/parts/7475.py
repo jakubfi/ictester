@@ -1,23 +1,23 @@
-from prototypes import (PackageDIP16_vcc5, Pin, Test)
+from prototypes import (PackageDIP16_vcc5, Pin, PinType, Test)
 
 class Part7475(PackageDIP16_vcc5):
     name = "7475"
     desc = "4-bit bistable latches"
     pin_cfg = {
-        1: Pin("~1Q", Pin.OUT),
-        2: Pin("1D", Pin.IN),
-        3: Pin("2D", Pin.IN),
-        4: Pin("3C,4C", Pin.IN),
-        6: Pin("3D", Pin.IN),
-        7: Pin("4D", Pin.IN),
-        8: Pin("~4Q", Pin.OUT),
-        9: Pin("4Q", Pin.OUT),
-        10: Pin("3Q", Pin.OUT),
-        11: Pin("~3Q", Pin.OUT),
-        13: Pin("1C,2C", Pin.IN),
-        14: Pin("~2Q", Pin.OUT),
-        15: Pin("2Q", Pin.OUT),
-        16: Pin("1Q", Pin.OUT),
+        1: Pin("~1Q", PinType.OUT),
+        2: Pin("1D", PinType.IN),
+        3: Pin("2D", PinType.IN),
+        4: Pin("3C,4C", PinType.IN),
+        6: Pin("3D", PinType.IN),
+        7: Pin("4D", PinType.IN),
+        8: Pin("~4Q", PinType.OUT),
+        9: Pin("4Q", PinType.OUT),
+        10: Pin("3Q", PinType.OUT),
+        11: Pin("~3Q", PinType.OUT),
+        13: Pin("1C,2C", PinType.IN),
+        14: Pin("~2Q", PinType.OUT),
+        15: Pin("2Q", PinType.OUT),
+        16: Pin("1Q", PinType.OUT),
     }
 
     test_async = Test("Asynchronous operation", Test.COMB,

@@ -48,17 +48,17 @@ enum package_type {
 	PACKAGE_DIP = 1,
 };
 
-enum pin_type {
-	PIN_IN	= 1,
-	PIN_OUT	= 2,
-	PIN_OC	= 3,
-	PIN_3ST	= 4,
-	PIN_OE = 5,
-	PIN_C = 6,
-	PIN_RC = 7,
-	PIN_VCC	= 128,
-	PIN_GND	= 129,
-	PIN_NC	= 255,
+enum zif_pin_function {
+	ZIF_OUT				= 1,
+	ZIF_IN				= 2,
+	ZIF_IN_PU_STRONG	= 3,
+	ZIF_IN_PU_WEAK		= 4,
+	ZIF_OUT_SINK		= 5,
+	ZIF_C				= 6,
+	ZIF_OUT_SOURCE		= 7,
+	ZIF_VCC				= 128,
+	ZIF_GND				= 129,
+	ZIF_IN_HIZ			= 255,
 };
 
 void reply(uint8_t res);
