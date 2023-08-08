@@ -79,6 +79,10 @@ tests_passed = 0
 
 total_time = 0
 print()
+
+tester.dut_setup()
+tester.dut_connect()
+
 for test_name in all_tests:
     test = tester.part.get_test(test_name)
     loops = args.loops if args.loops is not None else test.loops
@@ -94,6 +98,8 @@ for test_name in all_tests:
         print(f"\b\b\b\b{OK}PASS{ENDC}  ({elapsed:.2f} sec.)")
     else:
         print(f"\b\b\b\b{FAIL}FAIL{ENDC}  ({elapsed:.2f} sec.)")
+
+tester.dut_disconnect()
 
 if tests_passed != test_count:
     color = FAIL

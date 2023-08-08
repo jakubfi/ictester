@@ -61,6 +61,16 @@ class Tester:
         if self.tr.recv() != Tester.RESP_OK:
             raise RuntimeError("DUT setup failed")
 
+    def dut_connect(self):
+        self.tr.send([Tester.CMD_DUT_CONNECT])
+        if self.tr.recv() != Tester.RESP_OK:
+            raise RuntimeError("DUT connect failed")
+
+    def dut_disconnect(self):
+        self.tr.send([Tester.CMD_DUT_DISCONNECT])
+        if self.tr.recv() != Tester.RESP_OK:
+            raise RuntimeError("DUT disconnect failed")
+
     def test_setup(self, test):
         self.tr.send([Tester.CMD_TEST_SETUP, test.type, *test.params])
 
@@ -113,7 +123,6 @@ class Tester:
         return result, elapsed
 
     def exec_test(self, test, loops):
-        self.dut_setup()
         self.test_setup(test)
         self.vectors_load(test)
         res = self.run(loops)

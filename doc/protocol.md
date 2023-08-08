@@ -77,6 +77,7 @@ Valid responses:
 ## DUT Connect
 
 This command causes the tester to configure it's pin connections and apply power to the DUT. Requires the DUT to be set up first.
+DUT connect starts the test session; tests can be loaded and executed one by one.
 
 * 1 BYTE: command: `CMD_DUT_CONNECT`
 
@@ -89,6 +90,7 @@ Valid responses:
 ## DUT Disconnect
 
 This command causes the tester to power down the DUT and deconfigure it's pin connections.
+Disconnect ends the test session.
 
 * 1 BYTE: command: `CMD_DUT_DISCONNECT`
 
@@ -116,7 +118,7 @@ Valid responses:
 
 ### Logic IC test
 
-Designed to test 74 logic (both combinatorial and sequential), but suitable for many other families.
+Designed to test 74 logic (both combinatorial and sequential), but suitable for many other IC families.
 
   * `TEST_LOGIC` (1)
     * does not use (ignores) test parameters
@@ -126,7 +128,7 @@ Designed to test 74 logic (both combinatorial and sequential), but suitable for 
 
   * `TEST_DRAM_41` (2)
     * uses following test parameters:
-      * `PARAM_1` - memory size: 1=64k, 2=256k
+      * `PARAM_1` - memory size: 1=64k (4164), 2=256k (41256)
       * `PARAM_2` - test type: 1=read-modify-write, 2=read+write, 3=page mode
     * does not use test vectors
 

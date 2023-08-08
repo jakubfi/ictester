@@ -26,7 +26,7 @@ uint8_t test_type;
 uint8_t test_params[MAX_TEST_PARAMS];
 
 // -----------------------------------------------------------------------
-void mcu_port_deconfigure(void)
+static void mcu_port_deconfigure(void)
 {
 	DDRA = 0;
 	PORTA = 0;
@@ -37,7 +37,7 @@ void mcu_port_deconfigure(void)
 }
 
 // -----------------------------------------------------------------------
-void mcu_port_setup(void)
+static void mcu_port_setup(void)
 {
 	// DUT input == MCU output
 	DDRA = port[0].dut_input;
@@ -50,7 +50,7 @@ void mcu_port_setup(void)
 }
 
 // -----------------------------------------------------------------------
-void handle_dut_setup(void)
+static void handle_dut_setup(void)
 {
 	uint8_t res = RESP_OK;
 	uint8_t pin_data[24];
@@ -116,7 +116,7 @@ fin:
 }
 
 // -----------------------------------------------------------------------
-void handle_test_setup(void)
+static void handle_test_setup(void)
 {
 	test_type = serial_rx_char();
 	for (uint8_t i=0 ; i<MAX_TEST_PARAMS ; i++) {
@@ -149,23 +149,11 @@ void handle_test_setup(void)
 }
 
 // -----------------------------------------------------------------------
-void handle_run(void)
+static void handle_run(void)
 {
 	uint8_t res = RESP_PASS;
 
 	uint16_t test_loops = serial_rx_16le();
-
-	led_active();
-
-	mcu_port_setup();
-	if (!zif_connect()) {
-		res = RESP_ERR;
-		goto fin;
-	}
-
-	if (test_type == TYPE_MEM) {
-		mem_setup();
-	}
 
 	if (test_type == TYPE_MEM) {
 		for (uint16_t rep=0 ; rep<test_loops ; rep++) {
@@ -182,13 +170,35 @@ void handle_run(void)
 	}
 
 fin:
-	zif_disconnect();
-	mcu_port_deconfigure();
 
 	if (res == RESP_PASS) led_ok();
 	else led_fail();
 
 	reply(res);
+}
+
+// -----------------------------------------------------------------------
+static void handle_dut_connect(void)
+{
+	led_active();
+	mcu_port_setup();
+	if (!zif_connect()) {
+		reply(RESP_ERR);
+	}
+
+	if (test_type == TYPE_MEM) {
+		mem_setup();
+	}
+
+	reply(RESP_OK);
+}
+
+// -----------------------------------------------------------------------
+static void handle_dut_disconnect(void)
+{
+	zif_disconnect();
+	mcu_port_deconfigure();
+	reply(RESP_OK);
 }
 
 // -----------------------------------------------------------------------
@@ -207,6 +217,9 @@ int main(void)
 				handle_dut_setup();
 				led_comm();
 				break;
+			case CMD_DUT_CONNECT:
+				handle_dut_connect();
+				break;
 			case CMD_TEST_SETUP:
 				handle_test_setup();
 				break;
@@ -215,6 +228,9 @@ int main(void)
 				break;
 			case CMD_TEST_RUN:
 				handle_run();
+				break;
+			case CMD_DUT_DISCONNECT:
+				handle_dut_disconnect();
 				break;
 			default:
 				reply(RESP_ERR);
