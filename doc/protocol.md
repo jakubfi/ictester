@@ -132,6 +132,18 @@ Designed to test 74 logic (both combinatorial and sequential), but suitable for 
       * `PARAM_2` - test type: 1=read-modify-write, 2=read+write, 3=page mode
     * does not use test vectors
 
+### 7412x univibrator test
+
+  * `TEST_UNIVIB` (3)
+    * uses following test parameters:
+        * `PARAM_1` - device to test: 0=74121, 1=74122, 2=74123 univibrator 1, 3=74123 univibrator 2
+        * `PARAM_2` - test to run:
+          * 0 = no trigger conditions
+          * 1 = trigger conditions
+          * 2 = retrigger (not available for 74121)
+          * 3 = clear (not available for 74121)
+          * 4 = cross-trigger check (only for 74123)
+    * does not use test vectors
 
 ## Vectors upload
 

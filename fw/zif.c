@@ -66,6 +66,11 @@ const __flash struct switch_coord zif_pu_coord[24] = {
 	{A2, 7},  {A2, 6},  {A2, 5},  {B1, 0},  {B1, 1},  {B1, 2},  {B1, 3},  {B1, 4},  {B1, 7},  {B0, 5},  {B0, 3},  {B0, 0}
 };
 
+const __flash struct switch_coord zif_c_coord[24] = {
+	{NA, NA}, {NA, NA}, {NA, NA}, {NA, NA}, {NA, NA}, {A1, 6},  {NA, NA}, {NA, NA}, {NA, NA}, {NA, NA}, {NA, NA}, {NA, NA},
+	{NA, NA}, {NA, NA}, {NA, NA}, {NA, NA}, {NA, NA}, {NA, NA}, {NA, NA}, {B1, 6},  {B0, 7},  {B0, 4},  {NA, NA}, {NA, NA}
+};
+
 // -----------------------------------------------------------------------
 void zif_init(void)
 {
@@ -93,6 +98,9 @@ bool zif_func(uint8_t func, uint8_t pin)
 			break;
 		case ZIF_IN_PU_STRONG:
 			coord = zif_pu_coord;
+			break;
+		case ZIF_C:
+			coord = zif_c_coord;
 			break;
 		default:
 			return false;

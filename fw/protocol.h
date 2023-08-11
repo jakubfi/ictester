@@ -41,7 +41,8 @@ enum test_type {
 	TYPE_COMB	= 0,
 	TYPE_SEQ	= 1,
 	TYPE_MEM	= 2,
-	TYPE_MAX	= TYPE_MEM,
+	TYPE_UNIVIB	= 3,
+	TYPE_MAX	= TYPE_UNIVIB
 };
 
 enum package_type {
@@ -58,7 +59,7 @@ enum zif_pin_function {
 	ZIF_OUT_SOURCE		= 7,
 	ZIF_VCC				= 128,
 	ZIF_GND				= 129,
-	ZIF_IN_HIZ			= 255,
+	ZIF_IN_HIZ			= 255
 };
 
 void reply(uint8_t res);

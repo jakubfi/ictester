@@ -10,6 +10,7 @@
 #include "zif.h"
 #include "logic.h"
 #include "mem.h"
+#include "univib.h"
 
 #define LINK_SPEED 500000
 
@@ -107,7 +108,17 @@ static void handle_dut_setup(void)
 					goto fin;
 				}
 				break;
+			case ZIF_C:
+				if (!zif_func(ZIF_C, zif_pin)) {
+					res = RESP_ERR;
+					goto fin;
+				}
+				break;
+			case ZIF_IN_HIZ:
+				// TODO: ensure HiZ
+				break;
 			default:
+				res = RESP_ERR;
 				break;
 		}
 	}
@@ -158,6 +169,10 @@ static void handle_run(void)
 	if (test_type == TYPE_MEM) {
 		for (uint16_t rep=0 ; rep<test_loops ; rep++) {
 			if ((res = run_mem(test_params)) != RESP_PASS) goto fin;
+		}
+	} else if (test_type == TYPE_UNIVIB) {
+		for (uint16_t rep=0 ; rep<test_loops ; rep++) {
+			if ((res = run_univib(test_params)) != RESP_PASS) goto fin;
 		}
 	} else if (pin_count <= 16) {
 		for (uint16_t rep=0 ; rep<test_loops ; rep++) {

@@ -204,9 +204,11 @@ class Test():
     COMB = 0
     SEQ = 1
     MEM = 2
+    UNIVIB = 3
 
     TEST_LOGIC_74 = 1
     TEST_DRAM_41 = 2
+    TEST_UNIVIB_74 = 3
 
     MAX_TEST_PARAMS = 4
 
