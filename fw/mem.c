@@ -21,17 +21,11 @@
 #define PORT_ADDR_L		PORTC
 #define PORT_ADDR_H		PORTB
 
-#define BIT_WE		2
-#define BIT_RAS		3
-#define BIT_CAS		6
-#define BIT_DO		5
-#define BIT_DI		1
-
-#define VAL_WE		(1 << BIT_WE)
-#define VAL_RAS		(1 << BIT_RAS)
-#define VAL_CAS		(1 << BIT_CAS)
-#define VAL_DO		(1 << BIT_DO)
-#define VAL_DI		(1 << BIT_DI)
+#define VAL_WE		_BV(2)
+#define VAL_RAS		_BV(3)
+#define VAL_CAS		_BV(6)
+#define VAL_DO		_BV(5)
+#define VAL_DI		_BV(1)
 
 #define WE_OFF		PORT_WE |= VAL_WE
 #define WE_ON		PORT_WE &= ~VAL_WE
