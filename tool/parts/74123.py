@@ -2,8 +2,6 @@ from binvec import BV
 from prototypes import (PackageDIP16, Pin, PinType, Test)
 
 class Part74123(PackageDIP16):
-    UNI_74121 = 0
-    UNI_74122 = 1
     UNI_74123_1 = 2
     UNI_74123_2 = 3
 
@@ -29,16 +27,16 @@ class Part74123(PackageDIP16):
     default_inputs=[1, 2, 3,  9, 10, 11],
     default_outputs=[13, 4,  5, 12],
     tests = [
-        Test("Univibrator 1: no trigger", Test.UNIVIB, default_inputs, default_outputs, params=[UNI_74123_1, 0]),
-        Test("Univibrator 1: trigger", Test.UNIVIB, default_inputs, default_outputs, params=[UNI_74123_1, 1]),
-        Test("Univibrator 1: retrigger", Test.UNIVIB, default_inputs, default_outputs, params=[UNI_74123_1, 2]),
-        Test("Univibrator 1: clear", Test.UNIVIB, default_inputs, default_outputs, params=[UNI_74123_1, 3]),
-        Test("Univibrator 1: cross-trigger", Test.UNIVIB, default_inputs, default_outputs, params=[UNI_74123_1, 4]),
-        Test("Univibrator 2: no trigger", Test.UNIVIB, default_inputs, default_outputs, params=[UNI_74123_2, 0]),
-        Test("Univibrator 2: trigger", Test.UNIVIB, default_inputs, default_outputs, params=[UNI_74123_2, 1]),
-        Test("Univibrator 2: retrigger", Test.UNIVIB, default_inputs, default_outputs, params=[UNI_74123_2, 2]),
-        Test("Univibrator 2: clear", Test.UNIVIB, default_inputs, default_outputs, params=[UNI_74123_2, 3]),
-        Test("Univibrator 2: cross-trigger", Test.UNIVIB, default_inputs, default_outputs, params=[UNI_74123_2, 4]),
+        Test("Univibrator 1, no trigger", Test.UNIVIB, default_inputs, default_outputs, params=[UNI_74123_1, 0]),
+        Test("Univibrator 1, trigger", Test.UNIVIB, default_inputs, default_outputs, params=[UNI_74123_1, 1]),
+        Test("Univibrator 1, retrigger", Test.UNIVIB, default_inputs, default_outputs, params=[UNI_74123_1, 2]),
+        Test("Univibrator 1, clear", Test.UNIVIB, default_inputs, default_outputs, params=[UNI_74123_1, 3]),
+        Test("Univibrator 1, cross-trigger", Test.UNIVIB, default_inputs, default_outputs, params=[UNI_74123_1, 4]),
+        Test("Univibrator 2, no trigger", Test.UNIVIB, default_inputs, default_outputs, params=[UNI_74123_2, 0]),
+        Test("Univibrator 2, trigger", Test.UNIVIB, default_inputs, default_outputs, params=[UNI_74123_2, 1]),
+        Test("Univibrator 2, retrigger", Test.UNIVIB, default_inputs, default_outputs, params=[UNI_74123_2, 2]),
+        Test("Univibrator 2, clear", Test.UNIVIB, default_inputs, default_outputs, params=[UNI_74123_2, 3]),
+        Test("Univibrator 2, cross-trigger", Test.UNIVIB, default_inputs, default_outputs, params=[UNI_74123_2, 4]),
     ]
 
 

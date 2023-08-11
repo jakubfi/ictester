@@ -6,21 +6,25 @@
 
 #include "protocol.h"
 
-#define PARAM_DEV 0
-#define PARAM_TEST 1
+enum test_parameters {
+	PARAM_DEV = 0,
+	PARAM_TEST = 1,
+};
 
-#define UNIVIB_121 0
-#define UNIVIB_122 1
-#define UNIVIB_123_1 2
-#define UNIVIB_123_2 3
+enum univib_devices {
+	UNIVIB_121 = 0,
+	UNIVIB_122 = 1,
+	UNIVIB_123_1 = 2,
+	UNIVIB_123_2 = 3,
+};
 
-#define TEST_NOTRIG 0
-#define TEST_TRIG 1
-#define TEST_RETRIG 2
-#define TEST_CLEAR 3
-#define TEST_CROSSTRIG 4
-
-#define LAST_TRIG 0xff
+enum test_types {
+	TEST_NOTRIG = 0,
+	TEST_TRIG = 1,
+	TEST_RETRIG = 2,
+	TEST_CLEAR = 3,
+	TEST_CROSSTRIG = 4,
+};
 
 // 74121
 
@@ -49,6 +53,8 @@
 #define VAL_123_NQ _BV(3)
 
 // trig and notrig conditions
+
+#define LAST_TRIG 0xff
 
 static const __flash uint8_t trigs_121[] = {
 	VAL_121_B |          0 |          0,
@@ -218,27 +224,21 @@ static inline void clear(const __flash struct univib_test *uvt)
 // -----------------------------------------------------------------------
 static inline bool is_active(const __flash struct univib_test *uvt)
 {
-	if ((*uvt->pin_q & uvt->val_q) || !(*uvt->pin_nq & uvt->val_nq)) {
-		return true;
-	}
+	if ((*uvt->pin_q & uvt->val_q) || !(*uvt->pin_nq & uvt->val_nq)) return true;
 	return false;
 }
 
 // -----------------------------------------------------------------------
 static inline bool is_other_active(const __flash struct univib_test *uvt)
 {
-	if ((*uvt->pin_nq & uvt->val_q) || !(*uvt->pin_q & uvt->val_nq)) {
-		return true;
-	}
+	if ((*uvt->pin_nq & uvt->val_q) || !(*uvt->pin_q & uvt->val_nq)) return true;
 	return false;
 }
 
 // -----------------------------------------------------------------------
 static inline bool is_not_active(const __flash struct univib_test *uvt)
 {
-	if (!(*uvt->pin_q & uvt->val_q) || (*uvt->pin_nq & uvt->val_nq)) {
-		return true;
-	}
+	if (!(*uvt->pin_q & uvt->val_q) || (*uvt->pin_nq & uvt->val_nq)) return true;
 	return false;
 }
 
@@ -377,14 +377,11 @@ static uint8_t test_123_2(uint8_t test)
 // -----------------------------------------------------------------------
 uint8_t run_univib(uint8_t *params)
 {
-	uint8_t device = params[PARAM_DEV];
-	uint8_t test = params[PARAM_TEST];
-
-	switch (device) {
-		case UNIVIB_121: return test_121(test);
-		case UNIVIB_122: return test_122(test);
-		case UNIVIB_123_1: return test_123_1(test);
-		case UNIVIB_123_2: return test_123_2(test);
+	switch (params[PARAM_DEV]) {
+		case UNIVIB_121: return test_121(params[PARAM_TEST]);
+		case UNIVIB_122: return test_122(params[PARAM_TEST]);
+		case UNIVIB_123_1: return test_123_1(params[PARAM_TEST]);
+		case UNIVIB_123_2: return test_123_2(params[PARAM_TEST]);
 		default: return RESP_ERR;
 	}
 }

@@ -2,10 +2,7 @@ from binvec import BV
 from prototypes import (PackageDIP14, Pin, PinType, Test)
 
 class Part74122(PackageDIP14):
-    UNI_74121 = 0
     UNI_74122 = 1
-    UNI_74123_1 = 2
-    UNI_74123_2 = 3
 
     name = "74122"
     desc = "Retriggerable Monostable Monovibrators"
