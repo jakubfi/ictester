@@ -9,10 +9,11 @@
 
 void led_init(void);
 void led_welcome(void);
-void led_ok(void);
+void led_pass(void);
 void led_fail(void);
+void led_err(void);
+void led_idle(void);
 void led_active(void);
-void led_comm(void);
 
 #endif
 

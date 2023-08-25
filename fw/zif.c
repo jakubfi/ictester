@@ -115,7 +115,7 @@ bool zif_func(uint8_t func, uint8_t pin)
 }
 
 // -----------------------------------------------------------------------
-static bool zif_config_sane(void)
+bool zif_config_sane(void)
 {
 	if ((zif_switch[A1].data & 0b00001100) == 0b00001100) return false; // pin 8 VCC+GND
 	if ((zif_switch[B0].data & 0b00000110) == 0b00000110) return false; // pin 24 VCC+GND
@@ -140,13 +140,9 @@ static void zif_push_config(void)
 }
 
 // -----------------------------------------------------------------------
-bool zif_connect(void)
+void zif_connect(void)
 {
-	if (!zif_config_sane()) return false;
-
 	zif_push_config();
-
-	return true;
 }
 
 // -----------------------------------------------------------------------

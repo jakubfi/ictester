@@ -7,7 +7,8 @@
 void zif_init(void);
 uint8_t zif_pos(uint8_t dut_pin_count, uint8_t dut_pin);
 bool zif_func(uint8_t func, uint8_t pin);
-bool zif_connect(void);
+bool zif_config_sane(void);
+void zif_connect(void);
 void zif_disconnect(void);
 
 uint8_t mcu_port(uint8_t dut_pin);

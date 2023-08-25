@@ -51,9 +51,8 @@ static void mcu_port_setup(void)
 }
 
 // -----------------------------------------------------------------------
-static void handle_dut_setup(void)
+static uint8_t handle_dut_setup(void)
 {
-	uint8_t res = RESP_OK;
 	uint8_t pin_data[24];
 
 	// receive DUT configuration
@@ -65,8 +64,7 @@ static void handle_dut_setup(void)
 
 	// check DUT pinout
 	if (((pin_count != 14) && (pin_count != 16) && (pin_count != 20) && (pin_count != 24)) || (package_type != PACKAGE_DIP)) {
-		res = RESP_ERR;
-		goto fin;
+		return RESP_ERR;
 	}
 
 	// clear current DUT configuration
@@ -98,36 +96,32 @@ static void handle_dut_setup(void)
 				break;
 			case ZIF_VCC:
 				if (!zif_func(ZIF_VCC, zif_pin)) {
-					res = RESP_ERR;
-					goto fin;
+					return RESP_ERR;
 				}
 				break;
 			case ZIF_GND:
 				if (!zif_func(ZIF_GND, zif_pin)) {
-					res = RESP_ERR;
-					goto fin;
+					return RESP_ERR;
 				}
 				break;
 			case ZIF_C:
 				if (!zif_func(ZIF_C, zif_pin)) {
-					res = RESP_ERR;
-					goto fin;
+					return RESP_ERR;
 				}
 				break;
 			case ZIF_IN_HIZ:
 				// TODO: ensure HiZ
 				break;
 			default:
-				res = RESP_ERR;
-				break;
+				return RESP_ERR;
 		}
 	}
-fin:
-	reply(res);
+
+	return RESP_OK;
 }
 
 // -----------------------------------------------------------------------
-static void handle_test_setup(void)
+static uint8_t handle_test_setup(void)
 {
 	test_type = serial_rx_char();
 	for (uint8_t i=0 ; i<MAX_TEST_PARAMS ; i++) {
@@ -156,11 +150,11 @@ static void handle_test_setup(void)
 		}
 	}
 
-	reply(RESP_OK);
+	return RESP_OK;
 }
 
 // -----------------------------------------------------------------------
-static void handle_run(void)
+static uint8_t handle_run(void)
 {
 	uint8_t res = RESP_PASS;
 
@@ -185,35 +179,33 @@ static void handle_run(void)
 	}
 
 fin:
-
-	if (res == RESP_PASS) led_ok();
-	else led_fail();
-
-	reply(res);
+	return res;
 }
 
 // -----------------------------------------------------------------------
-static void handle_dut_connect(void)
+static uint8_t handle_dut_connect(void)
 {
-	led_active();
-	mcu_port_setup();
-	if (!zif_connect()) {
-		reply(RESP_ERR);
+	if (!zif_config_sane()) {
+		return RESP_ERR;
 	}
+
+	mcu_port_setup();
+	zif_connect();
 
 	if (test_type == TYPE_MEM) {
 		mem_setup();
 	}
 
-	reply(RESP_OK);
+	return RESP_OK;
 }
 
 // -----------------------------------------------------------------------
-static void handle_dut_disconnect(void)
+static uint8_t handle_dut_disconnect(void)
 {
 	zif_disconnect();
 	mcu_port_deconfigure();
-	reply(RESP_OK);
+
+	return RESP_OK;
 }
 
 // -----------------------------------------------------------------------
@@ -225,31 +217,44 @@ int main(void)
 	led_init();
 	led_welcome();
 
-	while (1) {
+	while (true) {
+		uint8_t resp, session_result;
 		int cmd = serial_rx_char();
 		switch (cmd) {
 			case CMD_DUT_SETUP:
-				handle_dut_setup();
-				led_comm();
+				resp = handle_dut_setup();
 				break;
 			case CMD_DUT_CONNECT:
-				handle_dut_connect();
+				session_result = RESP_NONE;
+				resp = handle_dut_connect();
+				led_active();
 				break;
 			case CMD_TEST_SETUP:
-				handle_test_setup();
+				resp = handle_test_setup();
 				break;
 			case CMD_VECTORS_LOAD:
-				handle_vectors_load(pin_count);
+				resp = handle_vectors_load(pin_count);
 				break;
 			case CMD_TEST_RUN:
-				handle_run();
+				resp = handle_run();
+				if ((resp != RESP_PASS) || (session_result == RESP_NONE)) {
+					session_result = resp;
+				}
 				break;
 			case CMD_DUT_DISCONNECT:
-				handle_dut_disconnect();
+				resp = handle_dut_disconnect();
+				switch (session_result) {
+					case RESP_NONE: led_idle(); break;
+					case RESP_PASS: led_pass(); break;
+					case RESP_FAIL: led_fail(); break;
+					default: led_err(); break;
+				}
 				break;
 			default:
-				reply(RESP_ERR);
+				resp = RESP_ERR;
 		}
+		if (resp == RESP_ERR) led_err();
+		reply(resp);
 	}
 
 	return 0;

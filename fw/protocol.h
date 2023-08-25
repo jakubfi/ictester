@@ -4,6 +4,7 @@
 #define MAX_TEST_PARAMS 4
 
 enum commands {
+	CMD_NONE			= 0,
 	CMD_HELLO			= 1,
 	CMD_DUT_SETUP		= 2,
 	CMD_DUT_CONNECT		= 3,
@@ -14,6 +15,7 @@ enum commands {
 };
 
 enum responses {
+	RESP_NONE	= 0,
 	RESP_HELLO	= 128,
 	RESP_OK		= 129,
 	RESP_PASS	= 130,

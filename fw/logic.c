@@ -24,7 +24,7 @@ extern struct port {
 } port[3];
 
 // -----------------------------------------------------------------------
-void handle_vectors_load(uint8_t pin_count)
+uint8_t handle_vectors_load(uint8_t pin_count)
 {
 	vectors_count = serial_rx_16le();
 
@@ -56,7 +56,8 @@ void handle_vectors_load(uint8_t pin_count)
 			}
 		}
 	}
-	reply(RESP_OK);
+
+	return RESP_OK;
 }
 
 // -----------------------------------------------------------------------

@@ -35,7 +35,7 @@ void led_welcome(void)
 }
 
 // -----------------------------------------------------------------------
-void led_ok(void)
+void led_pass(void)
 {
 	rgb_color color;
 	color.red = 0;
@@ -55,6 +55,16 @@ void led_fail(void)
 }
 
 // -----------------------------------------------------------------------
+void led_err(void)
+{
+	rgb_color color;
+	color.red = 4;
+	color.green = 0;
+	color.blue = 3;
+	led_strip_write(&color, 1);
+}
+
+// -----------------------------------------------------------------------
 void led_active(void)
 {
 	rgb_color color;
@@ -65,11 +75,11 @@ void led_active(void)
 }
 
 // -----------------------------------------------------------------------
-void led_comm(void)
+void led_idle(void)
 {
 	rgb_color color;
-	color.red = 4;
-	color.green = 0;
+	color.red = 3;
+	color.green = 3;
 	color.blue = 3;
 	led_strip_write(&color, 1);
 }
