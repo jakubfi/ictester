@@ -9,9 +9,9 @@ class Part7472(PackageDIP14):
         3: Pin("J1", PinType.IN),
         4: Pin("J2", PinType.IN),
         5: Pin("J3", PinType.IN),
-        6: Pin("~Q", PinType.IN),
+        6: Pin("~Q", PinType.OUT),
         8: Pin("Q", PinType.OUT),
-        9: Pin("K1", PinType.OUT),
+        9: Pin("K1", PinType.IN),
         10: Pin("K2", PinType.IN),
         11: Pin("K3", PinType.IN),
         12: Pin("CLK", PinType.IN),
@@ -62,6 +62,9 @@ class Part7472(PackageDIP14):
             [[1, 1, 1,  1, 0, 1,  1, 1, '-'], [1, 0]],
             [[1, 1, 1,  1, 1, 0,  1, 1, '-'], [1, 0]],
             [[1, 1, 1,  1, 1, 1,  1, 1, '-'], [0, 1]],
+
+            # clear
+            [[1, 1, 1,  0, 0, 0,  1, 0, '-'], [0, 1]],
 
             # try K=1 with not fully set J
             [[0, 0, 0,  1, 1, 1,  1, 1, '-'], [0, 1]],
