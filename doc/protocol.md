@@ -7,8 +7,8 @@ Dialog between the software and the tester are conducted using messages. There a
  * commands,
  * responses.
 
-
 Dialog is always initiated with a command sent by the software controlling the tester. Tester always responds with a response.
+All 16-bit values are little-endian.
 
 ## Available commands
 
@@ -33,7 +33,7 @@ Dialog is always initiated with a command sent by the software controlling the t
 | `RESP_ERR`           | 132   | Error                         |
 
 
-# Commands
+# Command description
 
 
 ## Hello
@@ -179,7 +179,7 @@ Upload test vectors. Requires the test to be set up first. Test needs to use vec
 ### Command format
 
 * 1 BYTE: command: `CMD_VECTORS_LOAD`
-* 2 BYTES: `v` = number of test vectors (little-endian), >0.
+* 2 BYTES: `v` = number of test vectors, >0.
 * `v` VECTORS, each containing all pin values (inputs to set, outputs to check):
   * 1 BYTE: check result (0=no, otherwise=yes)
   * `n` BYTES: pin data (n=2 for 14-pin and 16-pin devices, n=3 for >16-pin devices)
@@ -205,7 +205,7 @@ the DUT. If the test fails, DUT is immediately disconnected.
 * 1 BYTE: command: `CMD_TEST_RUN`
 * 1 BYTE: flags:
   * bit 0: slow mode (1=enable, 0=disable). If enabled, tester will wait additional 1 μs before reading DUT outputs. May be required for some ICs with OC outputs that are slower with 4.7 kΩ pull-ups.
-* 2 BYTES: `l` = number of loops, "0" for infinite testing (little-endian).
+* 2 BYTES: `l` = number of loops, "0" for infinite testing.
 
 ### Valid responses
 
@@ -275,12 +275,12 @@ Note that when test fails, DUT is immediately disconnected by the tester.
 
 ### `TEST_LOGIC` failure
 
-  * 2 BYTES: vector number that test failed on (little-endian)
+  * 2 BYTES: vector number that test failed on
   * `n` bytes of pin data - failing vector. Format as in the test configuration.
 
 ### `TEST_DRAM_41` failure
 
-  * 2 BYTES: failing address (little endian)
+  * 2 BYTES: failing address
   * 1 BYTE: failing MARCH C- step
 
 ### `TEST_UNIVIB` failure
