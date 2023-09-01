@@ -10,7 +10,7 @@ Dialog between the software and the tester are conducted using messages. There a
 
 Dialog is always initiated with a command sent by the software controlling the tester. Tester always responds with a response.
 
-Available commands:
+## Available commands
 
 | Command              | Value | Description                                       |
 |----------------------|-------|---------------------------------------------------|
@@ -22,7 +22,7 @@ Available commands:
 | `CMD_TEST_RUN`       | 6     | Run the test                                      |
 | `CMD_DUT_DISCONNECT` | 7     | Power down the DUT, disconnect from the tester    |
 
-Available responses:
+## Available responses
 
 | Response             | Value | Meaning                       |
 |----------------------|-------|-------------------------------|
@@ -40,7 +40,11 @@ Available responses:
 
 To verify that controlling software can work with the hardware, initial "Hello" handshake has to be performed.
 
+### Command format
+
 * 1 BYTE: command `CMD_HELLO`
+
+### Valid responses
 
 Tester always responds with `RESP_HELLO`, described in later section.
 
@@ -50,25 +54,27 @@ Tester always responds with `RESP_HELLO`, described in later section.
 Before any other command, tester needs to be set up for the specific DUT.
 This command informs the tester how to address DUT pins and sets ZIF socket pin functions for the DUT.
 
+### Command format
+
 * 1 BYTE: command: `CMD_DUT_SETUP`
 * 1 BYTE: `t` = package type  (1=DIP)
 * 1 BYTE: `p` = number of all DUT pins ([14, 16, 20, 24])
 * `p` BYTES: `p` ZIF pin functions for each DUT pin. 1 byte each, starting from pin 1. See table below.
 
-| ZIF Function        | Value | MCU Pin Function               | SW Function      | Default DUT use            |
-|---------------------|-------|--------------------------------|------------------|----------------------------|
-| `ZIF_OUT`           | 1     | output                         | -                | TTL input                  |
-| `ZIF_IN`            | 2     | input                          | -                | TTL output                 |
-| `ZIF_IN_PU_STRONG`  | 3     | input                          | pull-up 4k7      | open-collector output      |
-| `ZIF_IN_PU_WEAK`    | 4     | input with weak pullup (>100k) | -                | 3-state output             |
-| `ZIF_OUT_SINK`      | 5     | output driven low (sink)       | -                | open-emitter               |
-| `ZIF_C`             | 6     | high impedance                 | capacitor 470p   | univibrator C connection   |
-| `ZIF_OUT_SOURCE`    | 7     | output driven high (sink)      | -                | -                          |
-| `ZIF_VCC`           | 128   | high impedance                 | VDUT (+5V)       | +5V                        |
-| `ZIF_GND`           | 129   | high impedance                 | GND              | GND                        |
-| `ZIF_HIZ`           | 255   | high impedance                 | -                | not connected, unused      |
+| ZIF Function        | Value | MCU Pin Function          | SW Function      | Default DUT use            |
+|---------------------|-------|---------------------------|------------------|----------------------------|
+| `ZIF_OUT`           | 1     | output                    | -                | TTL input                  |
+| `ZIF_IN`            | 2     | input HiZ                 | -                | TTL output                 |
+| `ZIF_IN_PU_STRONG`  | 3     | input HiZ                 | pull-up 4.7 kΩ   | open-collector output      |
+| `ZIF_IN_PU_WEAK`    | 4     | input with weak pullup    | -                | TTL output, 3-state output |
+| `ZIF_OUT_SINK`      | 5     | output driven low (sink)  | -                | open-emitter               |
+| `ZIF_C`             | 6     | input HiZ                 | capacitor 470 pF | univibrator C connection   |
+| `ZIF_OUT_SOURCE`    | 7     | output driven high (sink) | -                | -                          |
+| `ZIF_VCC`           | 128   | input HiZ                 | VDUT (+5 V)      | VCC (+5 V)                 |
+| `ZIF_GND`           | 129   | input HiZ                 | GND              | GND                        |
+| `ZIF_HIZ`           | 255   | input HiZ                 | -                | not connected, unused      |
 
-Valid responses:
+### Valid responses
 
 * `RESP_OK` - DUT configuration accepted
 * `RESP_ERR` - DUT configuration not accepted
@@ -76,12 +82,20 @@ Valid responses:
 
 ## DUT Connect
 
-This command causes the tester to configure it's pin connections and apply power to the DUT. Requires the DUT to be set up first.
-DUT connect starts the test session; tests can be loaded and executed one by one.
+This command causes the tester to configure its pin connections and apply power to the DUT. Requires the DUT to be set up first.
+Note that if DUT connect is not sent explicitely, first `CMD_TEST_RUN` command will connect the DUT.
+
+DUT connection is established in 3 steps:
+
+* connect GND pin(-s),
+* connect VCC, pull-up and C pins,
+* configure MCU pins according to DUT pin functions.
+
+### Command format
 
 * 1 BYTE: command: `CMD_DUT_CONNECT`
 
-Valid responses:
+### Valid responses
 
 * `RESP_OK` - DUT connected
 * `RESP_ERR` - DUT cannot be connected
@@ -90,11 +104,13 @@ Valid responses:
 ## DUT Disconnect
 
 This command causes the tester to power down the DUT and deconfigure it's pin connections.
-Disconnect ends the test session.
+Note that DUT is also immediately disconnected by the tester if a test fails.
+
+### Command format
 
 * 1 BYTE: command: `CMD_DUT_DISCONNECT`
 
-Valid responses:
+### Valid responses
 
 * `RESP_OK` - DUT disconnected
 
@@ -102,6 +118,8 @@ Valid responses:
 ## Test Setup
 
 Sets up the test. Requires the DUT to be set up first.
+
+### Command format
 
 * 1 BYTE: command: `CMD_TEST_SETUP`
 * 1 BYTE: test type. Algorithm used to test the DUT. See below for test types available.
@@ -111,43 +129,54 @@ Sets up the test. Requires the DUT to be set up first.
     * 1st byte - lowest pin numbers
     * bit 0 in each byte - lowest pin number
 
-Valid responses:
+### Valid responses
 
 * `RESP_OK` - test setup successfull
 * `RESP_ERR` - test setup failed
 
-### Logic IC test
+### Test types
 
-Designed to test 74 logic (both combinatorial and sequential), but suitable for many other IC families.
+Available test types and their specific requirements are described below.
 
-  * `TEST_LOGIC` (1)
-    * does not use (ignores) test parameters
-    * requires test vectors
+#### Logic IC test
 
-### 4164 and 41256 DRAM memory test
+`TEST_LOGIC` (1) is designed to test 74 logic (both combinatorial and sequential), but suitable for many other IC families.
+This test type requires test vectors and does not use (ignores) test parameters.
 
-  * `TEST_DRAM_41` (2)
-    * uses following test parameters:
-      * `PARAM_1` - memory size: 1=64k (4164), 2=256k (41256)
-      * `PARAM_2` - test type: 1=read-modify-write, 2=read+write, 3=page mode
-    * does not use test vectors
+#### 4164 and 41256 DRAM memory test
 
-### 7412x univibrator test
+`TEST_DRAM_41` (2) is designed to test 4164 and 41256 DRAM memory chips. There are three tests available, all using MARCH C- algorithm:
 
-  * `TEST_UNIVIB` (3)
-    * uses following test parameters:
-        * `PARAM_1` - device to test: 0=74121, 1=74122, 2=74123 univibrator 1, 3=74123 univibrator 2
-        * `PARAM_2` - test to run:
-          * 0 = no trigger conditions
-          * 1 = trigger conditions
-          * 2 = retrigger (not available for 74121)
-          * 3 = clear (not available for 74121)
-          * 4 = cross-trigger check (only for 74123)
-    * does not use test vectors
+* read-modify-write - test is done using read-modify-write memory access,
+* read+write - test is done using separate "read" and "write" operations,
+* page mode - test is done using page reads and writes.
+
+Test does not use vectors and uses the following parameters:
+
+  * `PARAM_1` - memory size: 1=64k (4164), 2=256k (41256)
+  * `PARAM_2` - test type: 1=read-modify-write, 2=read+write, 3=page mode
+
+#### 7412x univibrator test
+
+`TEST_UNIVIB` (3) is designed to test 74121, 74122 and 74123 univibrators. Test does not use vectors and uses the following parameters:
+
+* `PARAM_1` - device to test:
+  * 0 = 74121,
+  * 1 = 74122,
+  * 2 = 74123 univibrator 1,
+  * 3 = 74123 univibrator 2
+* `PARAM_2` - test to run:
+  * 0 = conditions which should not trigger the device
+  * 1 = conditions that should trigger the device
+  * 2 = retrigger (not available for 74121)
+  * 3 = clear (not available for 74121)
+  * 4 = cross-trigger check (only for 74123)
 
 ## Vectors upload
 
 Upload test vectors. Requires the test to be set up first. Test needs to use vectors.
+
+### Command format
 
 * 1 BYTE: command: `CMD_VECTORS_LOAD`
 * 2 BYTES: `v` = number of test vectors (little-endian), >0.
@@ -160,7 +189,7 @@ Upload test vectors. Requires the test to be set up first. Test needs to use vec
     * DUT inputs are set according to input pin bits
     * DUT outputs are checked against output bits if result checking is enabled for the vector
 
-Valid responses:
+### Valid responses
 
 * `RESP_OK` - vectors uploaded successfully
 * `RESP_ERR` - vector upload failed
@@ -168,11 +197,17 @@ Valid responses:
 ## Run Test
 
 Run the uploaded test. Requires test to be set and vectors to be uploaded (if required by the test).
+Note that if `DUT_CONNECT` command has not been sent, `CMD_TEST_RUN` will first connect
+the DUT. If the test fails, DUT is immediately disconnected.
+
+### Command format
 
 * 1 BYTE: command: `CMD_TEST_RUN`
+* 1 BYTE: flags:
+  * bit 0: slow mode (1=enable, 0=disable). If enabled, tester will wait additional 1 μs before reading DUT outputs. May be required for some ICs with OC outputs that are slower with 4.7 kΩ pull-ups.
 * 2 BYTES: `l` = number of loops, "0" for infinite testing (little-endian).
 
-Valid responses:
+### Valid responses
 
 * `RESP_ERR` - not possible to execute the test
 * `RESP_PASS` - test executed, passed
@@ -197,16 +232,20 @@ but not all features available in the hardware may be available to the software.
 
 ## Command OK
 
+This response is sent when command has been successfully executed.
+
 * 1 BYTE: response: `RESP_OK`
 
 ## Command error
+
+This response is sent when a command cannot be executed or the execution failed.
 
 * 1 BYTE: response: `RESP_ERR`
 * 1 BYTE: error code from the table below
 
 | Command         | Value | Description                                       |
 |-----------------|-------|---------------------------------------------------|
-| `ERR_UNKNOWN`   | 0     | Error code was not set (likely a bug)             |
+| `ERR_UNKNOWN`   | 0     | Error code was not set (likely a software bug)    |
 | `ERR_CMD`       | 1     | Unknown command                                   |
 | `ERR_NO_SETUP`  | 2     | Missing DUT setup                                 |
 | `ERR_NO_TEST`   | 3     | No test set                                       |
@@ -222,15 +261,28 @@ but not all features available in the hardware may be available to the software.
 
 ## Test PASS
 
+This response is sent only for `CMD_TEST_RUN` command, when the test passes successfully.
+
 * 1 BYTE: response: `RESP_PASS`
 
 ## Test FAIL
 
+This response is sent only for `CMD_TEST_RUN` command, when the test fails.
+Note that when test fails, DUT is immediately disconnected by the tester.
+
 * 1 BYTE: response: `RESP_FAIL`
-* `x` BYTES: failure description. Depends on the test type:
-  * `TEST_LOGIC`
-    * 2 BYTES: vector number that test failed on (little-endian)
-    * `n` bytes of pin data - failing vector. Format as in the test configuration.
-  * `TEST_DRAM_41`
-    * 2 BYTES: failing address (little endian)
-    * 1 BYTE: failing MARCH step
+* `x` BYTES: failure description. Depends on the test type, see below
+
+### `TEST_LOGIC` failure
+
+  * 2 BYTES: vector number that test failed on (little-endian)
+  * `n` bytes of pin data - failing vector. Format as in the test configuration.
+
+### `TEST_DRAM_41` failure
+
+  * 2 BYTES: failing address (little endian)
+  * 1 BYTE: failing MARCH C- step
+
+### `TEST_UNIVIB` failure
+
+Test sends no additional description.

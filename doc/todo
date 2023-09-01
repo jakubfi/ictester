@@ -9,6 +9,8 @@
 92
 549
 
+retest "slow" ICs
+
 name matching?
  * exact name (SN7400, UCY7400),
  * common name (7400),
