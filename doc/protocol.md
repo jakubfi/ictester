@@ -85,10 +85,10 @@ This command informs the tester how to address DUT pins and sets ZIF socket pin 
 This command causes the tester to configure its pin connections and apply power to the DUT. Requires the DUT to be set up first.
 Note that if DUT connect is not sent explicitely, first `CMD_TEST_RUN` command will connect the DUT.
 
-DUT connection is established in 3 steps:
+DUT connection is done in 3 steps:
 
 * connect GND pin(-s),
-* connect VCC, pull-up and C pins,
+* connect VCC, pull-ups and C pins,
 * configure MCU pins according to DUT pin functions.
 
 ### Command format
@@ -105,6 +105,12 @@ DUT connection is established in 3 steps:
 
 This command causes the tester to power down the DUT and deconfigure it's pin connections.
 Note that DUT is also immediately disconnected by the tester if a test fails.
+
+DUT disconnection is done in 3 steps (reversed order of what `CMD_DUT_CONNECT` does):
+
+* deconfigure MCU pins (set all pins as HiZ)
+* disconnect VCC, pull-ups and C pins,
+* disconnect GND pin(-s),
 
 ### Command format
 

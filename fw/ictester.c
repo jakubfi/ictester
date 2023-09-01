@@ -189,8 +189,8 @@ static uint8_t handle_dut_connect(void)
 		return RESP_ERR;
 	}
 
-	mcu_port_setup();
 	zif_connect();
+	mcu_port_setup();
 
 	if (test_type == TYPE_MEM) {
 		mem_setup();
@@ -202,8 +202,8 @@ static uint8_t handle_dut_connect(void)
 // -----------------------------------------------------------------------
 static uint8_t handle_dut_disconnect(void)
 {
-	zif_disconnect();
 	mcu_port_deconfigure();
+	zif_disconnect();
 
 	return RESP_OK;
 }
