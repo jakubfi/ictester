@@ -52,6 +52,7 @@ if '--list' in sys.argv:
 parser = argparse.ArgumentParser(description='IC tester controller')
 parser.add_argument('--device', default="/dev/ttyUSB1", help='Serial port where the IC tester is connected')
 parser.add_argument('--loops', type=int, default=None, help='Loop count (1..65535)')
+parser.add_argument('--delay', type=float, default=None, help='additional DUT output read delay (in μs, rounded to nearest 0.2 μs))')
 parser.add_argument('--list', action="store_true", help='List all supported parts')
 parser.add_argument('--tests', action="store_true", help='When listing parts, list also tests for each part')
 parser.add_argument('--debug', action="store_true", help='Enable debug output')
@@ -93,7 +94,7 @@ for test_name in all_tests:
     if tests_failed:
         print(f"\b\b\b\b{SKIP}SKIPPED{ENDC}")
     else:
-        res, elapsed = tester.exec_test(test, loops)
+        res, elapsed = tester.exec_test(test, loops, args.delay)
         if res == Tester.RESP_PASS:
             print(f"\b\b\b\b{OK}PASS{ENDC}  ({elapsed:.2f} sec.)")
         else:

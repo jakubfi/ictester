@@ -209,9 +209,8 @@ the DUT. If the test fails, DUT is immediately disconnected.
 ### Command format
 
 * 1 BYTE: command: `CMD_TEST_RUN`
-* 1 BYTE: flags:
-  * bit 0: slow mode (1=enable, 0=disable). If enabled, tester will wait additional 1 μs before reading DUT outputs. May be required for some ICs with OC outputs that are slower with 4.7 kΩ pull-ups.
-* 2 BYTES: `l` = number of loops, "0" for infinite testing.
+* 2 BYTES: number of loops, 0 for infinite testing.
+* 2 BYTES: delay (in 200 ns steps) before checking DUT outputs. 0 for no delay.
 
 ### Valid responses
 

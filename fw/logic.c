@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <avr/io.h>
 #include <avr/cpufunc.h>
+#include <util/delay_basic.h>
 
 #include "zif.h"
 #include "protocol.h"
@@ -61,11 +62,16 @@ uint8_t handle_vectors_load(uint8_t pin_count)
 }
 
 // -----------------------------------------------------------------------
-uint8_t run_logic2(void)
+uint8_t run_logic2(uint16_t delay)
 {
 	for (uint16_t pos=0 ; pos<vectors_count ; pos++) {
 		PORTB = ((vectors[pos][1] & port[1].dut_input) | port[1].dut_pullup);
 		PORTC = ((vectors[pos][2] & port[2].dut_input) | port[2].dut_pullup);
+
+		if (delay) {
+			uint16_t i = delay; // has to be redeclared, otherwise everything gets optimized away
+			_delay_loop_2(i);
+		}
 
 		if ((test_type == TYPE_COMB) || (pos % 2)) {
 			if ((PINB ^ vectors[pos][1]) & port[1].used_outputs) return RESP_FAIL;
@@ -77,12 +83,17 @@ uint8_t run_logic2(void)
 }
 
 // -----------------------------------------------------------------------
-uint8_t run_logic3(void)
+uint8_t run_logic3(uint16_t delay)
 {
 	for (uint16_t pos=0 ; pos<vectors_count ; pos++) {
 		PORTA = ((vectors[pos][0] & port[0].dut_input) | port[0].dut_pullup);
 		PORTB = ((vectors[pos][1] & port[1].dut_input) | port[1].dut_pullup);
 		PORTC = ((vectors[pos][2] & port[2].dut_input) | port[2].dut_pullup);
+
+		if (delay) {
+			uint16_t i = delay; // has to be redeclared, otherwise everything gets optimized away
+			_delay_loop_2(i);
+		}
 
 		if ((test_type == TYPE_COMB) || (pos % 2)) {
 			if ((PINA ^ vectors[pos][0]) & port[0].used_outputs) return RESP_FAIL;

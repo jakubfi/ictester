@@ -20,6 +20,9 @@ class Part7447(PackageDIP16):
         15: Pin("f", PinType.OC),
     }
 
+    # 7447 outputs are very slow, signal rise is ~5us
+    read_delay_us = 2
+
     test_async = Test("Asynchronous operation", Test.COMB,
         inputs=[6, 2, 1, 7,  3, 5, 4],
         outputs=[13, 12, 11, 10, 9, 15, 14],

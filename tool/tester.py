@@ -110,11 +110,14 @@ class Tester:
         if self.tr.recv() != Tester.RESP_OK:
             raise RuntimeError("Vectors load failed")
 
-    def run(self, loops):
+    def run(self, loops, delay):
         assert 1 <= loops <= 0xffff
 
+        if self.debug:
+            print(f"Running test: {loops} loops, {delay} us output read delay")
         self.tr.send([Tester.CMD_RUN])
         self.tr.send(BV.int(loops, 16))
+        self.tr.send(BV.int(round(delay//0.2), 16)) # unit is 0.2us
 
         start = time.time()
         result = self.tr.recv()
@@ -122,10 +125,10 @@ class Tester:
 
         return result, elapsed
 
-    def exec_test(self, test, loops):
+    def exec_test(self, test, loops, delay):
         self.test_setup(test)
         self.vectors_load(test)
-        res = self.run(loops)
+        res = self.run(loops, delay if delay is not None else self.part.read_delay_us)
         if self.debug:
             print(f"Bytes sent: {self.tr.bytes_sent}, received: {self.tr.bytes_received}")
         return res

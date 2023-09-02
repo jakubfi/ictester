@@ -6,8 +6,8 @@ Main goal of this project was to make a logic IC tester that allows adding new t
 ## Features
 
 * fully programmable (client-side, in python)
-* designed for 5V TTL logic, but other 5V logic families can be tested too
-* 2.2us (<=16-pin ICs) and ?.?us (>16-pin ICs) per single test cycle
+* designed for 5 V TTL logic, but other 5 V logic families can be tested too
+* 2.2 μs (<=16-pin ICs) and 3.2 μs (>16-pin ICs) per single logic test cycle
 * built-in tests for 4164 and 41256 memories (MARCH C- test in read+write, read/write and page access modes)
 * built-in tests for 74121, 74122 and 74123 univibrators
 * small and USB powered

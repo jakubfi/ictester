@@ -156,27 +156,25 @@ static uint8_t handle_test_setup(void)
 }
 
 // -----------------------------------------------------------------------
-static uint8_t handle_run(void)
+static uint8_t handle_run(uint16_t loops, uint16_t delay)
 {
 	uint8_t res = RESP_PASS;
 
-	uint16_t test_loops = serial_rx_16le();
-
 	if (test_type == TYPE_MEM) {
-		for (uint16_t rep=0 ; rep<test_loops ; rep++) {
+		for (uint16_t rep=0 ; rep<loops ; rep++) {
 			if ((res = run_mem(test_params)) != RESP_PASS) goto fin;
 		}
 	} else if (test_type == TYPE_UNIVIB) {
-		for (uint16_t rep=0 ; rep<test_loops ; rep++) {
+		for (uint16_t rep=0 ; rep<loops ; rep++) {
 			if ((res = run_univib(test_params)) != RESP_PASS) goto fin;
 		}
 	} else if (pin_count <= 16) {
-		for (uint16_t rep=0 ; rep<test_loops ; rep++) {
-			if ((res = run_logic2()) != RESP_PASS) goto fin;
+		for (uint16_t rep=0 ; rep<loops ; rep++) {
+			if ((res = run_logic2(delay)) != RESP_PASS) goto fin;
 		}
 	} else {
-		for (uint16_t rep=0 ; rep<test_loops ; rep++) {
-			if ((res = run_logic3()) != RESP_PASS) goto fin;
+		for (uint16_t rep=0 ; rep<loops ; rep++) {
+			if ((res = run_logic3(delay)) != RESP_PASS) goto fin;
 		}
 	}
 
@@ -245,11 +243,13 @@ int main(void)
 				resp = handle_vectors_load(pin_count);
 				break;
 			case CMD_TEST_RUN:
+				uint16_t loops = serial_rx_16le();
+				uint16_t delay = serial_rx_16le();
 				if (!dut_connected) {
 					resp = handle_dut_connect();
 					if (resp != RESP_OK) break;
 				}
-				resp = handle_run();
+				resp = handle_run(loops, delay);
 				if (resp != RESP_PASS) {
 					handle_dut_disconnect(resp);
 				}

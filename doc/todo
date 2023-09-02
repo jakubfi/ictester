@@ -9,7 +9,8 @@
 92
 549
 
-retest "slow" ICs
+protocol frames
+don't use BV in non-tester context
 
 name matching?
  * exact name (SN7400, UCY7400),
