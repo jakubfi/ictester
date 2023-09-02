@@ -1,4 +1,6 @@
 import serial
+from binvec import BV
+
 
 class Transport:
     def __init__(self, port, speed, debug=False):
@@ -32,6 +34,13 @@ class Transport:
             print(f"<- {data}")
         self.s.write(b)
         self.bytes_sent += len(b)
+
+    def send_16le(self, val):
+        self.send(val.to_bytes(2, 'little'))
+
+    def send_bitarray(self, bitarray):
+        # convert 1/0 bit-array to BV. bytes(BV) will pack bits into bytes
+        self.send(BV(bitarray))
 
     def recv(self):
         b = ord(self.s.read(1))

@@ -1,5 +1,4 @@
 import time
-from binvec import BV
 
 
 class Tester:
@@ -82,7 +81,7 @@ class Tester:
             print(f"Test pin usage map: {data}")
             print(f"DUT inputs: {test.inputs}")
             print(f"DUT outputs: {test.outputs}")
-        self.tr.send(BV(data))
+        self.tr.send_bitarray(data)
 
         if self.tr.recv() != Tester.RESP_OK:
             raise RuntimeError("Test setup failed")
@@ -96,7 +95,7 @@ class Tester:
         assert len(test.body) <= Tester.MAX_VECTORS
 
         self.tr.send([Tester.CMD_VECTORS_LOAD])
-        self.tr.send(BV.int(len(test.body), 16))
+        self.tr.send_16le(len(test.body))
 
         if self.debug:
             print("Binary vectors:")
@@ -105,7 +104,7 @@ class Tester:
             data = v.by_pins(reversed(sorted(self.part.pins)))
             if self.debug:
                 print(f" {data}")
-            self.tr.send(BV(data))
+            self.tr.send_bitarray(data)
 
         if self.tr.recv() != Tester.RESP_OK:
             raise RuntimeError("Vectors load failed")
@@ -116,8 +115,8 @@ class Tester:
         if self.debug:
             print(f"Running test: {loops} loops, {delay} us output read delay")
         self.tr.send([Tester.CMD_RUN])
-        self.tr.send(BV.int(loops, 16))
-        self.tr.send(BV.int(round(delay//0.2), 16)) # unit is 0.2us
+        self.tr.send_16le(loops)
+        self.tr.send_16le(round(delay//0.2)) # unit is 0.2us
 
         start = time.time()
         result = self.tr.recv()
