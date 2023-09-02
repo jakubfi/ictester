@@ -10,7 +10,7 @@
 549
 
 protocol frames
-don't use BV in non-tester context
+debug verbosity?
 
 name matching?
  * exact name (SN7400, UCY7400),

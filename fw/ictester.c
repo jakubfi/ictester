@@ -156,33 +156,6 @@ static uint8_t handle_test_setup(void)
 }
 
 // -----------------------------------------------------------------------
-static uint8_t handle_run(uint16_t loops, uint16_t delay)
-{
-	uint8_t res = RESP_PASS;
-
-	if (test_type == TYPE_MEM) {
-		for (uint16_t rep=0 ; rep<loops ; rep++) {
-			if ((res = run_mem(test_params)) != RESP_PASS) goto fin;
-		}
-	} else if (test_type == TYPE_UNIVIB) {
-		for (uint16_t rep=0 ; rep<loops ; rep++) {
-			if ((res = run_univib(test_params)) != RESP_PASS) goto fin;
-		}
-	} else if (pin_count <= 16) {
-		for (uint16_t rep=0 ; rep<loops ; rep++) {
-			if ((res = run_logic2(delay)) != RESP_PASS) goto fin;
-		}
-	} else {
-		for (uint16_t rep=0 ; rep<loops ; rep++) {
-			if ((res = run_logic3(delay)) != RESP_PASS) goto fin;
-		}
-	}
-
-fin:
-	return res;
-}
-
-// -----------------------------------------------------------------------
 static uint8_t handle_dut_connect(void)
 {
 	if (!zif_config_sane()) {
@@ -218,6 +191,44 @@ static uint8_t handle_dut_disconnect(uint8_t resp)
 }
 
 // -----------------------------------------------------------------------
+static uint8_t handle_run(void)
+{
+	uint8_t res = RESP_PASS;
+
+	uint16_t loops = serial_rx_16le();
+	uint16_t delay = serial_rx_16le();
+
+	if (!dut_connected) {
+		res = handle_dut_connect();
+		if (res != RESP_OK) goto fin;
+	}
+
+	if (test_type == TYPE_MEM) {
+		for (uint16_t rep=0 ; rep<loops ; rep++) {
+			if ((res = run_mem(test_params)) != RESP_PASS) goto fin;
+		}
+	} else if (test_type == TYPE_UNIVIB) {
+		for (uint16_t rep=0 ; rep<loops ; rep++) {
+			if ((res = run_univib(test_params)) != RESP_PASS) goto fin;
+		}
+	} else if (pin_count <= 16) {
+		for (uint16_t rep=0 ; rep<loops ; rep++) {
+			if ((res = run_logic2(delay)) != RESP_PASS) goto fin;
+		}
+	} else {
+		for (uint16_t rep=0 ; rep<loops ; rep++) {
+			if ((res = run_logic3(delay)) != RESP_PASS) goto fin;
+		}
+	}
+
+fin:
+	if (res != RESP_PASS) {
+		handle_dut_disconnect(res);
+	}
+	return res;
+}
+
+// -----------------------------------------------------------------------
 int main(void)
 {
 	mcu_port_deconfigure();
@@ -229,6 +240,7 @@ int main(void)
 	while (true) {
 		uint8_t resp;
 		int cmd = serial_rx_char();
+
 		switch (cmd) {
 			case CMD_DUT_SETUP:
 				resp = handle_dut_setup();
@@ -243,16 +255,7 @@ int main(void)
 				resp = handle_vectors_load(pin_count);
 				break;
 			case CMD_TEST_RUN:
-				uint16_t loops = serial_rx_16le();
-				uint16_t delay = serial_rx_16le();
-				if (!dut_connected) {
-					resp = handle_dut_connect();
-					if (resp != RESP_OK) break;
-				}
-				resp = handle_run(loops, delay);
-				if (resp != RESP_PASS) {
-					handle_dut_disconnect(resp);
-				}
+				resp = handle_run();
 				break;
 			case CMD_DUT_DISCONNECT:
 				resp = handle_dut_disconnect(resp);
