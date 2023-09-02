@@ -26,6 +26,8 @@ uint8_t pin_count;
 uint8_t test_type;
 uint8_t test_params[MAX_TEST_PARAMS];
 
+bool dut_connected;
+
 // -----------------------------------------------------------------------
 static void mcu_port_deconfigure(void)
 {
@@ -189,6 +191,7 @@ static uint8_t handle_dut_connect(void)
 		return RESP_ERR;
 	}
 
+	led_active();
 	zif_connect();
 	mcu_port_setup();
 
@@ -196,14 +199,22 @@ static uint8_t handle_dut_connect(void)
 		mem_setup();
 	}
 
+	dut_connected = true;
+
 	return RESP_OK;
 }
 
 // -----------------------------------------------------------------------
-static uint8_t handle_dut_disconnect(void)
+static uint8_t handle_dut_disconnect(uint8_t resp)
 {
 	mcu_port_deconfigure();
 	zif_disconnect();
+	dut_connected = false;
+
+	if (resp == RESP_ERR) led_err();
+	else if (resp == RESP_FAIL) led_fail();
+	else if (resp == RESP_PASS) led_pass();
+	else led_idle();
 
 	return RESP_OK;
 }
@@ -218,16 +229,14 @@ int main(void)
 	led_welcome();
 
 	while (true) {
-		uint8_t resp, session_result;
+		uint8_t resp;
 		int cmd = serial_rx_char();
 		switch (cmd) {
 			case CMD_DUT_SETUP:
 				resp = handle_dut_setup();
 				break;
 			case CMD_DUT_CONNECT:
-				session_result = RESP_NONE;
 				resp = handle_dut_connect();
-				led_active();
 				break;
 			case CMD_TEST_SETUP:
 				resp = handle_test_setup();
@@ -236,24 +245,26 @@ int main(void)
 				resp = handle_vectors_load(pin_count);
 				break;
 			case CMD_TEST_RUN:
+				if (!dut_connected) {
+					resp = handle_dut_connect();
+					if (resp != RESP_OK) break;
+				}
 				resp = handle_run();
-				if ((resp != RESP_PASS) || (session_result == RESP_NONE)) {
-					session_result = resp;
+				if (resp != RESP_PASS) {
+					handle_dut_disconnect(resp);
 				}
 				break;
 			case CMD_DUT_DISCONNECT:
-				resp = handle_dut_disconnect();
-				switch (session_result) {
-					case RESP_NONE: led_idle(); break;
-					case RESP_PASS: led_pass(); break;
-					case RESP_FAIL: led_fail(); break;
-					default: led_err(); break;
-				}
+				resp = handle_dut_disconnect(resp);
 				break;
 			default:
 				resp = RESP_ERR;
 		}
-		if (resp == RESP_ERR) led_err();
+
+		if (resp == RESP_ERR) {
+			led_err();
+		}
+
 		reply(resp);
 	}
 

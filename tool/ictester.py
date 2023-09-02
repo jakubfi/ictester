@@ -42,6 +42,7 @@ def print_part_info(part):
 FAIL = '\033[91m\033[1m'
 OK = '\033[92m\033[1m'
 WARN = '\033[95m\033[1m'
+SKIP = '\033[93m\033[1m'
 ENDC = '\033[0m'
 
 if '--list' in sys.argv:
@@ -75,13 +76,11 @@ tester = Tester(part, transport, debug=args.debug)
 all_tests = tester.tests_available()
 test_count = len(all_tests)
 longest_desc = len(max(all_tests, key=len))
-tests_passed = 0
-
+tests_failed = 0
 total_time = 0
 print()
 
 tester.dut_setup()
-tester.dut_connect()
 
 for test_name in all_tests:
     test = tester.part.get_test(test_name)
@@ -89,27 +88,27 @@ for test_name in all_tests:
 
     plural = "s" if loops != 1 else ""
     endc = "\n" if args.debug else ""
-    print(f" * Testing: {test_name:{longest_desc}s}   {loops} loop{plural}  ... ", end=endc, flush=True)
+    print(f" * Testing: {test_name:{longest_desc}s}   {loops:5} loop{plural}  ... ", end=endc, flush=True)
 
-    res, elapsed = tester.exec_test(test, loops)
-
-    if res == Tester.RESP_PASS:
-        tests_passed += 1
-        print(f"\b\b\b\b{OK}PASS{ENDC}  ({elapsed:.2f} sec.)")
+    if tests_failed:
+        print(f"\b\b\b\b{SKIP}SKIPPED{ENDC}")
     else:
-        print(f"\b\b\b\b{FAIL}FAIL{ENDC}  ({elapsed:.2f} sec.)")
+        res, elapsed = tester.exec_test(test, loops)
+        if res == Tester.RESP_PASS:
+            print(f"\b\b\b\b{OK}PASS{ENDC}  ({elapsed:.2f} sec.)")
+        else:
+            tests_failed += 1
+            print(f"\b\b\b\b{FAIL}FAIL{ENDC}  ({elapsed:.2f} sec.)")
 
 tester.dut_disconnect()
 
-if tests_passed != test_count:
-    color = FAIL
-    result = "PART DEFECTIVE"
+if tests_failed != 0:
+    result = f"{FAIL}PART DEFECTIVE"
     ret = 1
 else:
-    color = OK
-    result = "PART OK"
+    result = f"{OK}PART OK"
     ret = 0
 
-print(f"\n{color}{result}: {tests_passed} of {test_count} tests passed{ENDC}")
+print(f"\n{result}{ENDC}")
 
 sys.exit(ret)
