@@ -45,10 +45,14 @@ class Part7489(PackageDIP16):
             ]
 
         body = []
+
+        # 7489 outputs normally require much stronger pullup than what's available in the tester
+        read_delay_us = 0.6
         for v in BV.range(0, 16):
             body.extend(rw_cycle(v))
 
         return Test("Complete array", Test.LOGIC,
+            params=list(round(read_delay_us/0.2).to_bytes(2, 'little')),
             inputs=[1, 15, 14, 13,  4, 6, 10, 12,  2, 3],
             outputs=[5, 7, 9, 11],
             body=body,
