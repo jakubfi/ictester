@@ -332,7 +332,9 @@ static uint8_t test_121(uint8_t test)
 	switch (test) {
 		case TEST_NOTRIG: return test_no_trig(univib_test + UNIVIB_121);
 		case TEST_TRIG: return test_trig(univib_test + UNIVIB_121);
-		default: return RESP_ERR;
+		default:
+			// unknown test type
+			return RESP_ERR;
 	}
 }
 
@@ -344,7 +346,9 @@ static uint8_t test_122(uint8_t test)
 		case TEST_TRIG: return test_trig(univib_test + UNIVIB_122);
 		case TEST_RETRIG: return test_retrig(univib_test + UNIVIB_122);
 		case TEST_CLEAR: return test_clear(univib_test + UNIVIB_122);
-		default: return RESP_ERR;
+		default:
+			// unknown test type
+			return RESP_ERR;
 	}
 }
 
@@ -357,7 +361,9 @@ static uint8_t test_123_1(uint8_t test)
 		case TEST_RETRIG: return test_retrig(univib_test + UNIVIB_123_1);
 		case TEST_CLEAR: return test_clear(univib_test + UNIVIB_123_1);
 		case TEST_CROSSTRIG: return test_crosstrig(univib_test + UNIVIB_123_1);
-		default: return RESP_ERR;
+		default:
+			// unknown test type
+			return RESP_ERR;
 	}
 }
 
@@ -365,25 +371,43 @@ static uint8_t test_123_1(uint8_t test)
 static uint8_t test_123_2(uint8_t test)
 {
 	switch (test) {
-		case TEST_NOTRIG: return test_no_trig(univib_test + UNIVIB_123_2);
+		case TEST_NOTRIG:return test_no_trig(univib_test + UNIVIB_123_2);
 		case TEST_TRIG: return test_trig(univib_test + UNIVIB_123_2);
 		case TEST_RETRIG: return test_retrig(univib_test + UNIVIB_123_2);
 		case TEST_CLEAR: return test_clear(univib_test + UNIVIB_123_2);
 		case TEST_CROSSTRIG: return test_crosstrig(univib_test + UNIVIB_123_2);
-		default: return RESP_ERR;
+		default:
+			// unknown test type
+			return RESP_ERR;
 	}
 }
 
 // -----------------------------------------------------------------------
-uint8_t run_univib(uint8_t *params)
+uint8_t run_univib(uint16_t loops, uint8_t *params)
 {
-	switch (params[PARAM_DEV]) {
-		case UNIVIB_121: return test_121(params[PARAM_TEST]);
-		case UNIVIB_122: return test_122(params[PARAM_TEST]);
-		case UNIVIB_123_1: return test_123_1(params[PARAM_TEST]);
-		case UNIVIB_123_2: return test_123_2(params[PARAM_TEST]);
-		default: return RESP_ERR;
+	uint8_t res;
+
+	for (uint16_t rep=0 ; rep<loops ; rep++) {
+		switch (params[PARAM_DEV]) {
+			case UNIVIB_121:
+				if ((res = test_121(params[PARAM_TEST])) != RESP_PASS) return res;
+				break;
+			case UNIVIB_122:
+				if ((res = test_122(params[PARAM_TEST])) != RESP_PASS) return res;
+				break;
+			case UNIVIB_123_1:
+				if ((res = test_123_1(params[PARAM_TEST])) != RESP_PASS) return res;
+				break;
+			case UNIVIB_123_2:
+				if ((res = test_123_2(params[PARAM_TEST])) != RESP_PASS) return res;
+				break;
+			default:
+				// unknown device type
+				return RESP_ERR;
+		}
 	}
+
+	return RESP_PASS;
 }
 
 // vim: tabstop=4 shiftwidth=4 autoindent

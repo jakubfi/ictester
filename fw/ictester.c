@@ -199,30 +199,26 @@ static uint8_t handle_run(void)
 
 	if (!dut_connected) {
 		res = handle_dut_connect();
-		if (res != RESP_OK) goto fin;
+		if (res != RESP_OK) return res;
 	}
 
-	if (test_type == TYPE_MEM) {
-		for (uint16_t rep=0 ; rep<loops ; rep++) {
-			if ((res = run_mem(test_params)) != RESP_PASS) goto fin;
-		}
-	} else if (test_type == TYPE_UNIVIB) {
-		for (uint16_t rep=0 ; rep<loops ; rep++) {
-			if ((res = run_univib(test_params)) != RESP_PASS) goto fin;
-		}
-	} else if (pin_count <= 16) {
-		uint16_t delay = (test_params[1] << 8) + test_params[0];
-		for (uint16_t rep=0 ; rep<loops ; rep++) {
-			if ((res = run_logic2(delay)) != RESP_PASS) goto fin;
-		}
-	} else {
-		uint16_t delay = (test_params[1] << 8) + test_params[0];
-		for (uint16_t rep=0 ; rep<loops ; rep++) {
-			if ((res = run_logic3(delay)) != RESP_PASS) goto fin;
-		}
+	switch (test_type) {
+		case TYPE_MEM:
+			res = run_mem(loops, test_params);
+			break;
+		case TYPE_UNIVIB:
+			res = run_univib(loops, test_params);
+			break;
+		case TYPE_SEQ:
+		case TYPE_COMB:
+			res = run_logic(loops, test_params);
+			break;
+		default:
+			// unknown test type
+			res = RESP_ERR;
+			break;
 	}
 
-fin:
 	if (res != RESP_PASS) {
 		handle_dut_disconnect(res);
 	}

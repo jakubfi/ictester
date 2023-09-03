@@ -62,7 +62,7 @@ uint8_t handle_vectors_load(uint8_t pin_count)
 }
 
 // -----------------------------------------------------------------------
-uint8_t run_logic2(uint16_t delay)
+static inline uint8_t run_logic2(uint16_t delay)
 {
 	for (uint16_t pos=0 ; pos<vectors_count ; pos++) {
 		PORTB = ((vectors[pos][1] & port[1].dut_input) | port[1].dut_pullup);
@@ -83,7 +83,7 @@ uint8_t run_logic2(uint16_t delay)
 }
 
 // -----------------------------------------------------------------------
-uint8_t run_logic3(uint16_t delay)
+static inline uint8_t run_logic3(uint16_t delay)
 {
 	for (uint16_t pos=0 ; pos<vectors_count ; pos++) {
 		PORTA = ((vectors[pos][0] & port[0].dut_input) | port[0].dut_pullup);
@@ -99,6 +99,25 @@ uint8_t run_logic3(uint16_t delay)
 			if ((PINA ^ vectors[pos][0]) & port[0].used_outputs) return RESP_FAIL;
 			if ((PINB ^ vectors[pos][1]) & port[1].used_outputs) return RESP_FAIL;
 			if ((PINC ^ vectors[pos][2]) & port[2].used_outputs) return RESP_FAIL;
+		}
+	}
+
+	return RESP_PASS;
+}
+
+// -----------------------------------------------------------------------
+uint8_t run_logic(uint16_t loops, uint8_t *params)
+{
+	uint8_t res;
+	volatile uint16_t delay = (params[1] << 8) + params[0];
+
+	if (pin_count <= 16) {
+		for (uint16_t rep=0 ; rep<loops ; rep++) {
+			if ((res = run_logic2(delay)) != RESP_PASS) return res;
+		}
+	} else {
+		for (uint16_t rep=0 ; rep<loops ; rep++) {
+			if ((res = run_logic3(delay)) != RESP_PASS) return res;
 		}
 	}
 

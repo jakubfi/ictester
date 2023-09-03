@@ -218,7 +218,7 @@ static uint8_t march_step_page(uint8_t dir, uint8_t r, uint8_t w, uint16_t addr_
 }
 
 // -----------------------------------------------------------------------
-uint8_t run_mem(uint8_t *params)
+uint8_t run_mem(uint16_t loops, uint8_t *params)
 {
 	march_fun m_funcs[4] = {
 		march_step_rmw,
@@ -230,11 +230,13 @@ uint8_t run_mem(uint8_t *params)
 	march_fun m_fun = m_funcs[params[1] & 0b11];
 	uint16_t address_space = params[0] == 2 ? 0x200 : 0x100;
 
-	for (uint8_t i=0 ; i<MARCH_STEPS ; i++) {
-		if (m_fun(march_cm[i].dir, march_cm[i].read, march_cm[i].write, address_space) != RESP_PASS) {
-			CAS_OFF;
-			RAS_OFF;
-			return RESP_FAIL;
+	for (uint16_t rep=0 ; rep<loops ; rep++) {
+		for (uint8_t i=0 ; i<MARCH_STEPS ; i++) {
+			if (m_fun(march_cm[i].dir, march_cm[i].read, march_cm[i].write, address_space) != RESP_PASS) {
+				CAS_OFF;
+				RAS_OFF;
+				return RESP_FAIL;
+			}
 		}
 	}
 
