@@ -24,9 +24,7 @@ def list_parts(list_tests=False):
             print(f"{name:7s} {part.package_name:6s} {part.desc}")
             if (list_tests):
                 for t in part.tests:
-                    # NOTE: hack to work around sequentialize()
-                    l = 2*len(t.body) if (t.type == t.SEQ) else len(t.body)
-                    print(f"  * ({l} vectors) {t.name}")
+                    print(f"  * ({len(t.vectors)} vectors) {t.name}")
 
 # ------------------------------------------------------------------------
 def print_part_info(part):
@@ -93,7 +91,8 @@ for test_name in all_tests:
 
     plural = "s" if loops != 1 else ""
     endc = "\n" if args.debug else ""
-    print(f" * Testing: {test_name:{longest_desc}s}   {loops:5} loop{plural}  ... ", end=endc, flush=True)
+    stats = f"({len(test.vectors)} vectors, {loops} loop{plural})"
+    print(f" * Testing: {test_name:{longest_desc}s}   {stats:25}  ... ", end=endc, flush=True)
 
     if tests_failed:
         print(f"\b\b\b\b{SKIP}SKIPPED{ENDC}")

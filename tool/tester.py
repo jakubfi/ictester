@@ -74,7 +74,7 @@ class Tester:
     def test_setup(self, test, delay):
         params = test.params
         if delay is not None:
-            if test.type in [Test.COMB, Test.SEQ]:
+            if test.type == Test.LOGIC:
                 delay_val = round(delay/0.2)
                 params[0] = delay_val & 0xff
                 params[1] = delay_val >> 8
@@ -96,22 +96,31 @@ class Tester:
 
     def vectors_load(self, test):
         if self.debug:
-            print(f"Test vectors ({len(test.body)}):")
+            print(f"Test vectors ({len(test.vectors)}):")
             for v in test.vectors:
                 print(f" {v}")
 
-        assert len(test.body) <= Tester.MAX_VECTORS
+        assert len(test.vectors) <= Tester.MAX_VECTORS
 
         self.tr.send([Tester.CMD_VECTORS_LOAD])
-        self.tr.send_16le(len(test.body))
+        self.tr.send_16le(len(test.vectors))
 
         if self.debug:
             print("Binary vectors:")
 
         for v in test.vectors:
-            data = v.by_pins(reversed(sorted(self.part.pins)))
+            data = v.by_pins(sorted(self.part.pins))
+            # If output is empty, that means DUT outputs shouldn't be checked
+            # Protocol marks such case with "1" on VCC position
+            if not v.output:
+                for vcc in self.part.vcc:
+                    data[vcc-1] = 1
+
+            data = list(reversed(data))
+
             if self.debug:
                 print(f" {data}")
+
             self.tr.send_bitarray(data)
 
         if self.tr.recv() != Tester.RESP_OK:
@@ -120,8 +129,6 @@ class Tester:
     def run(self, loops):
         assert 1 <= loops <= 0xffff
 
-        if self.debug:
-            print(f"Running test: {loops} loops, {delay} us output read delay")
         self.tr.send([Tester.CMD_RUN])
         self.tr.send_16le(loops)
 
@@ -133,7 +140,8 @@ class Tester:
 
     def exec_test(self, test, loops, delay):
         self.test_setup(test, delay)
-        self.vectors_load(test)
+        if test.type == Test.LOGIC:
+            self.vectors_load(test)
         res = self.run(loops)
         if self.debug:
             print(f"Bytes sent: {self.tr.bytes_sent}, received: {self.tr.bytes_received}")

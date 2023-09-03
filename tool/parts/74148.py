@@ -20,7 +20,7 @@ class Part74148(PackageDIP16):
         15: Pin("E0", PinType.OUT),
     }
 
-    test_all = Test("Complete logic", Test.COMB,
+    test_all = Test("Complete logic", Test.LOGIC,
         inputs=[5,  10, 11, 12, 13, 1, 2, 3, 4],
         outputs=[6, 7, 9, 14, 15],
         body=[

@@ -21,7 +21,7 @@ class Part7442(PackageDIP16):
         15: Pin("A", PinType.IN),
     }
 
-    test_async = Test("Asynchronous operation", Test.COMB,
+    test_async = Test("Asynchronous operation", Test.LOGIC,
         inputs=[12, 13, 14, 15],
         outputs=[11, 10, 9, 7, 6, 5, 4, 3, 2, 1],
         body=[[BV.int(i, 4),  ~BV.bit(i, 10)] for i in range(0, 16)]

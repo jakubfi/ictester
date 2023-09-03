@@ -18,7 +18,7 @@ class Part7473(PackageDIP14_vcc4):
         14: Pin("1J", PinType.IN),
     }
 
-    test_all = Test("Sync/Async operation", Test.SEQ,
+    test_all = Test("Sync/Async operation", Test.LOGIC,
         inputs=[14, 3, 2, 1,  7, 10, 6, 5],
         outputs=[12, 13, 9, 8],
         body=[

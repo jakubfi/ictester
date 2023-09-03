@@ -20,7 +20,7 @@ class Part74193(PackageDIP16):
         15: Pin("A", PinType.IN),
     }
 
-    test_all = Test("Complete logic", Test.SEQ,
+    test_all = Test("Complete logic", Test.LOGIC,
         inputs=[14, 11,  5, 4,  9, 10, 1, 15],
         outputs=[7, 6, 2, 3,  12, 13],
         body=[

@@ -24,10 +24,10 @@ class Part74S405(PackageDIP16):
     default_inputs = [4, 5, 6,  3, 2, 1]
     default_outputs = [7, 9, 10, 11, 12, 13, 14, 15]
 
-    test_select = Test("Select", Test.COMB, default_inputs, default_outputs,
+    test_select = Test("Select", Test.LOGIC, default_inputs, default_outputs,
         body=[[[0, 0, 1, *BV.int(i, 3)],  ~BV.bit(i, 8)] for i in range(0, 8)]
     )
-    test_inhibit = Test("Inhibit (all comb.)", Test.COMB, default_inputs, default_outputs,
+    test_inhibit = Test("Inhibit (all comb.)", Test.LOGIC, default_inputs, default_outputs,
         body=[[[*BV.int(i, 3), 0, 0, 0],  8*[1]] for i in set(range(0, 8)) - {1}]
     )
 

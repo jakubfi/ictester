@@ -24,19 +24,19 @@ class Part74155(PackageDIP16):
     default_inputs = [3, 13,  2, 1,  14, 15]
     default_outputs = [4, 5, 6, 7,  12, 11, 10, 9]
 
-    test_inhibit = Test("Inhibit", Test.COMB, default_inputs, default_outputs,
+    test_inhibit = Test("Inhibit", Test.LOGIC, default_inputs, default_outputs,
         body=[
             [[*addr, 1, data, 1, data],  8*[1]]
             for addr in BV.range(0, 4)
             for data in [0, 1]
         ]
     )
-    test_select_0 = Test("Select 0", Test.COMB, default_inputs, default_outputs,
+    test_select_0 = Test("Select 0", Test.LOGIC, default_inputs, default_outputs,
         body=[
             [[*BV.int(addr, 2), 0, 0,  0, 0],  [1, 1, 1, 1, *~BV.bit(addr, 4)]] for addr in range(0, 4)
         ]
     )
-    test_select_1 = Test("Select 1", Test.COMB, default_inputs, default_outputs,
+    test_select_1 = Test("Select 1", Test.LOGIC, default_inputs, default_outputs,
         body=[
             [[*BV.int(addr, 2), 0, 1,  0, 1],  [*~BV.bit(addr, 4), 1, 1, 1, 1]] for addr in range(0, 4)
         ]

@@ -31,13 +31,13 @@ class Part74198(PackageDIP24):
     default_inputs = [13,  23, 1,  11,  22, 2,  3, 5, 7, 9, 15, 17, 19, 21]
     default_outputs = [4, 6, 8, 10, 14, 16, 18, 20]
 
-    test_load = Test("Parallel load", Test.SEQ, default_inputs, default_outputs,
+    test_load = Test("Parallel load", Test.LOGIC, default_inputs, default_outputs,
         body=[
             [[1,  1, 1,  '+',  0, 0,  0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0]],
             [[1,  1, 1,  '+',  0, 0,  1, 1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1, 1]],
         ]
     )
-    test_clear = Test("Clear", Test.SEQ, default_inputs, default_outputs,
+    test_clear = Test("Clear", Test.LOGIC, default_inputs, default_outputs,
         body=[
             # load 1s
             [[1,  1, 1,  '+',  0, 0,  1, 1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1, 1]],
@@ -45,7 +45,7 @@ class Part74198(PackageDIP24):
             [['-',  1, 1,  0,  0, 0,  1, 1, 1, 1, 1, 1, 1, 1], [0, 0, 0, 0, 0, 0, 0, 0]],
         ]
     )
-    test_rshift = Test("Shift right", Test.SEQ, default_inputs, default_outputs,
+    test_rshift = Test("Shift right", Test.LOGIC, default_inputs, default_outputs,
         body=[
             # clear
             [['0',  1, 1,  0,  0, 0,  1, 1, 1, 1, 1, 1, 1, 1], [0, 0, 0, 0, 0, 0, 0, 0]],
@@ -61,7 +61,7 @@ class Part74198(PackageDIP24):
             [[1,  0, 1,  '+',  0, 0,  0, 0, 0, 0, 0, 0, 0, 0], [0, 1, 0, 1, 0, 1, 0, 1]],
         ]
     )
-    test_lshift = Test("Shift left", Test.SEQ, default_inputs, default_outputs,
+    test_lshift = Test("Shift left", Test.LOGIC, default_inputs, default_outputs,
         body=[
             # clear
             [['-',  1, 1,  0,  0, 0,  1, 1, 1, 1, 1, 1, 1, 1], [0, 0, 0, 0, 0, 0, 0, 0]],
@@ -77,7 +77,7 @@ class Part74198(PackageDIP24):
             [[1,  1, 0,  '+',  0, 0,  0, 0, 0, 0, 0, 0, 0, 0], [1, 0, 1, 0, 1, 0, 1, 0]],
         ]
     )
-    test_clk_inhibit = Test("Clock inhibit", Test.SEQ, default_inputs, default_outputs,
+    test_clk_inhibit = Test("Clock inhibit", Test.LOGIC, default_inputs, default_outputs,
         body=[
             # clear
             [['-',  1, 1,  0,  0, 0,  1, 1, 1, 1, 1, 1, 1, 1], [0, 0, 0, 0, 0, 0, 0, 0]],

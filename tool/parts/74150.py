@@ -33,16 +33,16 @@ class Part74150(PackageDIP24):
     default_outputs = [10]
 
     tests = [
-        Test("Select 0", Test.COMB, default_inputs, default_outputs,
+        Test("Select 0", Test.LOGIC, default_inputs, default_outputs,
             body=[[[*BV.int(addr, 4), 0, *~BV.bit(addr, 16)],  [1]] for addr in range(0, 15)]
         ),
-        Test("Select 1", Test.COMB, default_inputs, default_outputs,
+        Test("Select 1", Test.LOGIC, default_inputs, default_outputs,
             body=[[[*BV.int(addr, 4), 0, *BV.bit(addr, 16)],  [0]] for addr in range(0, 15)]
         ),
-        Test("Inhibit 0", Test.COMB, default_inputs, default_outputs,
+        Test("Inhibit 0", Test.LOGIC, default_inputs, default_outputs,
             body=[[[*BV.int(addr, 4), 1, *BV.int(0, 16)],  [1]] for addr in range(0, 15)]
         ),
-        Test("Inhibit 1", Test.COMB, default_inputs, default_outputs,
+        Test("Inhibit 1", Test.LOGIC, default_inputs, default_outputs,
             body=[[[*BV.int(addr, 4), 1, *~BV.int(0, 16)],  [1]] for addr in range(0, 15)]
         ),
     ]

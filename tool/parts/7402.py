@@ -20,7 +20,7 @@ class Part7402(PackageDIP14):
     }
 
     tests = [
-        Test("Complete logic", Test.COMB,
+        Test("Complete logic", Test.LOGIC,
             inputs=[2, 3, 5, 6, 8, 9, 11, 12],
             outputs=[1, 4, 10, 13],
             body=[[4*v, 4*~v.vor()] for v in BV.range(0, 4)]

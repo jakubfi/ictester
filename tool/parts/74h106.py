@@ -20,7 +20,7 @@ class Part74H106(PackageDIP16_vcc5_gnd13):
         16: Pin("1K", PinType.IN),
     }
 
-    test_all = Test("Complete logic", Test.COMB,
+    test_all = Test("Complete logic", Test.LOGIC,
         inputs=[1, 2, 3, 4, 16,  6, 7, 8, 9, 12],
         outputs=[15, 14,  11, 10],
         body=[

@@ -27,16 +27,16 @@ class Part9312(PackageDIP16):
     default_outputs = [15, 14]
 
     tests = [
-        Test("Select 0", Test.COMB, default_inputs, default_outputs,
+        Test("Select 0", Test.LOGIC, default_inputs, default_outputs,
             body=[[[*~BV.bit(addr, 8), *BV.int(addr, 3), 0],  [0, 1]] for addr in range(0, 8)]
         ),
-        Test("Select 1", Test.COMB, default_inputs, default_outputs,
+        Test("Select 1", Test.LOGIC, default_inputs, default_outputs,
             body=[[[*BV.bit(addr, 8), *BV.int(addr, 3), 0],  [1, 0]] for addr in range(0, 8)]
         ),
-        Test("Inhibit 0", Test.COMB, default_inputs, default_outputs,
+        Test("Inhibit 0", Test.LOGIC, default_inputs, default_outputs,
             body=[[[*~BV.bit(addr, 8), *BV.int(addr, 3), 1],  [0, 1]] for addr in range(0, 8)]
         ),
-        Test("Inhibit 1", Test.COMB, default_inputs, default_outputs,
+        Test("Inhibit 1", Test.LOGIC, default_inputs, default_outputs,
             body=[[[*BV.bit(addr, 8), *BV.int(addr, 3), 1],  [0, 1]] for addr in range(0, 8)]
         )
     ]

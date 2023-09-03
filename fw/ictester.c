@@ -26,6 +26,7 @@ uint8_t pin_count;
 uint8_t test_type;
 uint8_t test_params[MAX_TEST_PARAMS];
 
+uint8_t zif_vcc_pin;
 bool dut_connected;
 
 // -----------------------------------------------------------------------
@@ -97,6 +98,7 @@ static uint8_t handle_dut_setup(void)
 				zif_func(ZIF_IN_PU_STRONG, zif_pin);
 				break;
 			case ZIF_VCC:
+				zif_vcc_pin = zif_pin;
 				if (!zif_func(ZIF_VCC, zif_pin)) {
 					return RESP_ERR;
 				}
@@ -166,7 +168,7 @@ static uint8_t handle_dut_connect(void)
 	zif_connect();
 	mcu_port_setup();
 
-	if (test_type == TYPE_MEM) {
+	if (test_type == TEST_DRAM) {
 		mem_setup();
 	}
 
@@ -203,15 +205,14 @@ static uint8_t handle_run(void)
 	}
 
 	switch (test_type) {
-		case TYPE_MEM:
+		case TEST_LOGIC:
+			res = run_logic(loops, test_params);
+			break;
+		case TEST_DRAM:
 			res = run_mem(loops, test_params);
 			break;
-		case TYPE_UNIVIB:
+		case TEST_UNIVIB:
 			res = run_univib(loops, test_params);
-			break;
-		case TYPE_SEQ:
-		case TYPE_COMB:
-			res = run_logic(loops, test_params);
 			break;
 		default:
 			// unknown test type

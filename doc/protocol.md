@@ -154,7 +154,7 @@ This test type requires test vectors and uses the following parameters:
 
 #### 4164 and 41256 DRAM memory test
 
-`TEST_DRAM_41` (2) is designed to test 4164 and 41256 DRAM memory chips. There are three tests available, all using MARCH C- algorithm:
+`TEST_DRAM` (2) is designed to test 4164 and 41256 DRAM memory chips. There are three tests available, all using MARCH C- algorithm:
 
 * read-modify-write - test is done using read-modify-write memory access,
 * read+write - test is done using separate "read" and "write" operations,
@@ -189,14 +189,26 @@ Upload test vectors. Requires the test to be set up first. Test needs to use vec
 
 * 1 BYTE: command: `CMD_VECTORS_LOAD`
 * 2 BYTES: `v` = number of test vectors, >0.
-* `v` VECTORS, each containing all pin values (inputs to set, outputs to check):
-  * 1 BYTE: check result (0=no, otherwise=yes)
-  * `n` BYTES: pin data (n=2 for 14-pin and 16-pin devices, n=3 for >16-pin devices)
-    * 1st byte - lowest pin numbers
-    * bit 0 in each byte - lowest pin number
-    * bits for pins other than used by the test are ignored
-    * DUT inputs are set according to input pin bits
-    * DUT outputs are checked against output bits if result checking is enabled for the vector
+* `v` VECTORS
+
+Each vector consists of 2 (for <=16-pin devices) or 3 (for >16-pin devices) BYTES.
+Each byte contains bit values for 8 consecutive DUT pins.
+For each input, bit value is set on DUT input. For each output, bit value is compared to DUT output. Bits map to pins as follow:
+
+```
+        .----.----.----.----.----.----.----.----.
+BYTE 1: |  8 |  7 |  6 |  5 |  4 |  3 |  2 |  1 |
+        +----.----.----.----.----.----.----.----+
+BYTE 2: | 16 | 15 | 14 | 13 | 12 | 11 | 10 |  9 |
+        +----.----.----.----.----.----.----.----+
+BYTE 3: | 24 | 23 | 22 | 21 | 20 | 19 | 18 | 17 | (only for >16-pin devices)
+        `----`----`----`----`----`----`----`----`
+```
+
+* Pins absent in the tested device are ignored (eg. for 14-pin devices two most significant bits of BYTE 2 are ignored).
+* Non-I/O pins and pins not declared as inputs or outpus in the test are ignored, with one **exception** described below.
+
+**Bit for VCC pin has a special meaning.** Since it's never set nor read, tester uses it to decide whether DUT outputs should be checked at all. If VCC pin is set to "1" for a given vector, test result for this vector is not checked. Such vectors are used for DUT state setup and in sequential logic tests, where output has to be checked only after the clock/strobe input changes.
 
 ### Valid responses
 
@@ -285,7 +297,7 @@ Note that when test fails, DUT is immediately disconnected by the tester.
   * 2 BYTES: vector number that test failed on
   * `n` bytes of pin data - failing vector. Format as in the test configuration.
 
-### `TEST_DRAM_41` failure
+### `TEST_DRAM` failure
 
   * 2 BYTES: failing address
   * 1 BYTE: failing MARCH C- step

@@ -40,11 +40,10 @@ enum error_types {
 };
 
 enum test_type {
-	TYPE_COMB	= 0,
-	TYPE_SEQ	= 1,
-	TYPE_MEM	= 2,
-	TYPE_UNIVIB	= 3,
-	TYPE_MAX	= TYPE_UNIVIB
+	TEST_LOGIC	= 1,
+	TEST_DRAM	= 2,
+	TEST_UNIVIB	= 3,
+	TEST_MAX	= TEST_UNIVIB
 };
 
 enum package_type {

@@ -18,7 +18,7 @@ class Part74125(PackageDIP14):
         13: Pin("~4G", PinType.IN),
     }
 
-    test_all = Test("Complete logic", Test.COMB,
+    test_all = Test("Complete logic", Test.LOGIC,
         inputs=[1, 2,  4, 5,  10, 9,  13, 12],
         outputs=[3, 6, 8, 11],
         body=[

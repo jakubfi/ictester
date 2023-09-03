@@ -22,15 +22,15 @@ class Part74180(PackageDIP14):
     default_inputs = [8, 9, 10, 11, 12, 13, 1, 2,  3, 4]
     default_outputs = [5, 6]
 
-    test_valid_even = Test("Even upstream", Test.COMB, default_inputs, default_outputs,
+    test_valid_even = Test("Even upstream", Test.LOGIC, default_inputs, default_outputs,
         loops=64,
         body=lambda: [[[*data, 1, 0],  [data.even(), data.odd()]] for data in BV.range(0, 256)]
     )
-    test_valid_odd = Test("Odd upstream", Test.COMB, default_inputs, default_outputs,
+    test_valid_odd = Test("Odd upstream", Test.LOGIC, default_inputs, default_outputs,
         loops=64,
         body=lambda: [[[*data, 0, 1],  [data.odd(), data.even()]] for data in BV.range(0, 256)]
     )
-    test_invalid = Test("Invalid upstream", Test.COMB, default_inputs, default_outputs,
+    test_invalid = Test("Invalid upstream", Test.LOGIC, default_inputs, default_outputs,
         loops=64,
         body=lambda: [
             [[*data, *even_odd], ~BV(even_odd)]

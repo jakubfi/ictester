@@ -21,7 +21,7 @@ class Part7485(PackageDIP16):
         15: Pin("A3", PinType.IN),
     }
 
-    test_all_0 = Test("Full logic (A=B = 0)", Test.COMB,
+    test_all_0 = Test("Full logic (A=B = 0)", Test.LOGIC,
         inputs=[2, 3, 4,  15, 13, 12, 10,  1, 14, 11, 9],
         outputs=[7, 6, 5],
         loops=256,
@@ -40,7 +40,7 @@ class Part7485(PackageDIP16):
         ]
     )
 
-    test_all_1 = Test("Full logic (A=B = 1)", Test.COMB,
+    test_all_1 = Test("Full logic (A=B = 1)", Test.LOGIC,
         inputs=[2, 3, 4,  15, 13, 12, 10,  1, 14, 11, 9],
         outputs=[7, 6, 5],
         loops=256,

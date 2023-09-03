@@ -21,7 +21,7 @@ class Part7450(PackageDIP14):
 
     missing_tests = "Gate expansion is not tested"
 
-    test_async = Test("Asynchronous operation", Test.COMB,
+    test_async = Test("Asynchronous operation", Test.LOGIC,
         inputs=[1, 13, 9, 10,  2, 3, 4, 5],
         outputs=[8, 6],
         body=[

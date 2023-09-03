@@ -20,7 +20,7 @@ class Part7475(PackageDIP16_vcc5):
         16: Pin("1Q", PinType.OUT),
     }
 
-    test_async = Test("Asynchronous operation", Test.COMB,
+    test_async = Test("Asynchronous operation", Test.LOGIC,
         inputs=[2, 3, 13,  6, 7, 4],
         outputs=[16, 1,  15, 14,  10, 11,  9, 8],
         body=[

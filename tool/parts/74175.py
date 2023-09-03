@@ -23,7 +23,7 @@ class Part74175(PackageDIP16):
     default_inputs = [1, 9,  4, 5, 12, 13]
     default_outputs = [2, 3,  7, 6,  10, 11,  15, 14]
 
-    test_sync = Test("Synchronous operation", Test.SEQ, default_inputs, default_outputs,
+    test_sync = Test("Synchronous operation", Test.LOGIC, default_inputs, default_outputs,
         body=[
             [[1, '+',  0, 0, 0, 0], [0, 1,  0, 1,  0, 1,  0, 1]],
             [[1, '+',  1, 1, 1, 1], [1, 0,  1, 0,  1, 0,  1, 0]],
@@ -31,7 +31,7 @@ class Part74175(PackageDIP16):
             [[1, '+',  1, 1, 1, 1], [1, 0,  1, 0,  1, 0,  1, 0]],
         ]
     )
-    test_async = Test("Asynchronous operation", Test.COMB, default_inputs, default_outputs,
+    test_async = Test("Asynchronous operation", Test.LOGIC, default_inputs, default_outputs,
         body=[
             # clear
             [[0, 0,  1, 1, 1, 1], [0, 1,  0, 1,  0, 1,  0, 1]],

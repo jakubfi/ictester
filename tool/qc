@@ -27,7 +27,7 @@ for name, part in catalog.items():
 
     for test in part.tests:
         assert test.name
-        assert test.type in [Test.COMB, Test.SEQ, Test.MEM]
+        assert test.type in [Test.LOGIC, Test.DRAM, Test.UNIVIB]
         assert test.inputs
         assert test.outputs
         assert len(test.params) == Test.MAX_TEST_PARAMS
@@ -36,5 +36,5 @@ for name, part in catalog.items():
 
         for v in test.body:
             assert len(test.inputs) == len(v[0])
-            assert len(test.outputs) == len(v[1])
+            assert v[1] is None or len(test.outputs) == len(v[1])
 

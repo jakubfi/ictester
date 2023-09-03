@@ -20,7 +20,7 @@ class Part74163(PackageDIP16):
         15: Pin("RCO", PinType.OUT),
     }
 
-    test_all = Test("Complete logic", Test.SEQ,
+    test_all = Test("Complete logic", Test.LOGIC,
         inputs=[1, 9, 2,  10, 7,  6, 5, 4, 3],
         outputs=[11, 12, 13, 14,  15],
         body=[

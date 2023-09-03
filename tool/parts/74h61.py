@@ -19,7 +19,7 @@ class Part74H61(PackageDIP14):
         13: Pin("3C", PinType.IN),
     }
 
-    test_async = Test("Asynchronous operation", Test.COMB,
+    test_async = Test("Asynchronous operation", Test.LOGIC,
         inputs=[1, 2, 3,  4, 5, 6,  11, 12, 13],
         outputs=[9, 8, 10],
         loops=64,

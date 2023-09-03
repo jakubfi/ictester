@@ -18,7 +18,7 @@ class Part74107(PackageDIP14):
         13: Pin("~1CLR", PinType.IN),
     }
 
-    test_all = Test("Complete logic", Test.SEQ,
+    test_all = Test("Complete logic", Test.LOGIC,
         inputs=[1, 4, 12, 13,  8, 11, 9, 10],
         outputs=[3, 2,  5, 6],
         body=[

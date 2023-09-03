@@ -23,7 +23,7 @@ class Part74166(PackageDIP16):
     default_inputs = [9, 15, 6, 7, 1, 2, 3, 4, 5, 10, 11, 12, 14]
     default_outputs = [13]
 
-    test_shift = Test("Load, Shift", Test.SEQ, default_inputs, default_outputs,
+    test_shift = Test("Load, Shift", Test.LOGIC, default_inputs, default_outputs,
         body=[
             # load
             [[1, 0, 0, '+', 0,  1, 1, 1, 1, 1, 1, 1, 1], [1]],
@@ -47,7 +47,7 @@ class Part74166(PackageDIP16):
             [[1, 1, 0, '+', 1,  0, 0, 0, 0, 0, 0, 0, 0], [1]],
         ]
     )
-    test_clear = Test("Load, Clear", Test.COMB, default_inputs, default_outputs,
+    test_clear = Test("Load, Clear", Test.LOGIC, default_inputs, default_outputs,
         body=[
             # load
             [[1, 0, 0, 1, 0,  1, 1, 1, 1, 1, 1, 1, 1], [1]],
@@ -56,7 +56,7 @@ class Part74166(PackageDIP16):
             [[0, 0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0], [0]],
         ]
     )
-    test_inhibit_load = Test("Clear, Inhibit Load", Test.COMB, default_inputs, default_outputs,
+    test_inhibit_load = Test("Clear, Inhibit Load", Test.LOGIC, default_inputs, default_outputs,
         body=[
             # clear
             [[0, 0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0], [0]],
@@ -66,7 +66,7 @@ class Part74166(PackageDIP16):
             [[1, 0, 1, 0, 0,  1, 1, 1, 1, 1, 1, 1, 1], [0]],
         ]
     )
-    test_inhibit_shift = Test("Clear, Inhibit Shift", Test.SEQ, default_inputs, default_outputs,
+    test_inhibit_shift = Test("Clear, Inhibit Shift", Test.LOGIC, default_inputs, default_outputs,
         body=[
             # clear
             [[0, 0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0], [0]],

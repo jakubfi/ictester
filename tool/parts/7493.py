@@ -18,7 +18,7 @@ class Part7493(PackageDIP14_vcc5):
         14: Pin("CKA", PinType.IN),
     }
 
-    test_count = Test("Count", Test.SEQ,
+    test_count = Test("Count", Test.LOGIC,
         inputs=[2, 3,  14, 1],
         outputs=[12, 9, 8, 11],
         body=[

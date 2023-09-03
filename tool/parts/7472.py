@@ -21,7 +21,7 @@ class Part7472(PackageDIP14):
     default_inputs = [3, 4, 5,  9, 10, 11,  13, 2, 12]
     default_outputs = [8, 6]
 
-    test_sync = Test("Load, clear, toogle, keep", Test.SEQ, default_inputs, default_outputs,
+    test_sync = Test("Load, clear, toogle, keep", Test.LOGIC, default_inputs, default_outputs,
         body=[
             # load 1
             [[1, 1, 1,  0, 0, 0,  1, 1, '-'], [1, 0]],
@@ -39,7 +39,7 @@ class Part7472(PackageDIP14):
             [[1, 1, 1,  1, 1, 1,  1, 1, '-'], [0, 1]],
         ]
     )
-    test_async = Test("Set, preset", Test.SEQ, default_inputs, default_outputs,
+    test_async = Test("Set, preset", Test.LOGIC, default_inputs, default_outputs,
         body=[
             [[0, 0, 0,  1, 1, 1,  0, 1, '-'], [1, 0]],
             [[1, 1, 1,  0, 0, 0,  1, 0, '-'], [0, 1]],
@@ -51,7 +51,7 @@ class Part7472(PackageDIP14):
             [[0, 0, 0,  0, 0, 0,  1, 0, '-'], [0, 1]],
         ]
     )
-    test_and = Test("And input gates", Test.SEQ, default_inputs, default_outputs,
+    test_and = Test("And input gates", Test.LOGIC, default_inputs, default_outputs,
         body=[
             # try J=1 with not fully set K
             [[1, 1, 1,  0, 0, 0,  1, 1, '-'], [1, 0]],

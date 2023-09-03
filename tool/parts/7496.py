@@ -23,7 +23,7 @@ class Part7496(PackageDIP16_vcc5):
     default_inputs = [16, 8,  2, 3, 4, 6, 7,  1, 9]
     default_outputs = [15, 14, 13, 11, 10]
 
-    test_preset = Test("Preset", Test.COMB, default_inputs, default_outputs,
+    test_preset = Test("Preset", Test.LOGIC, default_inputs, default_outputs,
         body=[
             # preset all 1
             [[1, 1,  1, 1, 1, 1, 1,  0, 0], [1, 1, 1, 1, 1]],
@@ -42,7 +42,7 @@ class Part7496(PackageDIP16_vcc5):
             [[1, 0,  1, 1, 1, 1, 1,  0, 0], [0, 1, 0, 1, 0]],
         ]
     )
-    test_clear = Test("Clear", Test.COMB, default_inputs, default_outputs,
+    test_clear = Test("Clear", Test.LOGIC, default_inputs, default_outputs,
         body=[
             # preset/clear
             [[1, 1,  1, 1, 1, 1, 1,  0, 0], [1, 1, 1, 1, 1]],
@@ -55,7 +55,7 @@ class Part7496(PackageDIP16_vcc5):
             [[0, 0,  1, 1, 1, 1, 1,  0, 0], [0, 0, 0, 0, 0]],
         ]
     )
-    test_serial_in = Test("Serial in", Test.COMB, default_inputs, default_outputs,
+    test_serial_in = Test("Serial in", Test.LOGIC, default_inputs, default_outputs,
         body=[
             # clear, preset known
             [[0, 0,  0, 0, 0, 0, 0,  0, 0], [0, 0, 0, 0, 0]],

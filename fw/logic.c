@@ -14,8 +14,10 @@
 extern uint8_t pin_count;
 uint16_t vectors_count;
 uint8_t vectors[MAX_VECTORS][3];
+uint8_t check_output[MAX_VECTORS];
 
 extern uint8_t test_type;
+extern uint8_t zif_vcc_pin;
 
 extern struct port {
 	uint8_t dut_input;
@@ -46,12 +48,17 @@ uint8_t handle_vectors_load(uint8_t pin_count)
 		// clear received vector data
 		for (uint8_t i=0 ; i<3 ; i++) {
 			vectors[pos][i] = 0;
+			check_output[pos] = 1;
 		}
 		// fill in bits in MCU port pin order
 		for (uint8_t dut_pin=0 ; dut_pin<pin_count ; dut_pin++) {
 			uint8_t zif_pin = zif_pos(pin_count, dut_pin);
 			int8_t port_pos = mcu_port(zif_pin);
 			uint8_t bit_val = (bitvector >> dut_pin) & 1;
+			if ((zif_pin == zif_vcc_pin) && bit_val) {
+				check_output[pos] = 0;
+				bit_val = 0;
+			}
 			vectors[pos][port_pos] |= bit_val << mcu_port_pin(zif_pin);
 		}
 	}
@@ -68,7 +75,7 @@ static inline uint8_t run_logic2(uint16_t delay)
 
 		if (delay) _delay_loop_2(delay);
 
-		if ((test_type == TYPE_COMB) || (pos % 2)) {
+		if (check_output[pos]) {
 			if ((PINB ^ vectors[pos][1]) & port[1].used_outputs) return RESP_FAIL;
 			if ((PINC ^ vectors[pos][2]) & port[2].used_outputs) return RESP_FAIL;
 		}
@@ -87,7 +94,7 @@ static inline uint8_t run_logic3(uint16_t delay)
 
 		if (delay) _delay_loop_2(delay);
 
-		if ((test_type == TYPE_COMB) || (pos % 2)) {
+		if (check_output[pos]) {
 			if ((PINA ^ vectors[pos][0]) & port[0].used_outputs) return RESP_FAIL;
 			if ((PINB ^ vectors[pos][1]) & port[1].used_outputs) return RESP_FAIL;
 			if ((PINC ^ vectors[pos][2]) & port[2].used_outputs) return RESP_FAIL;

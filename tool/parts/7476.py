@@ -20,7 +20,7 @@ class Part7476(PackageDIP16_vcc5_gnd13):
         16: Pin("1K", PinType.IN),
     }
 
-    test_all = Test("Sync/Async operation", Test.SEQ,
+    test_all = Test("Sync/Async operation", Test.LOGIC,
         inputs=[2, 3, 1, 4, 16,  7, 8, 6, 9, 12],
         outputs=[15, 14,  11, 10],
         body=[

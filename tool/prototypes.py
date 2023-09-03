@@ -85,9 +85,16 @@ class Part:
         return f"{self._type_names[self.package_type]}{self.pincount}"
 
     @property
+    def vcc(self):
+        return list(k for k, v in self.pins.items() if v.role == PinType.VCC)
+
+    @property
+    def gnd(self):
+        return list(k for k, v in self.pins.items() if v.role == PinType.GND)
+
+    @property
     def package_variant(self):
-        vcc_pin = next(k for k, v in self.pins.items() if v.role == PinType.VCC)
-        return f"VCC@pin{vcc_pin}"
+        return f"VCC@pin{self.vcc[0]}"
 
 
 # ------------------------------------------------------------------------
@@ -184,14 +191,14 @@ class PackageDIP20(Part):
 class TestVector():
     def __init__(self, vector, test):
         self.input = vector[0]
-        self.output = vector[1]
+        self.output = vector[1] if vector[1] else []
         self.test = test
 
     def pin(self, pin):
-        if pin not in self.test.pins:
-            return 0
-        else:
+        try:
             return [*self.input, *self.output][self.test.pins.index(pin)]
+        except (IndexError, ValueError):
+            return 0
 
     def by_pins(self, pins):
         return [self.pin(i) for i in pins]
@@ -201,14 +208,9 @@ class TestVector():
 
 # ------------------------------------------------------------------------
 class Test():
-    COMB = 0
-    SEQ = 1
-    MEM = 2
+    LOGIC = 1
+    DRAM = 2
     UNIVIB = 3
-
-    TEST_LOGIC_74 = 1
-    TEST_DRAM_41 = 2
-    TEST_UNIVIB_74 = 3
 
     MAX_TEST_PARAMS = 4
 
@@ -217,43 +219,35 @@ class Test():
         self.type = ttype
         self.params = params + [0] * (self.MAX_TEST_PARAMS - len(params))
         self.loops = loops
-        self._body_source = body
-        self._body_generated = None
         self.inputs = inputs
         self.outputs = outputs
-
-    @property
-    def _body_data(self):
-        if callable(self._body_source):
-            return self._body_source()
-        else:
-            return self._body_source
-
-    def sequentialize(self, v):
-        i = v[0]
-        o = v[1]
-        return [
-            [[x if x in [0, 1] else 0 if x == '+' else 1 for x in i], o],
-            [[x if x in [0, 1] else 1 if x == '+' else 0 for x in i], o],
-        ]
-
-    @property
-    def body(self):
-        if not self._body_generated:
-            if self.type == Test.COMB:
-                self._body_generated = self._body_data
-            else:
-                self._body_generated = []
-                for t in self._body_data:
-                    self._body_generated.extend(self.sequentialize(t))
-
-        return self._body_generated
+        self._body = body
+        self._vectors = None
 
     @property
     def pins(self):
         return self.inputs + self.outputs
 
     @property
+    def _body_data(self):
+        if callable(self._body):
+            return self._body()
+        else:
+            return self._body
+
+    @property
+    def body(self):
+        for v in self._body_data:
+            i = v[0]
+            o = v[1]
+            if '+' in i or '-' in i:
+                yield [[0 if x == '+' else 1 if x == '-' else x for x in i], None]
+                yield [[1 if x == '+' else 0 if x == '-' else x for x in i], o]
+            else:
+                yield v
+
+    @property
     def vectors(self):
-        for v in self.body:
-            yield TestVector(v, self)
+        if not self._vectors:
+            self._vectors = [TestVector(v, self) for v in self.body]
+        return self._vectors

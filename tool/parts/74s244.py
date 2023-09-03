@@ -29,7 +29,7 @@ class Part74S244(PackageDIP20):
     default_outputs = [18, 16, 14, 12,  9, 7, 5, 3]
 
     tests = [
-        Test("All logic", Test.COMB, default_inputs, default_outputs,
+        Test("All logic", Test.LOGIC, default_inputs, default_outputs,
             body=[
                 [[1,  1, 1, 1, 1,  1,  1, 1, 1, 1], [1, 1, 1, 1,  1, 1, 1, 1]],
                 [[1,  0, 0, 0, 0,  1,  0, 0, 0, 0], [1, 1, 1, 1,  1, 1, 1, 1]],

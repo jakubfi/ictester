@@ -21,13 +21,13 @@ class Part7495(PackageDIP14):
     default_inputs = [6, 8, 9, 1, 2, 3, 4, 5]
     default_outputs = [13, 12, 11, 10]
 
-    test_load = Test("Parallel load", Test.SEQ, default_inputs, default_outputs,
+    test_load = Test("Parallel load", Test.LOGIC, default_inputs, default_outputs,
         body=[
             [[1, '-', 0, 0, 1, 1, 1, 1], [1, 1, 1, 1]],
             [[1, '-', 0, 0, 0, 0, 0, 0], [0, 0, 0, 0]],
         ]
     )
-    test_rshift = Test("Right Shift", Test.SEQ, default_inputs, default_outputs,
+    test_rshift = Test("Right Shift", Test.LOGIC, default_inputs, default_outputs,
         body=[
             # set known starting value
             [[1, '-', 0, 0, 0, 0, 0, 0], [0, 0, 0, 0]],

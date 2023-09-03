@@ -28,7 +28,7 @@ class Part7460(PackageDIP14):
         13: Pin("1D", PinType.IN),
     }
 
-    test_async = Test("Asynchronous operation", Test.COMB,
+    test_async = Test("Asynchronous operation", Test.LOGIC,
         inputs=[11, 10,  1, 2, 3, 13,  4, 5, 6, 8],
         outputs=[12, 9],
         body = [
