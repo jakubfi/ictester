@@ -129,7 +129,7 @@ Sets up the test. Requires the DUT to be set up first.
 
 * 1 BYTE: command: `CMD_TEST_SETUP`
 * 1 BYTE: test type. Algorithm used to test the DUT. See below for test types available.
-* 4 BYTES: test parameters `PARAM_1` - `PARAM_4`. Sent and received even if test does not use them.
+* 4 BYTES: test parameters `PARAM_0` - `PARAM_3`. Test type specific. All sent and received even if not all used by the test.
 * `n` BYTES: I/O pin usage in test vectors (n=2 for 14-pin and 16-pin devices, n=3 for >16-pin devices):
     * each bit: 1=I/O pin used by the test, 0=pin not used by the test
     * 1st byte - lowest pin numbers
@@ -147,7 +147,10 @@ Available test types and their specific requirements are described below.
 #### Logic IC test
 
 `TEST_LOGIC` (1) is designed to test 74 logic (both combinatorial and sequential), but suitable for many other IC families.
-This test type requires test vectors and does not use (ignores) test parameters.
+This test type requires test vectors and uses the following parameters:
+
+* `PARAM_0` (LSB), `PARAM_1` (MSB) - 16-bit value, additional delay (in 200 ns steps) before checking DUT outputs. 0 for no delay.
+
 
 #### 4164 and 41256 DRAM memory test
 
@@ -155,23 +158,23 @@ This test type requires test vectors and does not use (ignores) test parameters.
 
 * read-modify-write - test is done using read-modify-write memory access,
 * read+write - test is done using separate "read" and "write" operations,
-* page mode - test is done using page reads and writes.
+* page mode - test is done using page reads and writes, treating the whole page as a single word.
 
 Test does not use vectors and uses the following parameters:
 
-  * `PARAM_1` - memory size: 1=64k (4164), 2=256k (41256)
-  * `PARAM_2` - test type: 1=read-modify-write, 2=read+write, 3=page mode
+* `PARAM_0` - memory size: 1=64k (4164), 2=256k (41256)
+* `PARAM_1` - test type: 1=read-modify-write, 2=read+write, 3=page mode
 
 #### 7412x univibrator test
 
 `TEST_UNIVIB` (3) is designed to test 74121, 74122 and 74123 univibrators. Test does not use vectors and uses the following parameters:
 
-* `PARAM_1` - device to test:
+* `PARAM_0` - device to test:
   * 0 = 74121,
   * 1 = 74122,
   * 2 = 74123 univibrator 1,
   * 3 = 74123 univibrator 2
-* `PARAM_2` - test to run:
+* `PARAM_1` - test to run:
   * 0 = conditions which should not trigger the device
   * 1 = conditions that should trigger the device
   * 2 = retrigger (not available for 74121)
@@ -210,7 +213,6 @@ the DUT. If the test fails, DUT is immediately disconnected.
 
 * 1 BYTE: command: `CMD_TEST_RUN`
 * 2 BYTES: number of loops, 0 for infinite testing.
-* 2 BYTES: delay (in 200 ns steps) before checking DUT outputs. 0 for no delay.
 
 ### Valid responses
 

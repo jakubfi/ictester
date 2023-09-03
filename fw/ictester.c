@@ -196,7 +196,6 @@ static uint8_t handle_run(void)
 	uint8_t res = RESP_PASS;
 
 	uint16_t loops = serial_rx_16le();
-	uint16_t delay = serial_rx_16le();
 
 	if (!dut_connected) {
 		res = handle_dut_connect();
@@ -212,10 +211,12 @@ static uint8_t handle_run(void)
 			if ((res = run_univib(test_params)) != RESP_PASS) goto fin;
 		}
 	} else if (pin_count <= 16) {
+		uint16_t delay = (test_params[1] << 8) + test_params[0];
 		for (uint16_t rep=0 ; rep<loops ; rep++) {
 			if ((res = run_logic2(delay)) != RESP_PASS) goto fin;
 		}
 	} else {
+		uint16_t delay = (test_params[1] << 8) + test_params[0];
 		for (uint16_t rep=0 ; rep<loops ; rep++) {
 			if ((res = run_logic3(delay)) != RESP_PASS) goto fin;
 		}

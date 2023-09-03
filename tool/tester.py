@@ -1,4 +1,5 @@
 import time
+from prototypes import Test
 
 
 class Tester:
@@ -70,8 +71,15 @@ class Tester:
         if self.tr.recv() != Tester.RESP_OK:
             raise RuntimeError("DUT disconnect failed")
 
-    def test_setup(self, test):
-        self.tr.send([Tester.CMD_TEST_SETUP, test.type, *test.params])
+    def test_setup(self, test, delay):
+        params = test.params
+        if delay is not None:
+            if test.type in [Test.COMB, Test.SEQ]:
+                delay_val = round(delay/0.2)
+                params[0] = delay_val & 0xff
+                params[1] = delay_val >> 8
+
+        self.tr.send([Tester.CMD_TEST_SETUP, test.type, *params])
 
         data = [
             1 if i in test.pins else 0
@@ -109,14 +117,13 @@ class Tester:
         if self.tr.recv() != Tester.RESP_OK:
             raise RuntimeError("Vectors load failed")
 
-    def run(self, loops, delay):
+    def run(self, loops):
         assert 1 <= loops <= 0xffff
 
         if self.debug:
             print(f"Running test: {loops} loops, {delay} us output read delay")
         self.tr.send([Tester.CMD_RUN])
         self.tr.send_16le(loops)
-        self.tr.send_16le(round(delay//0.2)) # unit is 0.2us
 
         start = time.time()
         result = self.tr.recv()
@@ -125,9 +132,9 @@ class Tester:
         return result, elapsed
 
     def exec_test(self, test, loops, delay):
-        self.test_setup(test)
+        self.test_setup(test, delay)
         self.vectors_load(test)
-        res = self.run(loops, delay if delay is not None else self.part.read_delay_us)
+        res = self.run(loops)
         if self.debug:
             print(f"Bytes sent: {self.tr.bytes_sent}, received: {self.tr.bytes_received}")
         return res

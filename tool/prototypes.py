@@ -71,7 +71,6 @@ class Part:
     name = None
     tests = None
     missing_tests = None
-    read_delay_us = 0
 
     def __init__(self):
         self.pins = {}

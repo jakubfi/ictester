@@ -52,7 +52,7 @@ if '--list' in sys.argv:
 parser = argparse.ArgumentParser(description='IC tester controller')
 parser.add_argument('--device', default="/dev/ttyUSB1", help='Serial port where the IC tester is connected')
 parser.add_argument('--loops', type=int, default=None, help='Loop count (1..65535)')
-parser.add_argument('--delay', type=float, default=None, help='additional DUT output read delay (in μs, rounded to nearest 0.2 μs))')
+parser.add_argument('--delay', type=float, default=None, help='additional DUT output read delay in μs for logic tests (13107 μs max, rounded to nearest 0.2 μs)')
 parser.add_argument('--list', action="store_true", help='List all supported parts')
 parser.add_argument('--tests', action="store_true", help='When listing parts, list also tests for each part')
 parser.add_argument('--debug', action="store_true", help='Enable debug output')
@@ -63,6 +63,9 @@ args = parser.parse_args()
 if args.loops is not None and (args.loops <= 0 or args.loops > 65535):
     parser.error("Loops should be between 1 and 65535")
 
+if args.delay is not None and (args.delay < 0 or args.delay > 13107):
+    parser.error("Delay should be between 0 and 13107")
+
 try:
     part = catalog[args.part.upper()]
 except KeyError:
@@ -71,15 +74,16 @@ except KeyError:
     sys.exit(100)
 
 print_part_info(part)
+print()
 
 transport = Transport(args.device, 500000, debug=args.debug_serial)
 tester = Tester(part, transport, debug=args.debug)
 all_tests = tester.tests_available()
 test_count = len(all_tests)
 longest_desc = len(max(all_tests, key=len))
+
 tests_failed = 0
 total_time = 0
-print()
 
 tester.dut_setup()
 

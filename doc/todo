@@ -11,6 +11,8 @@
 
 protocol frames
 debug verbosity?
+better params building
+generalize test calls in handle_run()
 
 name matching?
  * exact name (SN7400, UCY7400),
