@@ -20,15 +20,19 @@ class Part7453(PackageDIP14):
     }
 
     missing_tests = "Gate expansion is not tested"
+    # 7453 outputs, although TTL,  are a tad slow with no serious load
+    read_delay_us = 0.4
+
 
     test_async = Test("Asynchronous operation", Test.LOGIC,
+        params=list(round(read_delay_us/0.2).to_bytes(2, 'little')),
         inputs=[1, 13, 2, 3, 4, 5, 6, 9, 10],
         outputs=[8],
         loops=256,
         body=lambda: [
             [
                 [*ab, *cd, *ef, 0, *gh], # '0' inserted for NC input 6
-                [~(ab.vand() | cd.vand() | ef.vand() | gh.vand())]
+                ~(ab.vand() | cd.vand() | ef.vand() | gh.vand())
             ]
             for ab in BV.range(0, 4)
             for cd in BV.range(0, 4)

@@ -26,7 +26,7 @@ class Part74H53(PackageDIP14):
         outputs=[8],
         loops=128,
         body=lambda: [
-            [[*ab, *cd, *efg, *hi], [~(ab.vand() | cd.vand() | efg.vand() | hi.vand())]]
+            [[*ab, *cd, *efg, *hi], ~(ab.vand() | cd.vand() | efg.vand() | hi.vand())]
             for ab in BV.range(0, 4)
             for cd in BV.range(0, 4)
             for efg in BV.range(0, 8)
