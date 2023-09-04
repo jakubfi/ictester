@@ -34,7 +34,10 @@ for name, part in catalog.items():
         for param in test.params:
             assert param in range(0, 256)
 
-        for v in test.body:
+        for v in test._body_data:
             assert len(test.inputs) == len(v[0])
             assert v[1] is None or len(test.outputs) == len(v[1])
+            two_vectors = set(['/', '\\']).intersection(v[0])
+            three_vectors = set(['+', '-']).intersection(v[0])
+            assert not all ([two_vectors, three_vectors])
 

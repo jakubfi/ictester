@@ -23,8 +23,8 @@ class Part7474(PackageDIP14):
 
     test_sync = Test("Synchronous operation", Test.LOGIC, default_inputs, default_outputs,
         body=[
-            [[1, 1, 0, '+',  1, 1, 0, '+'], [0, 1,  0, 1]],
-            [[1, 1, 1, '+',  1, 1, 1, '+'], [1, 0,  1, 0]],
+            [[1, 1, 0, '/',  1, 1, 0, '/'], [0, 1,  0, 1]],
+            [[1, 1, 1, '/',  1, 1, 1, '/'], [1, 0,  1, 0]],
         ]
     )
     test_async = Test("Asynchronous operation", Test.LOGIC, default_inputs, default_outputs,

@@ -240,9 +240,13 @@ class Test():
         for v in self._body_data:
             i = v[0]
             o = v[1]
-            if '+' in i or '-' in i:
+            if set(['+', '-']).intersection(i):
                 yield [[0 if x == '+' else 1 if x == '-' else x for x in i], None]
-                yield [[1 if x == '+' else 0 if x == '-' else x for x in i], o]
+                yield [[1 if x == '+' else 0 if x == '-' else x for x in i], None]
+                yield [[0 if x == '+' else 1 if x == '-' else x for x in i], o]
+            elif set(['/', '\\']).intersection(i):
+                yield [[0 if x == '/' else 1 if x == '\\' else x for x in i], None]
+                yield [[1 if x == '/' else 0 if x == '\\' else x for x in i], o]
             else:
                 yield v
 
