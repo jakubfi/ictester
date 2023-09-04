@@ -119,7 +119,8 @@ class Tester:
             data = list(reversed(data))
 
             if self.debug:
-                print(f" {data}")
+                check = " NC" if not v.output else ""
+                print(f" {data}{check}")
 
             self.tr.send_bitarray(data)
 
