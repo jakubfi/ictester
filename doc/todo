@@ -7,7 +7,6 @@
 92 - DECADE, DIVIDE-BY-TWELVE AND BINARY COUNTERS
 549 - 8-bit two stage pipelined register/latch
 
-fix 196
 review all sequential ICs (command changes vs clock, clock polarity)
 'IC state reset' non-test something
 better params building
