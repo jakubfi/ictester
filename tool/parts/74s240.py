@@ -24,12 +24,15 @@ class Part74S240(PackageDIP20):
         18: Pin("~1Y1", PinType.ST3, zif_func=ZIFFunc.IN_PU_STRONG),
         19: Pin("~2G", PinType.IN),
     }
+    # 240 outputs may require more load than what 5k tester's pull-up can provide
+    read_delay_us = 0.4
 
     default_inputs = [1,  2, 4, 6, 8,  19,  11, 13, 15, 17]
     default_outputs = [18, 16, 14, 12,  9, 7, 5, 3]
 
     tests = [
         Test("All logic", Test.LOGIC, default_inputs, default_outputs,
+            params=list(round(read_delay_us/0.2).to_bytes(2, 'little')),
             body=[
                 [[1,  1, 1, 1, 1,  1,  1, 1, 1, 1], [1, 1, 1, 1,  1, 1, 1, 1]],
                 [[1,  0, 0, 0, 0,  1,  0, 0, 0, 0], [1, 1, 1, 1,  1, 1, 1, 1]],
