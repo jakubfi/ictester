@@ -24,6 +24,7 @@ enum test_types {
 	TEST_RETRIG = 2,
 	TEST_CLEAR = 3,
 	TEST_CROSSTRIG = 4,
+	TEST_CLEARTRIG = 5,
 };
 
 // 74121
@@ -54,6 +55,7 @@ enum test_types {
 
 // trig and notrig conditions
 
+#define RETRIG_LOOPS 6
 #define LAST_TRIG 0xff
 
 static const __flash uint8_t trigs_121[] = {
@@ -134,16 +136,16 @@ static const __flash uint8_t notrigs_123[] = {
 // device-specific test variables
 
 static const __flash struct univib_test {
-	volatile uint8_t *port_trig;
-	volatile uint8_t *pin_q;
-	volatile uint8_t *pin_nq;
-	uint8_t val_trig;
-	uint8_t val_notrig;
-	uint8_t val_clear;
-	uint8_t val_q, val_nq;
-	uint8_t trig_loops;
-	const __flash uint8_t *trigs;
-	const __flash uint8_t *notrigs;
+	volatile uint8_t *port_trig;		// port with trigger inputs
+	volatile uint8_t *pin_q;			// pin with Q output
+	volatile uint8_t *pin_nq;			// pin with ~Q output
+	uint8_t val_trig;					// input for trigger
+	uint8_t val_notrig;					// "idle" input
+	uint8_t val_clear;					// input for clear
+	uint8_t val_clear_trig;				// input for clear with trigger active
+	uint8_t val_q, val_nq;				// Q, ~Q pin values
+	const __flash uint8_t *trigs;		// all triggers
+	const __flash uint8_t *notrigs;		// all non-triggers
 } univib_test[4] = {
 	{ // 74121
 		.port_trig = &PORTC,
@@ -154,7 +156,6 @@ static const __flash struct univib_test {
 		.val_clear = 0,
 		.val_q = VAL_121_Q,
 		.val_nq = VAL_121_NQ,
-		.trig_loops = 1,
 		.trigs = trigs_121,
 		.notrigs = notrigs_121,
 	},
@@ -165,9 +166,9 @@ static const __flash struct univib_test {
 		.val_trig = VAL_122_B1 | VAL_122_B2 | VAL_122_CLR,
 		.val_notrig = VAL_122_A1 | VAL_122_A2 | VAL_122_CLR,
 		.val_clear = VAL_122_A1 | VAL_122_A2,
+		.val_clear_trig = VAL_122_B1 | VAL_122_B2,
 		.val_q = VAL_122_Q,
 		.val_nq = VAL_122_NQ,
-		.trig_loops = 6,
 		.trigs = trigs_122,
 		.notrigs = notrigs_122,
 	},
@@ -178,9 +179,9 @@ static const __flash struct univib_test {
 		.val_trig = VAL_123_B | VAL_123_CLR,
 		.val_notrig = VAL_123_A | VAL_123_CLR,
 		.val_clear = VAL_123_A,
+		.val_clear_trig = VAL_123_B,
 		.val_q = VAL_123_Q,
 		.val_nq = VAL_123_NQ,
-		.trig_loops = 6,
 		.trigs = trigs_123,
 		.notrigs = notrigs_123,
 	},
@@ -191,9 +192,9 @@ static const __flash struct univib_test {
 		.val_trig = VAL_123_B | VAL_123_CLR,
 		.val_notrig = VAL_123_A | VAL_123_CLR,
 		.val_clear = VAL_123_A,
+		.val_clear_trig = VAL_123_B,
 		.val_q = VAL_123_Q,
 		.val_nq = VAL_123_NQ,
-		.trig_loops = 6,
 		.trigs = trigs_123,
 		.notrigs = notrigs_123,
 	},
@@ -207,39 +208,29 @@ static const __flash struct univib_test {
 //       but I'm afraid it's the only sensible way.
 
 // -----------------------------------------------------------------------
-static inline void trig(const __flash struct univib_test *uvt, uint8_t val)
+static inline void input_set(const __flash struct univib_test *uvt, uint8_t val)
 {
 	*uvt->port_trig = val;
 	_NOP(); _NOP();
+}
+
+// -----------------------------------------------------------------------
+static inline void trig(const __flash struct univib_test *uvt, uint8_t val)
+{
+	input_set(uvt, val);
 	*uvt->port_trig = uvt->val_notrig;
 }
 
 // -----------------------------------------------------------------------
-static inline void clear(const __flash struct univib_test *uvt)
+static inline bool output_active(const __flash struct univib_test *uvt)
 {
-	*uvt->port_trig = uvt->val_clear;
-	_NOP(); _NOP();
+	return (*uvt->pin_q & uvt->val_q) && !(*uvt->pin_nq & uvt->val_nq);
 }
 
 // -----------------------------------------------------------------------
-static inline bool is_active(const __flash struct univib_test *uvt)
+static inline bool other_output_active(const __flash struct univib_test *uvt)
 {
-	if ((*uvt->pin_q & uvt->val_q) || !(*uvt->pin_nq & uvt->val_nq)) return true;
-	return false;
-}
-
-// -----------------------------------------------------------------------
-static inline bool is_other_active(const __flash struct univib_test *uvt)
-{
-	if ((*uvt->pin_nq & uvt->val_q) || !(*uvt->pin_q & uvt->val_nq)) return true;
-	return false;
-}
-
-// -----------------------------------------------------------------------
-static inline bool is_not_active(const __flash struct univib_test *uvt)
-{
-	if (!(*uvt->pin_q & uvt->val_q) || (*uvt->pin_nq & uvt->val_nq)) return true;
-	return false;
+	return (*uvt->pin_nq & uvt->val_q) && !(*uvt->pin_q & uvt->val_nq);
 }
 
 // -----------------------------------------------------------------------
@@ -248,9 +239,9 @@ static inline uint8_t test_no_trig(const __flash struct univib_test *uvt)
 	const __flash uint8_t *i = uvt->notrigs;
 
 	while (*i != LAST_TRIG) {
-		trig(uvt, *i);
-		_NOP(); _NOP();
-		if (is_active(uvt)) return RESP_FAIL;
+		input_set(uvt, *i);
+		_NOP(); _NOP(); _NOP();
+		if (output_active(uvt)) return RESP_FAIL;
 		i++;
 	}
 
@@ -264,13 +255,13 @@ static inline uint8_t test_crosstrig(const __flash struct univib_test *uvt)
 
 	while (*i != LAST_TRIG) {
 		trig(uvt, *i);
-		if (is_other_active(uvt)) return RESP_FAIL;
+		if (other_output_active(uvt)) return RESP_FAIL;
 		_NOP(); _NOP(); _NOP();
 		// ~500ns after the trigger
-		if (is_other_active(uvt)) return RESP_FAIL;
+		if (other_output_active(uvt)) return RESP_FAIL;
 		_delay_us(1.3);
 		// ~2us after the last trigger
-		if (is_other_active(uvt)) return RESP_FAIL;
+		if (other_output_active(uvt)) return RESP_FAIL;
 		i++;
 	}
 
@@ -285,13 +276,38 @@ static inline uint8_t test_trig(const __flash struct univib_test *uvt)
 	while (*i != LAST_TRIG) {
 		trig(uvt, *i);
 		// right after the trigger
-		if (is_not_active(uvt)) return RESP_FAIL;
+		if (!output_active(uvt)) return RESP_FAIL;
 		_NOP(); _NOP(); _NOP();
 		// ~500ns after the trigger
-		if (is_not_active(uvt)) return RESP_FAIL;
+		if (!output_active(uvt)) return RESP_FAIL;
 		_delay_us(1.3);
 		// ~2us after the last trigger
-		if (is_active(uvt)) return RESP_FAIL;
+		if (output_active(uvt)) return RESP_FAIL;
+		i++;
+	}
+
+	return RESP_PASS;
+}
+
+// -----------------------------------------------------------------------
+static inline uint8_t test_cleartrig(const __flash struct univib_test *uvt)
+{
+	const __flash uint8_t *i = uvt->trigs;
+
+	while (*i != LAST_TRIG) {
+		input_set(uvt, uvt->val_clear); // initial CLR held
+		input_set(uvt, uvt->val_clear_trig); // trigger pulled with CLR still held
+		_NOP(); _NOP(); _NOP();
+		if (output_active(uvt)) return RESP_FAIL;
+		trig(uvt, *i); // release CLR => trigger
+		// right after the trigger
+		if (!output_active(uvt)) return RESP_FAIL;
+		_NOP(); _NOP(); _NOP();
+		// ~500ns after the trigger
+		if (!output_active(uvt)) return RESP_FAIL;
+		_delay_us(1.3);
+		// ~2us after the last trigger
+		if (output_active(uvt)) return RESP_FAIL;
 		i++;
 	}
 
@@ -301,16 +317,16 @@ static inline uint8_t test_trig(const __flash struct univib_test *uvt)
 // -----------------------------------------------------------------------
 static inline uint8_t test_retrig(const __flash struct univib_test *uvt)
 {
-	for (uint8_t i=0 ; i<uvt->trig_loops ; i++) {
+	for (uint8_t i=0 ; i<RETRIG_LOOPS; i++) {
 		trig(uvt, uvt->val_trig);
-		if (is_not_active(uvt)) return RESP_FAIL;
+		if (!output_active(uvt)) return RESP_FAIL;
 		_NOP(); _NOP(); _NOP();
 		// ~500ns after the trigger
-		if (is_not_active(uvt)) return RESP_FAIL;
+		if (!output_active(uvt)) return RESP_FAIL;
 	}
 	_delay_us(1.3);
 	// ~2us after the last trigger
-	if (is_active(uvt)) return RESP_FAIL;
+	if (output_active(uvt)) return RESP_FAIL;
 
 	return RESP_PASS;
 }
@@ -319,9 +335,9 @@ static inline uint8_t test_retrig(const __flash struct univib_test *uvt)
 static inline uint8_t test_clear(const __flash struct univib_test *uvt)
 {
 	trig(uvt, uvt->val_trig);
-	if (is_not_active(uvt)) return RESP_FAIL;
-	clear(uvt);
-	if (is_active(uvt)) return RESP_FAIL;
+	if (!output_active(uvt)) return RESP_FAIL;
+	input_set(uvt, uvt->val_clear);
+	if (output_active(uvt)) return RESP_FAIL;
 
 	return RESP_PASS;
 }
@@ -346,6 +362,7 @@ static uint8_t test_122(uint8_t test)
 		case TEST_TRIG: return test_trig(univib_test + UNIVIB_122);
 		case TEST_RETRIG: return test_retrig(univib_test + UNIVIB_122);
 		case TEST_CLEAR: return test_clear(univib_test + UNIVIB_122);
+		case TEST_CLEARTRIG: return test_cleartrig(univib_test + UNIVIB_122);
 		default:
 			// unknown test type
 			return RESP_ERR;
@@ -361,6 +378,7 @@ static uint8_t test_123_1(uint8_t test)
 		case TEST_RETRIG: return test_retrig(univib_test + UNIVIB_123_1);
 		case TEST_CLEAR: return test_clear(univib_test + UNIVIB_123_1);
 		case TEST_CROSSTRIG: return test_crosstrig(univib_test + UNIVIB_123_1);
+		case TEST_CLEARTRIG: return test_cleartrig(univib_test + UNIVIB_123_1);
 		default:
 			// unknown test type
 			return RESP_ERR;
@@ -376,6 +394,7 @@ static uint8_t test_123_2(uint8_t test)
 		case TEST_RETRIG: return test_retrig(univib_test + UNIVIB_123_2);
 		case TEST_CLEAR: return test_clear(univib_test + UNIVIB_123_2);
 		case TEST_CROSSTRIG: return test_crosstrig(univib_test + UNIVIB_123_2);
+		case TEST_CLEARTRIG: return test_cleartrig(univib_test + UNIVIB_123_2);
 		default:
 			// unknown test type
 			return RESP_ERR;

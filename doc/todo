@@ -33,13 +33,15 @@ cmd_hello
 protocol and fw versioning
 review all sequential ICs (command changes vs clock, clock polarity, test suitability)
 'IC state reset' non-test something
-better params building
+better test params building
 debug verbosity?
 protocol frames
+PROM reading?
+EPROM reading?
 
 name matching?
  * exact name (SN7400, UCY7400),
  * common name (7400),
  * difflib fuzzy high similarity (0.8)
  * difflib fuzzy low similarity (0.7?)
- * alternatively: suggestion when no exact/common match?
+alternatively: suggestion when no exact/common match?
