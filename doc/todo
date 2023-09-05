@@ -1,13 +1,37 @@
+54 - 4-wide and-or-invert gates
+92 - DECADE, DIVIDE-BY-TWELVE AND BINARY COUNTERS
 124 - VCO
+138 - 3-line to 8-line decoder / demultiplexer
+165 - PARALLEL-LOAD 8-BIT SHIFT REGISTERS
 167 - synchronous decade rate multiplier
 169 - SYNCHRONOUS 4-BIT UP/DOWN BINARY COUNTERS
 173 - 4-BIT D-TYPE REGISTERS WITH 3-STATE OUTPU
+188 - PROM
 190 - SYNCHRONOUS UP/DOWN COUNTERS WITH DOWN/UP MODE CONTROL
 191 - SYNCHRONOUS UP/DOWN COUNTERS WITH DOWN/UP MODE CONTROL
-92 - DECADE, DIVIDE-BY-TWELVE AND BINARY COUNTERS
+192 - UP/DOWN BCD Decade (8421) Counter
+245 - Octal Bus Transceivers With 3-State Outputs
+287 - PROM
+365 - 3-STATE HEX BUFFER
+366 - 3-STATE HEX BUFFER
+367 - 3-STATE HEX BUFFER
+373 - OCTAL D-TYPE TRANSPARENT LATCHES AND EDGE-TRIGGERED FLIP-FLOPS
+374 - OCTAL D-TYPE TRANSPARENT LATCHES AND EDGE-TRIGGERED FLIP-FLOPS
+414 - (UCY) 8-poziomowy kontroler priorytetu przerwań
+416 - (UCY) 4-bitowy nadajnik szyny danych
+540 - octal buffers and line drivers with 3-state outputs
+541 - octal buffers and line drivers with 3-state outputs
+547 - 8-bit bus register transceivers and latch transceivers
 549 - 8-bit two stage pipelined register/latch
+573 - octal transparent d-type latches witch 3-state outputs
+646 - octal bus transceivers and registers
+657 - octal transceiver with parity generator/checker and 3-state outputs
 
-review all sequential ICs (command changes vs clock, clock polarity)
+full error handling (protocol)
+failed vector reporting
+cmd_hello
+protocol and fw versioning
+review all sequential ICs (command changes vs clock, clock polarity, test suitability)
 'IC state reset' non-test something
 better params building
 debug verbosity?
