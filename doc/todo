@@ -1,4 +1,3 @@
-54 - 4-wide and-or-invert gates
 92 - DECADE, DIVIDE-BY-TWELVE AND BINARY COUNTERS
 124 - VCO
 138 - 3-line to 8-line decoder / demultiplexer
@@ -12,7 +11,6 @@
 192 - UP/DOWN BCD Decade (8421) Counter
 245 - Octal Bus Transceivers With 3-State Outputs
 287 - PROM
-365 - 3-STATE HEX BUFFER
 366 - 3-STATE HEX BUFFER
 367 - 3-STATE HEX BUFFER
 373 - OCTAL D-TYPE TRANSPARENT LATCHES AND EDGE-TRIGGERED FLIP-FLOPS
@@ -27,21 +25,37 @@
 646 - octal bus transceivers and registers
 657 - octal transceiver with parity generator/checker and 3-state outputs
 
+DUT:
+review all sequential ICs (command changes vs clock, clock polarity, test suitability)
+
+FW/protocol:
 full error handling (protocol)
 failed vector reporting
 cmd_hello
 protocol and fw versioning
-review all sequential ICs (command changes vs clock, clock polarity, test suitability)
 'IC state reset' non-test something
-better test params building
 debug verbosity?
 protocol frames
 PROM reading?
 EPROM reading?
+bidirectional ICs (pin reconfiguration)
+forced delay testing to mitigate stray/unwanted capacitances?
 
+SW:
+better test params building
+names: LS/S when no regular family?
 name matching?
  * exact name (SN7400, UCY7400),
  * common name (7400),
  * difflib fuzzy high similarity (0.8)
  * difflib fuzzy low similarity (0.7?)
 alternatively: suggestion when no exact/common match?
+
+HW:
+full HiZ testing (with ~1M to ground? always?)
+MCU pin over-current protection (120 ohm)
+DUT current measuremet (VCC? GND?)
+DUT power over-current protection
+R/C: workaround is enough? on relays? tested with GPIO?
+R/C: switchable R and C values?
+change GND@pin1 to VCC@pin9 to support 18-pin memories?

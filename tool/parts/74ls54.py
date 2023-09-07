@@ -24,7 +24,7 @@ class Part74LS54(PackageDIP14):
         outputs=[6],
         loops=256,
         body=lambda: [
-            [[*ab, *cde, *fgh, *ij],  [~(ab.vand() | cde.vand() | fgh.vand() | ij.vand())]]
+            [[*ab, *cde, *fgh, *ij],  ~(ab.vand() | cde.vand() | fgh.vand() | ij.vand())]
             for ab in BV.range(0, 4)
             for cde in BV.range(0, 8)
             for fgh in BV.range(0, 8)

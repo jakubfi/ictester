@@ -1,7 +1,7 @@
 from binvec import BV
 from prototypes import (PackageDIP14, Pin, PinType, Test)
 
-class Part74ls51(PackageDIP14):
+class Part74LS51(PackageDIP14):
     name = "74LS51"
     desc = "Invert Gates"
     pin_cfg = {
