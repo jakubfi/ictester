@@ -6,7 +6,7 @@
 struct mcu_port_config mcu_port[MCU_PORT_CNT];
 
 // -----------------------------------------------------------------------
-void mcu_disconnect(void)
+void mcu_disconnect()
 {   
 	DDRA = 0;
 	PORTA = 0;
@@ -17,7 +17,7 @@ void mcu_disconnect(void)
 }	   
 
 // -----------------------------------------------------------------------
-void mcu_connect(void)
+void mcu_connect()
 {
 	DDRA = mcu_port[PA].output;
 	DDRB = mcu_port[PB].output;
@@ -28,7 +28,7 @@ void mcu_connect(void)
 }
 
 // -----------------------------------------------------------------------
-void mcu_config_clear(void)
+void mcu_config_clear()
 {
 	for (uint8_t i=0 ; i<MCU_PORT_CNT ; i++) {
 		mcu_port[i].input = 0;
@@ -38,7 +38,7 @@ void mcu_config_clear(void)
 }
 
 // -----------------------------------------------------------------------
-void mcu_port_mask_clear(void)
+void mcu_port_mask_clear()
 {
 	for (uint8_t i=0 ; i<MCU_PORT_CNT ; i++) {
 		mcu_port[i].output_mask = 0;
@@ -46,7 +46,7 @@ void mcu_port_mask_clear(void)
 }
 
 // -----------------------------------------------------------------------
-void mcu_init(void)
+void mcu_init()
 {
 	mcu_config_clear();
 }

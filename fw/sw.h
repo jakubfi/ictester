@@ -13,13 +13,13 @@
 #define SW_CFG_ALL 0
 #define SW_CFG_GND_ONLY 1
 
-void sw_init(void);
+void sw_init();
 void sw_on(uint8_t port, uint8_t bit);
-bool sw_config_sane(void);
+bool sw_config_sane();
 void sw_push_config(uint8_t cfg);
-void sw_connect(void);
-void sw_disconnect(void);
-void sw_config_clear(void);
+void sw_connect();
+void sw_disconnect();
+void sw_config_clear();
 
 #endif
 

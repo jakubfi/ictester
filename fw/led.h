@@ -7,13 +7,13 @@
 #define LED_STRIP_DDR  DDRA
 #define LED_STRIP_PIN  0
 
-void led_init(void);
-void led_welcome(void);
-void led_pass(void);
-void led_fail(void);
-void led_err(void);
-void led_idle(void);
-void led_active(void);
+void led_init();
+void led_welcome();
+void led_pass();
+void led_fail();
+void led_err();
+void led_idle();
+void led_active();
 
 #endif
 

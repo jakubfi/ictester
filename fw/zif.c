@@ -44,14 +44,14 @@ const __flash struct coord zif_c_coord[ZIF_PIN_CNT] = {
 };
 
 // -----------------------------------------------------------------------
-void zif_init(void)
+void zif_init()
 {
 	sw_init();
 	mcu_init();
 }
 
 // -----------------------------------------------------------------------
-void zif_config_clear(void)
+void zif_config_clear()
 {
 	mcu_config_clear();
 	sw_config_clear();
@@ -115,13 +115,13 @@ bool zif_func(uint8_t func, uint8_t zif_pin)
 }
 
 // -----------------------------------------------------------------------
-static bool zif_config_sane(void)
+static bool zif_config_sane()
 {
 	return sw_config_sane();
 }
 
 // -----------------------------------------------------------------------
-bool zif_connect(void)
+bool zif_connect()
 {
 	if (!zif_config_sane()) return false;
 	sw_connect();
@@ -130,14 +130,14 @@ bool zif_connect(void)
 }
 
 // -----------------------------------------------------------------------
-void zif_disconnect(void)
+void zif_disconnect()
 {
 	mcu_disconnect();
 	sw_disconnect();
 }
 
 // -----------------------------------------------------------------------
-void zif_clear_checked_outputs(void)
+void zif_clear_checked_outputs()
 {
 	mcu_port_mask_clear();
 }
@@ -151,7 +151,7 @@ void zif_checked_output(uint8_t zif_pin)
 }
 
 // -----------------------------------------------------------------------
-uint8_t zif_get_vcc_pin(void)
+uint8_t zif_get_vcc_pin()
 {
 	return zif_vcc_pin;
 }

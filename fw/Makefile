@@ -16,7 +16,7 @@ CFLAGS=-I. $(INC) -g -mmcu=$(MCU) -O$(OPTLEVEL) \
 	--param=min-pagesize=0                  \
 	-fpack-struct -fshort-enums             \
 	-funsigned-bitfields -funsigned-char    \
-	-Wall -Wstrict-prototypes
+	-Wall
 
 # c++ specific flags
 CPPFLAGS=-fno-exceptions

@@ -8,14 +8,14 @@
 #include "led.h"
 
 // -----------------------------------------------------------------------
-void led_init(void)
+void led_init()
 {
 	LED_STRIP_PORT &= ~(1<<LED_STRIP_PIN);
 	LED_STRIP_DDR |= (1<<LED_STRIP_PIN);
 }
 
 // -----------------------------------------------------------------------
-void led_welcome(void)
+void led_welcome()
 {
 	rgb_color color;
 	for (int8_t i=30 ; i>=0 ; i--) {
@@ -35,7 +35,7 @@ void led_welcome(void)
 }
 
 // -----------------------------------------------------------------------
-void led_pass(void)
+void led_pass()
 {
 	rgb_color color;
 	color.red = 0;
@@ -45,7 +45,7 @@ void led_pass(void)
 }
 
 // -----------------------------------------------------------------------
-void led_fail(void)
+void led_fail()
 {
 	rgb_color color;
 	color.red = 5;
@@ -55,7 +55,7 @@ void led_fail(void)
 }
 
 // -----------------------------------------------------------------------
-void led_err(void)
+void led_err()
 {
 	rgb_color color;
 	color.red = 4;
@@ -65,7 +65,7 @@ void led_err(void)
 }
 
 // -----------------------------------------------------------------------
-void led_active(void)
+void led_active()
 {
 	rgb_color color;
 	color.red = 5;
@@ -75,7 +75,7 @@ void led_active(void)
 }
 
 // -----------------------------------------------------------------------
-void led_idle(void)
+void led_idle()
 {
 	rgb_color color;
 	color.red = 3;

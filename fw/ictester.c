@@ -22,7 +22,7 @@ uint8_t test_params[MAX_TEST_PARAMS];
 bool dut_connected;
 
 // -----------------------------------------------------------------------
-static uint8_t handle_dut_setup(void)
+static uint8_t handle_dut_setup()
 {
 	uint8_t pin_data[24];
 
@@ -53,7 +53,7 @@ static uint8_t handle_dut_setup(void)
 }
 
 // -----------------------------------------------------------------------
-static uint8_t handle_test_setup(void)
+static uint8_t handle_test_setup()
 {
 	test_type = serial_rx_char();
 	for (uint8_t i=0 ; i<MAX_TEST_PARAMS ; i++) {
@@ -81,7 +81,7 @@ static uint8_t handle_test_setup(void)
 }
 
 // -----------------------------------------------------------------------
-static uint8_t handle_dut_connect(void)
+static uint8_t handle_dut_connect()
 {
 	led_active();
 
@@ -113,7 +113,7 @@ static uint8_t handle_dut_disconnect(uint8_t resp)
 }
 
 // -----------------------------------------------------------------------
-static uint8_t handle_run(void)
+static uint8_t handle_run()
 {
 	uint8_t res = RESP_PASS;
 
@@ -148,7 +148,7 @@ static uint8_t handle_run(void)
 }
 
 // -----------------------------------------------------------------------
-int main(void)
+int main()
 {
 	zif_init();
 	serial_init(LINK_SPEED);

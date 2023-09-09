@@ -68,7 +68,7 @@ static const struct march march_cm[MARCH_STEPS] = {
 typedef uint8_t (*march_fun)(uint8_t dir, uint8_t r, uint8_t w, uint16_t addr_space);
 
 // -----------------------------------------------------------------------
-void mem_setup(void)
+void mem_setup()
 {
 	CAS_OFF;
 	RAS_OFF;

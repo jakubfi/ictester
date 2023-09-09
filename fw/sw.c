@@ -29,7 +29,7 @@ const __flash struct switch_drv {
 uint8_t switch_data[SWITCH_CNT];
 
 // -----------------------------------------------------------------------
-void sw_init(void)
+void sw_init()
 {
 	i2c_a_init();
 	i2c_b_init();
@@ -43,7 +43,7 @@ void sw_on(uint8_t port, uint8_t bit)
 }
 
 // -----------------------------------------------------------------------
-bool sw_config_sane(void)
+bool sw_config_sane()
 {
 	if ((switch_data[A1] & 0b00001100) == 0b00001100) return false; // pin 8 VCC+GND
 	if ((switch_data[B0] & 0b00000110) == 0b00000110) return false; // pin 24 VCC+GND
@@ -69,7 +69,7 @@ void sw_push_config(uint8_t cfg)
 }
 
 // -----------------------------------------------------------------------
-void sw_connect(void)
+void sw_connect()
 {
 	// connect grounds first
 	sw_push_config(SW_CFG_GND_ONLY);
@@ -78,13 +78,13 @@ void sw_connect(void)
 }
 
 // -----------------------------------------------------------------------
-void sw_config_clear(void)
+void sw_config_clear()
 {
 	for (uint8_t i=0 ; i<SWITCH_CNT ; i++) switch_data[i] = 0;
 }
 
 // -----------------------------------------------------------------------
-void sw_disconnect(void)
+void sw_disconnect()
 {
 	// disconnect grouds last
 	sw_push_config(SW_CFG_GND_ONLY);

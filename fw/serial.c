@@ -40,18 +40,18 @@ void serial_tx_char(uint8_t c)
 }
 
 // -----------------------------------------------------------------------
-uint8_t serial_rx_char(void)
+uint8_t serial_rx_char()
 {
 	while (!(UCSR0A & (1 << RXC0)));
 	return UDR0;
 }
 
 // -----------------------------------------------------------------------
-uint16_t serial_rx_16le(void)
+uint16_t serial_rx_16le()
 {
 	uint16_t tmp = serial_rx_char();
 	tmp |= (uint16_t) serial_rx_char() << 8;
 	return tmp;
 }
 
-// vim: tabstop=4
+// vim: tabstop=4 shiftwidth=4 autoindent
