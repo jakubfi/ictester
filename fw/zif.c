@@ -1,28 +1,11 @@
 #include <inttypes.h>
 #include <stdlib.h>
 #include <stdbool.h>
-#include <util/delay.h>
-
-#include "external/fleury-i2cmaster/i2cmaster_a.h"
-#include "external/fleury-i2cmaster/i2cmaster_b.h"
 
 #include "protocol.h"
+#include "sw.h"
 
 #define ZIF_PIN_CNT 24
-#define SWITCH_CNT 5
-
-#define CFG_ALL 0
-#define CFG_GND_ONLY 1
-
-// switch turn-on time @3.3V from datasheet, probably even less for 5V
-#define SWITCH_ON_DELAY_US 35
-
-#define A0 0 // analog switch 0, I2C bus A (top left)
-#define A1 1 // analog switch 1, I2C bus A
-#define A2 2 // analog switch 2, I2C bus A
-#define B0 3 // analog switch 0, I2C bus B (top right)
-#define B1 4 // analog switch 1, I2C bus B
-#define NA -1 // not connected
 
 #define PA 0 // MCU port A
 #define PB 1 // MCU port B
@@ -38,21 +21,6 @@ struct coord {
 const __flash struct coord zif_pin_to_mcu[ZIF_PIN_CNT] = {
 	{PC, 0}, {PC, 1}, {PC, 2}, {PC, 3}, {PC, 4}, {PC, 5}, {PC, 6}, {PC, 7}, {PA, 7}, {PA, 6}, {PA, 5}, {PA, 4},
 	{PA, 3}, {PA, 2}, {PA, 1}, {PA, 0}, {PB, 0}, {PB, 1}, {PB, 2}, {PB, 3}, {PB, 4}, {PB, 5}, {PB, 6}, {PB, 7}
-};
-
-// Analog switches I2C config
-const __flash struct switch_drv {
-	void (*i2c_start_wait)(unsigned char);
-	void (*i2c_stop)(void);
-	unsigned char (*i2c_write)(unsigned char);
-	uint8_t i2c_addr;
-	uint8_t gnd_mask;
-} zif_switch[SWITCH_CNT] = {
-	{i2c_a_start_wait, i2c_a_stop, i2c_a_write, 0x98, 0b00000001}, // A0
-	{i2c_a_start_wait, i2c_a_stop, i2c_a_write, 0x9a, 0b00011000}, // A1
-	{i2c_a_start_wait, i2c_a_stop, i2c_a_write, 0x9c, 0b00001001}, // A2
-	{i2c_b_start_wait, i2c_b_stop, i2c_b_write, 0x98, 0b01000100}, // B0
-	{i2c_b_start_wait, i2c_b_stop, i2c_b_write, 0x9a, 0b00100000}, // B1
 };
 
 // Translates ZIF pin (0-based) number to SW port/bit for each function available
@@ -76,14 +44,10 @@ const __flash struct coord zif_c_coord[ZIF_PIN_CNT] = {
 	{NA, NA}, {NA, NA}, {NA, NA}, {NA, NA}, {NA, NA}, {NA, NA}, {NA, NA}, {B1, 6},  {B0, 7},  {B0, 4},  {NA, NA}, {NA, NA}
 };
 
-// Current switches data
-uint8_t switch_data[SWITCH_CNT] = {0, 0, 0, 0, 0};
-
 // -----------------------------------------------------------------------
 void zif_init(void)
 {
-	i2c_a_init();
-	i2c_b_init();
+	sw_init();
 }
 
 // -----------------------------------------------------------------------
@@ -117,7 +81,7 @@ bool zif_func(uint8_t func, uint8_t pin)
 
 	if (coord->port == NA) return false;
 
-	switch_data[coord->port] |= 1 << coord->bit;
+	sw_on(coord->port, coord->bit);
 
 	return true;
 }
@@ -125,46 +89,19 @@ bool zif_func(uint8_t func, uint8_t pin)
 // -----------------------------------------------------------------------
 bool zif_config_sane(void)
 {
-	if ((switch_data[A1] & 0b00001100) == 0b00001100) return false; // pin 8 VCC+GND
-	if ((switch_data[B0] & 0b00000110) == 0b00000110) return false; // pin 24 VCC+GND
-	// TODO: GND + pullup?
-	// TODO: C + no pullup
-	// TODO: VCC + pullup?
-	// TODO: or just any two functions?
-	// TODO: more than one GND/VCC/C?
-	return true;
-}
-
-// -----------------------------------------------------------------------
-static void zif_push_config(uint8_t cfg)
-{
-	const __flash struct switch_drv *sw = zif_switch;
-	for (uint8_t i=0 ; i<SWITCH_CNT ; i++, sw++) {
-		sw->i2c_start_wait(sw->i2c_addr);
-		sw->i2c_write(0);
-		if (cfg == CFG_GND_ONLY) sw->i2c_write(switch_data[i] & sw->gnd_mask);
-		else sw->i2c_write(switch_data[i]);
-		sw->i2c_stop();
-	}
+	return sw_config_sane();
 }
 
 // -----------------------------------------------------------------------
 void zif_connect(void)
 {
-	// connect grounds first
-	zif_push_config(CFG_GND_ONLY);
-	zif_push_config(CFG_ALL);
-	_delay_us(SWITCH_ON_DELAY_US);
+	sw_connect();
 }
 
 // -----------------------------------------------------------------------
 void zif_disconnect(void)
 {
-	// disconnect grouds last
-	zif_push_config(CFG_GND_ONLY);
-	for (uint8_t i=0 ; i<SWITCH_CNT ; i++) switch_data[i] = 0;
-	zif_push_config(CFG_ALL);
-	_delay_us(SWITCH_ON_DELAY_US);
+	sw_disconnect();
 }
 
 // -----------------------------------------------------------------------
