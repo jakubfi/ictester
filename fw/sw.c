@@ -26,14 +26,14 @@ const __flash struct switch_drv {
 	{i2c_b_start_wait, i2c_b_stop, i2c_b_write, 0x9a, 0b00100000}, // B1
 };
 
-// Current switches data
-uint8_t switch_data[SWITCH_CNT] = {0, 0, 0, 0, 0};
+uint8_t switch_data[SWITCH_CNT];
 
 // -----------------------------------------------------------------------
 void sw_init(void)
 {
 	i2c_a_init();
 	i2c_b_init();
+	sw_config_clear();
 }
 
 // -----------------------------------------------------------------------
@@ -78,11 +78,17 @@ void sw_connect(void)
 }
 
 // -----------------------------------------------------------------------
+void sw_config_clear(void)
+{
+	for (uint8_t i=0 ; i<SWITCH_CNT ; i++) switch_data[i] = 0;
+}
+
+// -----------------------------------------------------------------------
 void sw_disconnect(void)
 {
 	// disconnect grouds last
 	sw_push_config(SW_CFG_GND_ONLY);
-	for (uint8_t i=0 ; i<SWITCH_CNT ; i++) switch_data[i] = 0;
+	sw_config_clear();
 	sw_push_config(SW_CFG_ALL);
 	_delay_us(SWITCH_ON_DELAY_US);
 }

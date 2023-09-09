@@ -19,6 +19,7 @@ bool sw_config_sane(void);
 void sw_push_config(uint8_t cfg);
 void sw_connect(void);
 void sw_disconnect(void);
+void sw_config_clear(void);
 
 #endif
 

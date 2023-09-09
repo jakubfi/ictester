@@ -6,12 +6,15 @@
 
 void zif_init(void);
 uint8_t zif_pos(uint8_t dut_pin_count, uint8_t dut_pin);
-bool zif_func(uint8_t func, uint8_t pin);
-bool zif_config_sane(void);
-void zif_connect(void);
+bool zif_func(uint8_t func, uint8_t zif_pin);
+bool zif_connect(void);
 void zif_disconnect(void);
+void zif_config_clear(void);
+void zif_clear_checked_outputs(void);
+void zif_checked_output(uint8_t zif_pin);
+uint8_t zif_get_vcc_pin(void);
 
-uint8_t get_mcu_port(uint8_t dut_pin);
-uint8_t get_mcu_port_bit(uint8_t dut_pin);
+uint8_t zif_mcu_port(uint8_t zif_pin);
+uint8_t zif_mcu_port_bit(uint8_t zif_pin);
 
 #endif
