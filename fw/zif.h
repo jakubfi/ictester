@@ -11,7 +11,7 @@ bool zif_config_sane(void);
 void zif_connect(void);
 void zif_disconnect(void);
 
-uint8_t mcu_port(uint8_t dut_pin);
-uint8_t mcu_port_pin(uint8_t dut_pin);
+uint8_t get_mcu_port(uint8_t dut_pin);
+uint8_t get_mcu_port_bit(uint8_t dut_pin);
 
 #endif

@@ -14,14 +14,14 @@
 
 #define LINK_SPEED 500000
 
-struct port {
-	uint8_t dut_input;
-	uint8_t dut_output;
-	uint8_t dut_pullup;
-	uint8_t used_outputs;
-} port[3];
-uint8_t package_type;
-uint8_t pin_count;
+struct mcu_port_config {
+	uint8_t output;
+	uint8_t input;
+	uint8_t pullup;
+	uint8_t output_mask;
+} mcu_port[3];
+uint8_t dut_package_type;
+uint8_t dut_pin_count;
 
 uint8_t test_type;
 uint8_t test_params[MAX_TEST_PARAMS];
@@ -43,14 +43,31 @@ static void mcu_port_deconfigure(void)
 // -----------------------------------------------------------------------
 static void mcu_port_setup(void)
 {
-	// DUT input == MCU output
-	DDRA = port[0].dut_input;
-	DDRB = port[1].dut_input;
-	DDRC = port[2].dut_input;
-	// pullups
-	PORTA = port[0].dut_pullup;
-	PORTB = port[1].dut_pullup;
-	PORTC = port[2].dut_pullup;
+	DDRA = mcu_port[0].output;
+	DDRB = mcu_port[1].output;
+	DDRC = mcu_port[2].output;
+	PORTA = mcu_port[0].pullup;
+	PORTB = mcu_port[1].pullup;
+	PORTC = mcu_port[2].pullup;
+}
+
+// -----------------------------------------------------------------------
+static void mcu_port_config_clear(void)
+{
+	for (uint8_t i=0 ; i<3 ; i++) {
+		mcu_port[i].input = 0;
+		mcu_port[i].output = 0;
+		mcu_port[i].pullup = 0;
+		// output_mask cleared separately with each test setup
+	}
+}
+
+// -----------------------------------------------------------------------
+static void mcu_port_mask_clear(void)
+{
+	for (uint8_t i=0 ; i<3 ; i++) {
+		mcu_port[i].output_mask = 0;
+	}
 }
 
 // -----------------------------------------------------------------------
@@ -59,42 +76,40 @@ static uint8_t handle_dut_setup(void)
 	uint8_t pin_data[24];
 
 	// receive DUT configuration
-	package_type = serial_rx_char();
-	pin_count = serial_rx_char();
-	for (uint8_t i=0 ; i<pin_count ; i++) {
+	dut_package_type = serial_rx_char();
+	dut_pin_count = serial_rx_char();
+	for (uint8_t i=0 ; i<dut_pin_count ; i++) {
 		pin_data[i] = serial_rx_char();
 	}
 
 	// check DUT pinout
-	if (((pin_count != 14) && (pin_count != 16) && (pin_count != 20) && (pin_count != 24)) || (package_type != PACKAGE_DIP)) {
+	if (
+		((dut_pin_count != 14) && (dut_pin_count != 16) && (dut_pin_count != 20) && (dut_pin_count != 24))
+		|| (dut_package_type != PACKAGE_DIP)
+	) {
 		return RESP_ERR;
 	}
 
-	// clear current DUT configuration
-	for (uint8_t i=0 ; i<3 ; i++) {
-		port[i].dut_output = 0;
-		port[i].dut_input = 0;
-		port[i].dut_pullup = 0;
-	}
+	mcu_port_config_clear();
 
 	// prepare port configuration based on provided DUT pin config
-	for (uint8_t i=0 ; i<pin_count ; i++) {
-		uint8_t zif_pin = zif_pos(pin_count, i);
-		int8_t port_pos = mcu_port(zif_pin);
-		uint8_t port_val = 1 << mcu_port_pin(zif_pin);
+	for (uint8_t i=0 ; i<dut_pin_count ; i++) {
+		uint8_t zif_pin = zif_pos(dut_pin_count, i);
+		int8_t port_pos = get_mcu_port(zif_pin);
+		uint8_t port_val = 1 << get_mcu_port_bit(zif_pin);
 		switch (pin_data[i]) {
 			case ZIF_OUT:
-				port[port_pos].dut_input |= port_val;
+				mcu_port[port_pos].output |= port_val;
 				break;
 			case ZIF_IN:
-				port[port_pos].dut_output |= port_val;
+				mcu_port[port_pos].input |= port_val;
 				break;
 			case ZIF_IN_PU_WEAK:
-				port[port_pos].dut_output |= port_val;
-				port[port_pos].dut_pullup |= port_val;
+				mcu_port[port_pos].input |= port_val;
+				mcu_port[port_pos].pullup |= port_val;
 				break;
 			case ZIF_IN_PU_STRONG:
-				port[port_pos].dut_output |= port_val;
+				mcu_port[port_pos].input |= port_val;
 				zif_func(ZIF_IN_PU_STRONG, zif_pin);
 				break;
 			case ZIF_VCC:
@@ -132,25 +147,22 @@ static uint8_t handle_test_setup(void)
 		test_params[i] = serial_rx_char();
 	}
 
-	// reset port masks
-	port[0].used_outputs = 0;
-	port[1].used_outputs = 0;
-	port[2].used_outputs = 0;
-
 	// read pin usage data
 	uint8_t pin_usage[3];
-	for (uint8_t i=0 ; i<pin_count ; i+=8) {
+	for (uint8_t i=0 ; i<dut_pin_count ; i+=8) {
 		pin_usage[i/8] = serial_rx_char();
 	}
 
+	mcu_port_mask_clear();
+
 	// fill in port masks
-	for (uint8_t i=0 ; i<pin_count ; i++) {
-		uint8_t zif_pin = zif_pos(pin_count, i);
-		int8_t port_pos = mcu_port(zif_pin);
+	for (uint8_t i=0 ; i<dut_pin_count ; i++) {
+		uint8_t zif_pin = zif_pos(dut_pin_count, i);
+		int8_t port_pos = get_mcu_port(zif_pin);
 		if (port_pos >= 0) {
 			uint8_t pin_used = (pin_usage[i/8] >> (i%8)) & 1;
-			uint8_t pin_mask = pin_used << mcu_port_pin(zif_pin);
-			port[port_pos].used_outputs |= port[port_pos].dut_output & pin_mask;
+			uint8_t pin_mask = pin_used << get_mcu_port_bit(zif_pin);
+			mcu_port[port_pos].output_mask |= mcu_port[port_pos].input & pin_mask;
 		}
 	}
 
@@ -250,7 +262,7 @@ int main(void)
 				resp = handle_test_setup();
 				break;
 			case CMD_VECTORS_LOAD:
-				resp = handle_vectors_load(pin_count);
+				resp = handle_vectors_load(dut_pin_count);
 				break;
 			case CMD_TEST_RUN:
 				resp = handle_run();
