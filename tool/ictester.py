@@ -4,6 +4,7 @@ import sys
 import argparse
 import math
 import re
+import serial.tools.list_ports as listports
 
 from tester import Tester
 from transport import Transport
@@ -48,7 +49,7 @@ if '--list' in sys.argv:
     sys.exit(0)
 
 parser = argparse.ArgumentParser(description='IC tester controller')
-parser.add_argument('--device', default="/dev/ttyUSB1", help='Serial port where the IC tester is connected')
+parser.add_argument('--device', default=None, help='Serial port where the IC tester is connected')
 parser.add_argument('--loops', type=int, default=None, help='Loop count (1..65535)')
 parser.add_argument('--delay', type=float, default=None, help='additional DUT output read delay in μs for logic tests (13107 μs max, rounded to nearest 0.2 μs)')
 parser.add_argument('--list', action="store_true", help='List all supported parts')
@@ -57,6 +58,19 @@ parser.add_argument('--debug', action="store_true", help='Enable debug output')
 parser.add_argument('--debug-serial', action="store_true", help='Enable serial debug output')
 parser.add_argument('part', help='Part symbol')
 args = parser.parse_args()
+
+# Try searching for ictester
+detected_device = None
+for port in listports.comports():
+    if port.manufacturer == "mera400.pl" and port.product == "ictester":
+        detected_device = port.device
+
+serial_port = args.device if args.device else detected_device
+
+# Device not found
+if not serial_port:
+    print("No ictester found. Please specify device with --device argument.")
+    sys.exit(90)
 
 if args.loops is not None and (args.loops <= 0 or args.loops > 65535):
     parser.error("Loops should be between 1 and 65535")
@@ -74,7 +88,7 @@ except KeyError:
 print_part_info(part)
 print()
 
-transport = Transport(args.device, 500000, debug=args.debug_serial)
+transport = Transport(serial_port, 500000, debug=args.debug_serial)
 tester = Tester(part, transport, debug=args.debug)
 all_tests = tester.tests_available()
 test_count = len(all_tests)

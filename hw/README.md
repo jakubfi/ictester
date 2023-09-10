@@ -12,6 +12,22 @@ See also [pdf schematic](../doc/ictester.pdf)
 * J7 - free MCU PD7 connection, ground and +5V.
 * J8 - MCU programmer interface.
 
+# CP2102N setup
+
+To complete the hardware setup, CP2102N USB UART transceiver needs to be programmed with the following values:
+
+* iManufacturer = mera400.pl
+* iProduct = ictester
+* MaxPower = 200mA
+
+One possible way of programming it is to use [this](https://github.com/VCTLabs/cp210x-program/tree/master/ext/badge) tool:
+
+`cp2102 -p "ictester" -m "mera400.pl" -x 200`
+
+You can also use one of the tools provided by the manufacturer - Silicon Labs.
+
+This step is not required, although without it no device autodetection will be possible and in some cases the default power limit (100 mA) may be too low.
+
 # BOM
 
 | Ref  | Value/Part | Package
@@ -31,7 +47,7 @@ See also [pdf schematic](../doc/ictester.pdf)
 | R1 | 10k | 0805
 | R2-R29 | 4k7 | 0805
 | U1 | ATmega1284 | TQFP-44 10x10mm
-| U2 | CP2102 | QFN28	5x5mm
+| U2 | CP2102N | QFN28	5x5mm
 | U3 | RClamp0504F | EIAJ SC-70 6L
 | U4-U8 | MAX14662 | QFN28 4x4mm
 | U9 | ZIF24 Socket |
