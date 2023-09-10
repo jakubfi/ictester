@@ -9,8 +9,8 @@ bool zif_func(uint8_t func, uint8_t zif_pin);
 bool zif_connect();
 void zif_disconnect();
 void zif_config_clear();
-void zif_clear_checked_outputs();
-void zif_checked_output(uint8_t zif_pin);
+void zif_pin_mask_clear();
+void zif_pin_unmasked(uint8_t zif_pin);
 uint8_t zif_get_vcc_pin();
 
 uint8_t zif_mcu_port(uint8_t zif_pin);

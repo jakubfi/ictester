@@ -137,17 +137,17 @@ void zif_disconnect()
 }
 
 // -----------------------------------------------------------------------
-void zif_clear_checked_outputs()
+void zif_pin_mask_clear()
 {
-	mcu_port_mask_clear();
+	mcu_pin_mask_clear();
 }
 
 // -----------------------------------------------------------------------
-void zif_checked_output(uint8_t zif_pin)
+void zif_pin_unmasked(uint8_t zif_pin)
 {
 	int8_t port_pos = zif_mcu_port(zif_pin);
 	uint8_t port_bit = zif_mcu_port_bit(zif_pin);
-	mcu_port_checked(port_pos, port_bit);
+	mcu_pin_unmasked(port_pos, port_bit);
 }
 
 // -----------------------------------------------------------------------

@@ -66,14 +66,14 @@ static uint8_t handle_test_setup()
 		pin_usage[i/8] = serial_rx_char();
 	}
 
-	zif_clear_checked_outputs();
+	zif_pin_mask_clear();
 
 	// fill in port masks
 	for (uint8_t i=0 ; i<dut_pin_count ; i++) {
 		uint8_t pin_used = (pin_usage[i/8] >> (i%8)) & 1;
 		if (pin_used) {
 			uint8_t zif_pin = zif_pos(dut_pin_count, i);
-			zif_checked_output(zif_pin);
+			zif_pin_unmasked(zif_pin);
 		}
 	}
 

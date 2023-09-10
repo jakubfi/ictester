@@ -38,10 +38,10 @@ void mcu_config_clear()
 }
 
 // -----------------------------------------------------------------------
-void mcu_port_mask_clear()
+void mcu_pin_mask_clear()
 {
 	for (uint8_t i=0 ; i<MCU_PORT_CNT ; i++) {
-		mcu_port[i].output_mask = 0;
+		mcu_port[i].mask = 0;
 	}
 }
 
@@ -76,9 +76,9 @@ bool mcu_func(uint8_t func, uint8_t port_pos, uint8_t port_bit)
 }
 
 // -----------------------------------------------------------------------
-void mcu_port_checked(uint8_t port_pos, uint8_t port_bit)
+void mcu_pin_unmasked(uint8_t port_pos, uint8_t port_bit)
 {
-	mcu_port[port_pos].output_mask |= mcu_port[port_pos].input & _BV(port_bit);
+	mcu_port[port_pos].mask |= mcu_port[port_pos].input & _BV(port_bit);
 }
 
 // -----------------------------------------------------------------------

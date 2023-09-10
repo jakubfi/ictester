@@ -66,8 +66,8 @@ static inline uint8_t run_logic2(uint16_t delay, struct mcu_port_config *mcu_por
 		if (delay) _delay_loop_2(delay);
 
 		if (check_result[pos]) {
-			if ((PINB ^ vectors[pos][PB]) & mcu_port[PB].output_mask) return RESP_FAIL;
-			if ((PINC ^ vectors[pos][PC]) & mcu_port[PC].output_mask) return RESP_FAIL;
+			if ((PINB ^ vectors[pos][PB]) & mcu_port[PB].mask) return RESP_FAIL;
+			if ((PINC ^ vectors[pos][PC]) & mcu_port[PC].mask) return RESP_FAIL;
 		}
 	}
 
@@ -85,9 +85,9 @@ static inline uint8_t run_logic3(uint16_t delay, struct mcu_port_config *mcu_por
 		if (delay) _delay_loop_2(delay);
 
 		if (check_result[pos]) {
-			if ((PINA ^ vectors[pos][PA]) & mcu_port[PA].output_mask) return RESP_FAIL;
-			if ((PINB ^ vectors[pos][PB]) & mcu_port[PB].output_mask) return RESP_FAIL;
-			if ((PINC ^ vectors[pos][PC]) & mcu_port[PC].output_mask) return RESP_FAIL;
+			if ((PINA ^ vectors[pos][PA]) & mcu_port[PA].mask) return RESP_FAIL;
+			if ((PINB ^ vectors[pos][PB]) & mcu_port[PB].mask) return RESP_FAIL;
+			if ((PINC ^ vectors[pos][PC]) & mcu_port[PC].mask) return RESP_FAIL;
 		}
 	}
 
