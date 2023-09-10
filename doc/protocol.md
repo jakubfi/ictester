@@ -53,13 +53,18 @@ Tester always responds with `RESP_HELLO`, described in later section.
 
 Before any other command, tester needs to be set up for the specific DUT.
 This command informs the tester how to address DUT pins and sets ZIF socket pin functions for the DUT.
+Protocol allows sending 1 or 2 pin configurations when setting up the DUT. One configuration is used
+in most cases. Two configurations are required for DUTs with bidirectional pins, where pin roles
+change from test to test.
 
 ### Command format
 
 * 1 BYTE: command: `CMD_DUT_SETUP`
 * 1 BYTE: `t` = package type  (1=DIP)
 * 1 BYTE: `p` = number of all DUT pins ([14, 16, 20, 24])
-* `p` BYTES: `p` ZIF pin functions for each DUT pin. 1 byte each, starting from pin 1. See table below.
+* 1 BYTE: `c` = number of pin configurations (1 or 2)
+* `c` PIN CONFIGURATIONS (internally numbered starting from `0`):
+  * `p` BYTES: `p` ZIF pin functions for each DUT pin. 1 byte each, starting from pin 1. See table below.
 
 | ZIF Function        | Value | MCU Pin Function          | SW Function      | Default DUT use            |
 |---------------------|-------|---------------------------|------------------|----------------------------|
@@ -128,12 +133,14 @@ Sets up the test. Requires the DUT to be set up first.
 ### Command format
 
 * 1 BYTE: command: `CMD_TEST_SETUP`
+* 1 BYTE: DUT pin configuration number used by the test
+  (configuration `0` is available for every DUT, `1` may be available in some cases. See `CMD_DUT_SETUP`)
 * 1 BYTE: test type. Algorithm used to test the DUT. See table below for test types available.
 * TEST PARAMETERS: depend on the test type, see below.
 
 | Test type           | Value | Description                                                             |
 |---------------------|-------|-------------------------------------------------------------------------|
-| `TEST_LOGIC`        | 1     | Logic ICs. Designed for 74 family, but suitable for others too          |
+| `TEST_LOGIC`        | 1     | Logic ICs. Designed for 74 family, but suitable for other families too  |
 | `TEST_DRAM`         | 2     | 4164 and 41256 DRAM memories                                            |
 | `TEST_UNIVIB`       | 3     | 74121, 74122 and 74123 monostable monovibrators                         |
 
