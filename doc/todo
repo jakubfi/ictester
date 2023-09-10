@@ -39,7 +39,6 @@ protocol frames
 PROM reading?
 EPROM reading?
 bidirectional ICs (pin reconfiguration)
-forced delay testing to mitigate stray/unwanted capacitances?
 
 SW:
 better test params building

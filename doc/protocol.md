@@ -128,12 +128,14 @@ Sets up the test. Requires the DUT to be set up first.
 ### Command format
 
 * 1 BYTE: command: `CMD_TEST_SETUP`
-* 1 BYTE: test type. Algorithm used to test the DUT. See below for test types available.
-* 4 BYTES: test parameters `PARAM_0` - `PARAM_3`. Test type specific. All sent and received even if not all used by the test.
-* `n` BYTES: I/O pin usage in test vectors (n=2 for 14-pin and 16-pin devices, n=3 for >16-pin devices):
-    * each bit: 1=I/O pin used by the test, 0=pin not used by the test
-    * 1st byte - lowest pin numbers
-    * bit 0 in each byte - lowest pin number
+* 1 BYTE: test type. Algorithm used to test the DUT. See table below for test types available.
+* TEST PARAMETERS: depend on the test type, see below.
+
+| Test type           | Value | Description                                                             |
+|---------------------|-------|-------------------------------------------------------------------------|
+| `TEST_LOGIC`        | 1     | Logic ICs. Designed for 74 family, but suitable for others too          |
+| `TEST_DRAM`         | 2     | 4164 and 41256 DRAM memories                                            |
+| `TEST_UNIVIB`       | 3     | 74121, 74122 and 74123 monostable monovibrators                         |
 
 ### Valid responses
 
@@ -147,10 +149,15 @@ Available test types and their specific requirements are described below.
 #### Logic IC test
 
 `TEST_LOGIC` (1) is designed to test 74 logic (both combinatorial and sequential), but suitable for many other IC families.
-This test type requires test vectors and uses the following parameters:
+It's a basic, generic test that uses test vectors (uploaded with a separate command) to verify IC functionality by
+setting its inputs to given values and checking if IC outputs match test vector outputs.
 
-* `PARAM_0` (LSB), `PARAM_1` (MSB) - 16-bit value, additional delay (in 200 ns steps) before checking DUT outputs. 0 for no delay.
+Test parameters:
 
+* `n` BYTES: I/O pin usage in test vectors (n=2 for 14-pin and 16-pin devices, n=3 for >16-pin devices):
+  * each bit: 1=I/O pin used by the test, 0=pin not used by the test
+  * 1st byte contains lowest pin numbers, bit 0 in each byte describes pin with the lowest number
+* 2 BYTES: additional delay (in 200 ns units) before checking DUT outputs. 0 for no delay.
 
 #### 4164 and 41256 DRAM memory test
 
@@ -160,26 +167,32 @@ This test type requires test vectors and uses the following parameters:
 * read+write - test is done using separate "read" and "write" operations,
 * page mode - test is done using page reads and writes, treating the whole page as a single word.
 
-Test does not use vectors and uses the following parameters:
+Test parameters:
 
-* `PARAM_0` - memory size: 1=64k (4164), 2=256k (41256)
-* `PARAM_1` - test type: 1=read-modify-write, 2=read+write, 3=page mode
+* 1 BYTE: chip type:
+  * 1 = 4164 (64kbit),
+  * 2 = 41256 (256kbit).
+* 1 BYTE: test type:
+  * 1 = read-modify-write,
+  * 2 = read+write,
+  * 3 = page mode.
 
 #### 7412x univibrator test
 
 `TEST_UNIVIB` (3) is designed to test 74121, 74122 and 74123 univibrators. Test does not use vectors and uses the following parameters:
 
-* `PARAM_0` - device to test:
+* 1 BYTE: device to test:
   * 0 = 74121,
   * 1 = 74122,
   * 2 = 74123 univibrator 1,
   * 3 = 74123 univibrator 2
-* `PARAM_1` - test to run:
+* 1 BYTE: test to run:
   * 0 = conditions which should not trigger the device
   * 1 = conditions that should trigger the device
   * 2 = retrigger (not available for 74121)
   * 3 = clear (not available for 74121)
   * 4 = cross-trigger check (only for 74123)
+  * 5 = trigger with rising clear edge (not available for 74121)
 
 ## Vectors upload
 
@@ -208,7 +221,11 @@ BYTE 3: | 24 | 23 | 22 | 21 | 20 | 19 | 18 | 17 | (only for >16-pin devices)
 * Pins absent in the tested device are ignored (eg. for 14-pin devices two most significant bits of BYTE 2 are ignored).
 * Non-I/O pins and pins not declared as inputs or outpus in the test are ignored, with one **exception** described below.
 
-**Bit for VCC pin has a special meaning.** Since it's never set nor read, tester uses it to decide whether DUT outputs should be checked at all. If VCC pin is set to "1" for a given vector, test result for this vector is not checked. Such vectors are used for DUT state setup and in sequential logic tests, where output has to be checked only after the clock/strobe input changes.
+**Bit for VCC pin has a special meaning.**
+Since it's never set nor read, tester uses it to decide whether DUT outputs should be checked at all.
+If VCC pin is set to "1" for a given vector, test result for this vector is not checked.
+Such vectors are used for DUT state setup and in sequential logic tests, where output has to be checked
+only after the clock/strobe input changes.
 
 ### Valid responses
 
