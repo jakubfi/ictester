@@ -12,6 +12,7 @@
 #include "univib.h"
 
 #define LINK_SPEED 500000
+#define NO_CONFIG -1
 
 uint8_t dut_package_type;
 uint8_t dut_pin_count;
@@ -19,18 +20,22 @@ uint8_t dut_pin_count;
 uint8_t test_type;
 uint8_t test_params[MAX_TEST_PARAMS];
 
-bool dut_connected;
+uint8_t cfgnum;
+uint8_t cfgnum_active = NO_CONFIG;
 
 // -----------------------------------------------------------------------
 static uint8_t handle_dut_setup()
 {
-	uint8_t pin_data[24];
+	uint8_t pin_data[MAX_CONFIGS][24];
 
 	// receive DUT configuration
 	dut_package_type = serial_rx_char();
 	dut_pin_count = serial_rx_char();
-	for (uint8_t i=0 ; i<dut_pin_count ; i++) {
-		pin_data[i] = serial_rx_char();
+	uint8_t pincfg_cnt = serial_rx_char();
+	for (uint8_t cfgnum=0 ; cfgnum<pincfg_cnt ; cfgnum++) {
+		for (uint8_t i=0 ; i<dut_pin_count ; i++) {
+			pin_data[cfgnum][i] = serial_rx_char();
+		}
 	}
 
 	// check DUT pinout
@@ -41,12 +46,18 @@ static uint8_t handle_dut_setup()
 		return RESP_ERR;
 	}
 
+	if ((pincfg_cnt < 1) || (pincfg_cnt > MAX_CONFIGS)) {
+		return RESP_ERR;
+	}
+
 	zif_config_clear();
 
 	// prepare port configuration based on provided DUT pin config
-	for (uint8_t i=0 ; i<dut_pin_count ; i++) {
-		uint8_t zif_pin = zif_pos(dut_pin_count, i);
-		if (!zif_func(pin_data[i], zif_pin)) return RESP_ERR;
+	for (uint8_t cfgnum=0 ; cfgnum<pincfg_cnt ; cfgnum++) {
+		for (uint8_t i=0 ; i<dut_pin_count ; i++) {
+			uint8_t zif_pin = zif_pos(dut_pin_count, i);
+			if (!zif_func(cfgnum, pin_data[cfgnum][i], zif_pin)) return RESP_ERR;
+		}
 	}
 
 	return RESP_OK;
@@ -55,6 +66,7 @@ static uint8_t handle_dut_setup()
 // -----------------------------------------------------------------------
 static uint8_t handle_test_setup()
 {
+	cfgnum = serial_rx_char();
 	test_type = serial_rx_char();
 	for (uint8_t i=0 ; i<MAX_TEST_PARAMS ; i++) {
 		test_params[i] = serial_rx_char();
@@ -66,14 +78,14 @@ static uint8_t handle_test_setup()
 		pin_usage[i/8] = serial_rx_char();
 	}
 
-	zif_pin_mask_clear();
+	zif_pin_mask_clear(cfgnum);
 
 	// fill in port masks
 	for (uint8_t i=0 ; i<dut_pin_count ; i++) {
 		uint8_t pin_used = (pin_usage[i/8] >> (i%8)) & 1;
 		if (pin_used) {
 			uint8_t zif_pin = zif_pos(dut_pin_count, i);
-			zif_pin_unmasked(zif_pin);
+			zif_pin_unmasked(cfgnum, zif_pin);
 		}
 	}
 
@@ -81,11 +93,11 @@ static uint8_t handle_test_setup()
 }
 
 // -----------------------------------------------------------------------
-static uint8_t handle_dut_connect()
+static uint8_t do_connect(uint8_t cfgnum)
 {
 	led_active();
 
-	if (!zif_connect()) {
+	if (!zif_connect(cfgnum)) {
 		return RESP_ERR;
 	}
 
@@ -93,16 +105,23 @@ static uint8_t handle_dut_connect()
 		mem_setup();
 	}
 
-	dut_connected = true;
+	cfgnum_active = cfgnum;
 
 	return RESP_OK;
+}
+
+// -----------------------------------------------------------------------
+static uint8_t handle_dut_connect()
+{
+	cfgnum = serial_rx_char();
+	return do_connect(cfgnum);
 }
 
 // -----------------------------------------------------------------------
 static uint8_t handle_dut_disconnect(uint8_t resp)
 {
 	zif_disconnect();
-	dut_connected = false;
+	cfgnum_active = NO_CONFIG;
 
 	if (resp == RESP_ERR) led_err();
 	else if (resp == RESP_FAIL) led_fail();
@@ -119,8 +138,8 @@ static uint8_t handle_run()
 
 	uint16_t loops = serial_rx_16le();
 
-	if (!dut_connected) {
-		res = handle_dut_connect();
+	if (cfgnum_active != cfgnum) {
+		res = do_connect(cfgnum);
 		if (res != RESP_OK) return res;
 	}
 

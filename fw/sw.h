@@ -14,10 +14,10 @@
 #define SW_CFG_GND_ONLY 1
 
 void sw_init();
-void sw_on(uint8_t port, uint8_t bit);
-bool sw_config_sane();
-void sw_push_config(uint8_t cfg);
-void sw_connect();
+void sw_on(uint8_t cfgnum, uint8_t port, uint8_t bit);
+bool sw_config_sane(uint8_t cfgnum);
+void sw_push_config(uint8_t cfgnum, uint8_t cfg);
+void sw_connect(uint8_t cfgnum);
 void sw_disconnect();
 void sw_config_clear();
 

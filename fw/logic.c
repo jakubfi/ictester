@@ -98,15 +98,20 @@ static inline uint8_t run_logic3(uint16_t delay, struct mcu_port_config *mcu_por
 uint8_t run_logic(uint8_t dut_pin_count, uint16_t loops, uint8_t *params)
 {
 	volatile uint16_t delay = (params[1] << 8) + params[0];
+
+	// local copy for speed (pointer known at compile time)
+	struct mcu_port_config mcu_port_copy[3];
 	struct mcu_port_config *mcu_port = mcu_get_port_config();
+	if (!mcu_port) return RESP_ERR;
+	for (uint8_t i=0 ; i<3 ; i++) mcu_port_copy[i] = mcu_port[i];
 
 	if (dut_pin_count <= 16) {
 		for (uint16_t rep=0 ; rep<loops ; rep++) {
-			if (run_logic2(delay, mcu_port) != RESP_PASS) return RESP_FAIL;
+			if (run_logic2(delay, mcu_port_copy) != RESP_PASS) return RESP_FAIL;
 		}
 	} else {
 		for (uint16_t rep=0 ; rep<loops ; rep++) {
-			if (run_logic3(delay, mcu_port) != RESP_PASS) return RESP_FAIL;
+			if (run_logic3(delay, mcu_port_copy) != RESP_PASS) return RESP_FAIL;
 		}
 	}
 

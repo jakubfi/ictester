@@ -5,6 +5,7 @@
 #include "external/fleury-i2cmaster/i2cmaster_a.h"
 #include "external/fleury-i2cmaster/i2cmaster_b.h"
 
+#include "protocol.h"
 #include "sw.h"
 
 #define SWITCH_CNT 5
@@ -26,7 +27,7 @@ const __flash struct switch_drv {
 	{i2c_b_start_wait, i2c_b_stop, i2c_b_write, 0x9a, 0b00100000}, // B1
 };
 
-uint8_t switch_data[SWITCH_CNT];
+uint8_t switch_data[MAX_CONFIGS][SWITCH_CNT];
 
 // -----------------------------------------------------------------------
 void sw_init()
@@ -37,59 +38,64 @@ void sw_init()
 }
 
 // -----------------------------------------------------------------------
-void sw_on(uint8_t port, uint8_t bit)
+void sw_on(uint8_t cfgnum, uint8_t port, uint8_t bit)
 {
-	switch_data[port] |= _BV(bit);
+	switch_data[cfgnum][port] |= _BV(bit);
 }
 
 // -----------------------------------------------------------------------
-bool sw_config_sane()
+bool sw_config_sane(uint8_t cfgnum)
 {
-	if ((switch_data[A1] & 0b00001100) == 0b00001100) return false; // pin 8 VCC+GND
-	if ((switch_data[B0] & 0b00000110) == 0b00000110) return false; // pin 24 VCC+GND
+	if ((switch_data[cfgnum][A1] & 0b00001100) == 0b00001100) return false; // pin 8 VCC+GND
+	if ((switch_data[cfgnum][B0] & 0b00000110) == 0b00000110) return false; // pin 24 VCC+GND
 	// TODO: GND + pullup?
 	// TODO: C + no pullup
 	// TODO: VCC + pullup?
 	// TODO: or just any two functions?
 	// TODO: more than one GND/VCC/C?
+	// check for disallowed inter-config changes
 	return true;
 }
 
 // -----------------------------------------------------------------------
-void sw_push_config(uint8_t cfg)
+void sw_push_config(uint8_t cfgnum, uint8_t cfg)
 {
 	const __flash struct switch_drv *sw = zif_switch;
 	for (uint8_t i=0 ; i<SWITCH_CNT ; i++, sw++) {
 		sw->i2c_start_wait(sw->i2c_addr);
 		sw->i2c_write(0);
-		if (cfg == SW_CFG_GND_ONLY) sw->i2c_write(switch_data[i] & sw->gnd_mask);
-		else sw->i2c_write(switch_data[i]);
+		if (cfg == SW_CFG_GND_ONLY) sw->i2c_write(switch_data[cfgnum][i] & sw->gnd_mask);
+		else sw->i2c_write(switch_data[cfgnum][i]);
 		sw->i2c_stop();
 	}
 }
 
 // -----------------------------------------------------------------------
-void sw_connect()
+void sw_connect(uint8_t cfgnum)
 {
 	// connect grounds first
-	sw_push_config(SW_CFG_GND_ONLY);
-	sw_push_config(SW_CFG_ALL);
+	sw_push_config(cfgnum, SW_CFG_GND_ONLY);
+	sw_push_config(cfgnum, SW_CFG_ALL);
 	_delay_us(SWITCH_ON_DELAY_US);
 }
 
 // -----------------------------------------------------------------------
 void sw_config_clear()
 {
-	for (uint8_t i=0 ; i<SWITCH_CNT ; i++) switch_data[i] = 0;
+	for (uint8_t cfgnum=0 ; cfgnum<MAX_CONFIGS ; cfgnum++) {
+		for (uint8_t i=0 ; i<SWITCH_CNT ; i++) {
+			switch_data[cfgnum][i] = 0;
+		}
+	}
 }
 
 // -----------------------------------------------------------------------
 void sw_disconnect()
 {
 	// disconnect grouds last
-	sw_push_config(SW_CFG_GND_ONLY);
+	sw_push_config(0, SW_CFG_GND_ONLY);
 	sw_config_clear();
-	sw_push_config(SW_CFG_ALL);
+	sw_push_config(0, SW_CFG_ALL);
 	_delay_us(SWITCH_ON_DELAY_US);
 }
 

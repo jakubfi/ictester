@@ -48,7 +48,8 @@ class Tester:
         return [t.name for t in self.part.tests]
 
     def dut_setup(self):
-        self.tr.send([Tester.CMD_DUT_SETUP, self.part.package_type,  self.part.pincount])
+        # TODO: multi configs
+        self.tr.send([Tester.CMD_DUT_SETUP, self.part.package_type, self.part.pincount, 1])
 
         if self.debug:
             print("DUT pin definitions:")
@@ -62,7 +63,8 @@ class Tester:
             raise RuntimeError("DUT setup failed")
 
     def dut_connect(self):
-        self.tr.send([Tester.CMD_DUT_CONNECT])
+        # TODO: config number
+        self.tr.send([Tester.CMD_DUT_CONNECT, 0])
         if self.tr.recv() != Tester.RESP_OK:
             raise RuntimeError("DUT connect failed")
 
@@ -79,7 +81,8 @@ class Tester:
                 params[0] = delay_val & 0xff
                 params[1] = delay_val >> 8
 
-        self.tr.send([Tester.CMD_TEST_SETUP, test.type, *params])
+        # TODO: config number
+        self.tr.send([Tester.CMD_TEST_SETUP, 0, test.type, *params])
 
         data = [
             1 if i in test.pins else 0

@@ -99,6 +99,7 @@ DUT connection is done in 3 steps:
 ### Command format
 
 * 1 BYTE: command: `CMD_DUT_CONNECT`
+* 1 BYTE: DUT pin configuration number used by the test
 
 ### Valid responses
 

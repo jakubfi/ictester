@@ -18,11 +18,11 @@ struct mcu_port_config {
 
 void mcu_init();
 void mcu_disconnect();
-void mcu_connect();
-void mcu_pin_mask_clear();
+void mcu_connect(uint8_t cfgnum);
+void mcu_pin_mask_clear(uint8_t cfgnum);
 void mcu_config_clear();
-bool mcu_func(uint8_t func, uint8_t port_pos, uint8_t port_bit);
-void mcu_pin_unmasked(uint8_t port_pos, uint8_t port_bit);
+bool mcu_func(uint8_t cfgnum, uint8_t func, uint8_t port_pos, uint8_t port_bit);
+void mcu_pin_unmasked(uint8_t cfgnum, uint8_t port_pos, uint8_t port_bit);
 struct mcu_port_config * mcu_get_port_config();
 
 #endif

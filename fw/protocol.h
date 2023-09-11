@@ -2,6 +2,7 @@
 #define __PROTOCOL_H__
 
 #define MAX_TEST_PARAMS 4
+#define MAX_CONFIGS 2
 
 enum commands {
 	CMD_NONE			= 0,

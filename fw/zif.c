@@ -76,7 +76,7 @@ uint8_t zif_mcu_port_bit(uint8_t zif_pin)
 }
 
 // -----------------------------------------------------------------------
-bool zif_func(uint8_t func, uint8_t zif_pin)
+bool zif_func(uint8_t cfgnum, uint8_t func, uint8_t zif_pin)
 {
 	uint8_t port_pos, port_bit;
 	const __flash struct coord *coord = NULL;
@@ -90,7 +90,7 @@ bool zif_func(uint8_t func, uint8_t zif_pin)
 		case ZIF_IN:
 			port_pos = zif_mcu_port(zif_pin);
 			port_bit = zif_mcu_port_bit(zif_pin);
-			mcu_func(func, port_pos, port_bit);
+			mcu_func(cfgnum, func, port_pos, port_bit);
 			break;
 		case ZIF_VCC:
 			zif_vcc_pin = zif_pin;
@@ -108,24 +108,24 @@ bool zif_func(uint8_t func, uint8_t zif_pin)
 
 	if (coord) { // SW function
 		if (coord->port == NA) return false;
-		sw_on(coord->port, coord->bit);
+		sw_on(cfgnum, coord->port, coord->bit);
 	}
 
 	return true;
 }
 
 // -----------------------------------------------------------------------
-static bool zif_config_sane()
+static bool zif_config_sane(uint8_t cfgnum)
 {
-	return sw_config_sane();
+	return sw_config_sane(cfgnum);
 }
 
 // -----------------------------------------------------------------------
-bool zif_connect()
+bool zif_connect(uint8_t cfgnum)
 {
-	if (!zif_config_sane()) return false;
-	sw_connect();
-	mcu_connect();
+	if (!zif_config_sane(cfgnum)) return false;
+	sw_connect(cfgnum);
+	mcu_connect(cfgnum);
 	return true;
 }
 
@@ -137,17 +137,17 @@ void zif_disconnect()
 }
 
 // -----------------------------------------------------------------------
-void zif_pin_mask_clear()
+void zif_pin_mask_clear(uint8_t cfgnum)
 {
-	mcu_pin_mask_clear();
+	mcu_pin_mask_clear(cfgnum);
 }
 
 // -----------------------------------------------------------------------
-void zif_pin_unmasked(uint8_t zif_pin)
+void zif_pin_unmasked(uint8_t cfgnum, uint8_t zif_pin)
 {
 	int8_t port_pos = zif_mcu_port(zif_pin);
 	uint8_t port_bit = zif_mcu_port_bit(zif_pin);
-	mcu_pin_unmasked(port_pos, port_bit);
+	mcu_pin_unmasked(cfgnum, port_pos, port_bit);
 }
 
 // -----------------------------------------------------------------------

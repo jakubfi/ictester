@@ -39,6 +39,8 @@ protocol frames
 PROM reading?
 EPROM reading?
 bidirectional ICs (pin reconfiguration)
+CHECKS: check everything early (protocol level if possible => no checks during testing)
+CHECKS: allow only meaningfull setups (anything out of ordinary => error)
 
 SW:
 better test params building
