@@ -62,7 +62,7 @@ change from test to test.
 * 1 BYTE: command: `CMD_DUT_SETUP`
 * 1 BYTE: `t` = package type  (1=DIP)
 * 1 BYTE: `p` = number of all DUT pins ([14, 16, 20, 24])
-* 1 BYTE: `c` = number of pin configurations (1 or 2)
+* 1 BYTE: `c` = number of pin configurations (min 1, max 4)
 * `c` PIN CONFIGURATIONS (internally numbered starting from `0`):
   * `p` BYTES: `p` ZIF pin functions for each DUT pin. 1 byte each, starting from pin 1. See table below.
 
@@ -135,7 +135,7 @@ Sets up the test. Requires the DUT to be set up first.
 
 * 1 BYTE: command: `CMD_TEST_SETUP`
 * 1 BYTE: DUT pin configuration number used by the test
-  (configuration `0` is available for every DUT, `1` may be available in some cases. See `CMD_DUT_SETUP`)
+  (configuration `0` is available for every DUT, more may be available in some cases. See `CMD_DUT_SETUP`)
 * 1 BYTE: test type. Algorithm used to test the DUT. See table below for test types available.
 * TEST PARAMETERS: depend on the test type, see below.
 
