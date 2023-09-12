@@ -143,7 +143,7 @@ class Tester:
 
             if self.debug:
                 check = " NC" if not v.output else ""
-                print(f" {data}{check}")
+                print(f" {list(map(int, data))}{check}")
 
             self.tr.send_bitarray(data)
 
