@@ -88,6 +88,7 @@ bool zif_func(uint8_t cfgnum, uint8_t func, uint8_t zif_pin)
 		case ZIF_IN_PU_WEAK:
 		case ZIF_OUT:
 		case ZIF_IN:
+		case ZIF_IN_HIZ:
 			port_pos = zif_mcu_port(zif_pin);
 			port_bit = zif_mcu_port_bit(zif_pin);
 			mcu_func(cfgnum, func, port_pos, port_bit);
