@@ -14,7 +14,7 @@ def partimport(part_name):
 
 
 # ------------------------------------------------------------------------
-PinType = Enum("PinType", ["IN", "OUT", "OC", "ST3", "OE", "C", "RC", "VCC", "GND", "NC"])
+PinType = Enum("PinType", ["IN", "OUT", "BIDI", "OC", "ST3", "OE", "C", "RC", "VCC", "GND", "NC"])
 ZIFFunc = Enum("ZIFFunc", names=[
         ("OUT", 1),
         ("IN", 2),
@@ -33,29 +33,51 @@ ZIFFunc = Enum("ZIFFunc", names=[
 # ------------------------------------------------------------------------
 class Pin:
 
-    _pin_zif_funcs = {
-        PinType.IN:  [ZIFFunc.OUT],
+    _pin_zif_allowed_funcs = {
+        PinType.IN: [ZIFFunc.OUT],
         PinType.OUT: [ZIFFunc.IN_PU_WEAK, ZIFFunc.IN_PU_STRONG, ZIFFunc.IN],
-        PinType.OC:  [ZIFFunc.IN_PU_STRONG, ZIFFunc.IN_PU_WEAK, ZIFFunc.IN],
+        PinType.BIDI: [ZIFFunc.OUT, ZIFFunc.IN_PU_WEAK, ZIFFunc.IN_PU_STRONG, ZIFFunc.IN],
+        PinType.OC: [ZIFFunc.IN_PU_STRONG, ZIFFunc.IN_PU_WEAK, ZIFFunc.IN],
         PinType.ST3: [ZIFFunc.IN_PU_WEAK, ZIFFunc.IN, ZIFFunc.IN_PU_STRONG],
-        PinType.OE:  [ZIFFunc.OUT_SINK],
-        PinType.C:   [ZIFFunc.C],
-        PinType.RC:  [ZIFFunc.IN_PU_STRONG],
+        PinType.OE: [ZIFFunc.OUT_SINK],
+        PinType.C: [ZIFFunc.C],
+        PinType.RC: [ZIFFunc.IN_PU_STRONG],
         PinType.VCC: [ZIFFunc.VCC],
         PinType.GND: [ZIFFunc.GND],
-        PinType.NC:  [ZIFFunc.IN_HIZ],
+        PinType.NC: [ZIFFunc.IN_HIZ],
     }
 
+    _pin_zif_default_funcs = {
+        PinType.IN: [ZIFFunc.OUT],
+        PinType.OUT: [ZIFFunc.IN_PU_WEAK],
+        PinType.BIDI: None,
+        PinType.OC: [ZIFFunc.IN_PU_STRONG],
+        PinType.ST3: [ZIFFunc.IN_PU_WEAK],
+        PinType.OE: [ZIFFunc.OUT_SINK],
+        PinType.C: [ZIFFunc.C],
+        PinType.RC: [ZIFFunc.IN_PU_STRONG],
+        PinType.VCC: [ZIFFunc.VCC],
+        PinType.GND: [ZIFFunc.GND],
+        PinType.NC: [ZIFFunc.IN_HIZ],
+    }
+
+
     def __init__(self, name, role, zif_func=None):
-        assert role in self._pin_zif_funcs
+        assert role in self._pin_zif_allowed_funcs
         self.name = name
         self.role = role
+
         if zif_func:
             self.zif_func = zif_func
         else:
-            self.zif_func = self._pin_zif_funcs[role][0]
-        if self.zif_func not in self._pin_zif_funcs[role]:
-            raise ValueError(f"ZIF function: {self.zif_func.name} cannot be assigned to pin type: {self.role.name}")
+            self.zif_func = self._pin_zif_default_funcs[role]
+
+        if not self.zif_func:
+                raise ValueError(f"Pin {self.name} which is of type {self.role.name} requires zif_func to be defined")
+        else:
+            for f in self.zif_func:
+                if f not in self._pin_zif_allowed_funcs[role]:
+                    raise ValueError(f"ZIF function: {f.name} cannot be assigned to pin type: {self.role.name}")
 
 
 # ------------------------------------------------------------------------
@@ -214,7 +236,7 @@ class Test():
 
     MAX_TEST_PARAMS = 4
 
-    def __init__(self, name, ttype, inputs, outputs, params=[], body=[], loops=1024):
+    def __init__(self, name, ttype, inputs, outputs, params=[], body=[], loops=1024, cfgnum=0):
         self.name = name
         self.type = ttype
         self.params = params + [0] * (self.MAX_TEST_PARAMS - len(params))
@@ -223,6 +245,7 @@ class Test():
         self.outputs = outputs
         self._body = body
         self._vectors = None
+        self.cfgnum = cfgnum
 
     @property
     def pins(self):

@@ -48,23 +48,33 @@ class Tester:
         return [t.name for t in self.part.tests]
 
     def dut_setup(self):
-        # TODO: multi configs
-        self.tr.send([Tester.CMD_DUT_SETUP, self.part.package_type, self.part.pincount, 1])
+        cfg_count = 0
+        for pin in self.part.pins.values():
+            if len(pin.zif_func) > cfg_count:
+                cfg_count = len(pin.zif_func)
+        assert 5 > cfg_count > 0
+        self.tr.send([Tester.CMD_DUT_SETUP, self.part.package_type, self.part.pincount, cfg_count])
 
         if self.debug:
-            print("DUT pin definitions:")
+            print(f"DUT pin definitions, {cfg_count} configuration(-s) available:")
 
-        for num, pin in sorted(self.part.pins.items()):
+        for cfgnum in range(0, cfg_count):
             if self.debug:
-                print(f'{num:-3} {pin.name:6} {pin.role.name:5} ZIF {pin.zif_func.name}')
-            self.tr.send([pin.zif_func.value])
+                print(f"Configuration {cfgnum}:")
+            for num, pin in sorted(self.part.pins.items()):
+                try:
+                    pin_func = pin.zif_func[cfgnum]
+                except IndexError:
+                    pin_func = pin.zif_func[0]
+                if self.debug:
+                    print(f'{num:-3} {pin.name:6} {pin.role.name:5} ZIF {pin_func.name}')
+                self.tr.send([pin_func.value])
 
         if self.tr.recv() != Tester.RESP_OK:
             raise RuntimeError("DUT setup failed")
 
-    def dut_connect(self):
-        # TODO: config number
-        self.tr.send([Tester.CMD_DUT_CONNECT, 0])
+    def dut_connect(self, cfgnum):
+        self.tr.send([Tester.CMD_DUT_CONNECT, cfgnum])
         if self.tr.recv() != Tester.RESP_OK:
             raise RuntimeError("DUT connect failed")
 
@@ -81,14 +91,14 @@ class Tester:
                 params[0] = delay_val & 0xff
                 params[1] = delay_val >> 8
 
-        # TODO: config number
-        self.tr.send([Tester.CMD_TEST_SETUP, 0, test.type, *params])
+        self.tr.send([Tester.CMD_TEST_SETUP, test.cfgnum, test.type, *params])
 
         data = [
             1 if i in test.pins else 0
             for i in reversed(sorted(self.part.pins))
         ]
         if self.debug:
+            print(f"Configuration used: {test.cfgnum}")
             print(f"Test pin usage map: {data}")
             print(f"DUT inputs: {test.inputs}")
             print(f"DUT outputs: {test.outputs}")
