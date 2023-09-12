@@ -32,8 +32,8 @@ class Part7485(PackageDIP16):
                 (a == b) and eq,
                 (a > b) or ((a == b) and not ls and not eq)
             ]]
-            for a in BV.range(0, 16)
-            for b in BV.range(0, 16)
+            for a in BV.range(0, 2**4)
+            for b in BV.range(0, 2**4)
             for ls in [0, 1]
             for eq in [0]
             for gt in [0, 1]
@@ -51,8 +51,8 @@ class Part7485(PackageDIP16):
                 (a == b) and eq,
                 (a > b) or ((a == b) and not ls and not eq)
             ]]
-            for a in BV.range(0, 16)
-            for b in BV.range(0, 16)
+            for a in BV.range(0, 2**4)
+            for b in BV.range(0, 2**4)
             for ls in [0, 1]
             for eq in [1]
             for gt in [0, 1]

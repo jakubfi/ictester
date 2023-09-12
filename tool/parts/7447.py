@@ -22,6 +22,7 @@ class Part7447(PackageDIP16):
     # 7447 outputs are very slow, signal rise is ~5us
     read_delay_us = 2
 
+    # TODO: full coverage
     test_async = Test("Asynchronous operation", Test.LOGIC,
         params=list(round(read_delay_us/0.2).to_bytes(2, 'little')),
         inputs=[6, 2, 1, 7,  3, 5, 4],

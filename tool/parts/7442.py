@@ -24,7 +24,7 @@ class Part7442(PackageDIP16):
     test_async = Test("Asynchronous operation", Test.LOGIC,
         inputs=[12, 13, 14, 15],
         outputs=[11, 10, 9, 7, 6, 5, 4, 3, 2, 1],
-        body=[[BV.int(i, 4),  ~BV.bit(i, 10)] for i in range(0, 16)]
+        body=[[BV.int(i, 4),  ~BV.bit(i, 10)] for i in range(0, 2**4)]
     )
 
     tests = [test_async]

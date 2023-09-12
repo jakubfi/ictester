@@ -23,6 +23,12 @@ class Part7408(PackageDIP14):
         Test("Complete logic", Test.LOGIC,
             inputs=[1, 2, 4, 5, 10, 9, 13, 12],
             outputs=[3, 6, 8, 11],
-            body=[[4*x, 4*[x.vand()]] for x in BV.range(0, 4)]
+            body=[
+                [[*g1, *g2, *g3, *g4], [g1.vand(), g2.vand(), g3.vand(), g4.vand()]]
+                for g1 in BV.range(0, 2**2)
+                for g2 in BV.range(0, 2**2)
+                for g3 in BV.range(0, 2**2)
+                for g4 in BV.range(0, 2**2)
+            ]
         )
     ]

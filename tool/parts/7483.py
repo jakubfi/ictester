@@ -26,8 +26,8 @@ class Part7483(PackageDIP16_vcc5):
         outputs=[15, 2, 6, 9,  14],
         body=lambda: [
             [[*c, *a, *b],  [*(a+b+c), (a+b+c).carry]]
-            for a in BV.range(0, 16)
-            for b in BV.range(0, 16)
+            for a in BV.range(0, 2**4)
+            for b in BV.range(0, 2**4)
             for c in BV.range(0, 2)
         ]
     )

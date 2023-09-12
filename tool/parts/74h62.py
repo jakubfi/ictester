@@ -34,10 +34,10 @@ class Part74H62(PackageDIP14):
         loops=64,
         body=lambda: [
             [[0, *ab, *cde, *fgh, *ij],  [not (ab.vand() or cde.vand() or fgh.vand() or ij.vand())]]
-            for ab in BV.range(0, 4)
-            for cde in BV.range(0, 8)
-            for fgh in BV.range(0, 8)
-            for ij in BV.range(0, 4)
+            for ab in BV.range(0, 2**2)
+            for cde in BV.range(0, 2**3)
+            for fgh in BV.range(0, 2**3)
+            for ij in BV.range(0, 2**2)
         ]
     )
 

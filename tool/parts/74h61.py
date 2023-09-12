@@ -23,7 +23,12 @@ class Part74H61(PackageDIP14):
         inputs=[1, 2, 3,  4, 5, 6,  11, 12, 13],
         outputs=[9, 8, 10],
         loops=64,
-        body=[[3*x, 3*[not x.vand()]] for x in BV.range(0, 8)]
+        body=[
+            [[*g1, *g2, *g3], [not g1.vand(), not g2.vand(), not g3.vand()]]
+            for g1 in BV.range(0, 2**3)
+            for g2 in BV.range(0, 2**3)
+            for g3 in BV.range(0, 2**3)
+        ]
     )
 
     tests = [test_async]

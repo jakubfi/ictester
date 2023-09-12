@@ -23,14 +23,13 @@ class Part7400(PackageDIP14):
         Test("Complete logic", Test.LOGIC,
             inputs=[1, 2, 4, 5, 10, 9, 13, 12],
             outputs=[3, 6, 8, 11],
-            body=[[4*v, 4*[not v.vand()]] for v in BV.range(0, 4)]
-            # 'body' can also be written as, and is equivalent to:
-            # body=[
-            #     [[0, 0,  0, 0,  0, 0,  0, 0], [1, 1, 1, 1]],
-            #     [[0, 1,  0, 1,  0, 1,  0, 1], [1, 1, 1, 1]],
-            #     [[1, 0,  1, 0,  1, 0,  1, 0], [1, 1, 1, 1]],
-            #     [[1, 1,  1, 1,  1, 1,  1, 1], [0, 0, 0, 0]],
-            # ]
+            body=[
+                [[*g1, *g2, *g3, *g4], [not g1.vand(), not g2.vand(), not g3.vand(), not g4.vand()]]
+                for g1 in BV.range(0, 2**2)
+                for g2 in BV.range(0, 2**2)
+                for g3 in BV.range(0, 2**2)
+                for g4 in BV.range(0, 2**2)
+            ]
         )
     ]
 

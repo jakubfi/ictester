@@ -25,9 +25,11 @@ class Part7450(PackageDIP14):
         inputs=[1, 13, 9, 10,  2, 3, 4, 5],
         outputs=[8, 6],
         body=[
-            [2*[*ab, *cd],  2*[not (ab.vand() or cd.vand())]]
-            for ab in BV.range(0, 4)
-            for cd in BV.range(0, 4)
+            [[*ab1, *cd1, *ab2, *cd2],  [not (ab1.vand() or cd1.vand()), not (ab2.vand() or cd2.vand())]]
+            for ab1 in BV.range(0, 2**2)
+            for cd1 in BV.range(0, 2**2)
+            for ab2 in BV.range(0, 2**2)
+            for cd2 in BV.range(0, 2**2)
         ]
     )
 

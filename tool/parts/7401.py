@@ -25,7 +25,13 @@ class Part7401(PackageDIP14):
             params=list(round(read_delay_us/0.2).to_bytes(2, 'little')),
             inputs=[2, 3,  5, 6,  8, 9,  11, 12],
             outputs=[1, 4, 10, 13],
-            body=[[4*v, 4*[not v.vand()]] for v in BV.range(0, 4)]
+            body=[
+                [[*g1, *g2, *g3, *g4], [not g1.vand(), not g2.vand(), not g3.vand(), not g4.vand()]]
+                for g1 in BV.range(0, 2**2)
+                for g2 in BV.range(0, 2**2)
+                for g3 in BV.range(0, 2**2)
+                for g4 in BV.range(0, 2**2)
+            ]
         )
     ]
 

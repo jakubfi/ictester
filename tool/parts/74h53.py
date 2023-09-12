@@ -27,10 +27,10 @@ class Part74H53(PackageDIP14):
         loops=128,
         body=lambda: [
             [[*ab, *cd, *efg, *hi], [not (ab.vand() or cd.vand() or efg.vand() or hi.vand())]]
-            for ab in BV.range(0, 4)
-            for cd in BV.range(0, 4)
-            for efg in BV.range(0, 8)
-            for hi in BV.range(0, 4)
+            for ab in BV.range(0, 2**2)
+            for cd in BV.range(0, 2**2)
+            for efg in BV.range(0, 2**3)
+            for hi in BV.range(0, 2**2)
         ]
     )
 
