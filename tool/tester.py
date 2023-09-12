@@ -48,6 +48,8 @@ class Tester:
         return [t.name for t in self.part.tests]
 
     def dut_setup(self):
+        if self.debug:
+            print("---- DUT SETUP ------------------------------------")
         cfg_count = 0
         for pin in self.part.pins.values():
             if len(pin.zif_func) > cfg_count:
@@ -74,16 +76,22 @@ class Tester:
             raise RuntimeError("DUT setup failed")
 
     def dut_connect(self, cfgnum):
+        if self.debug:
+            print("---- DUT CONNECT ----------------------------------")
         self.tr.send([Tester.CMD_DUT_CONNECT, cfgnum])
         if self.tr.recv() != Tester.RESP_OK:
             raise RuntimeError("DUT connect failed")
 
     def dut_disconnect(self):
+        if self.debug:
+            print("---- DUT DISCONNECT -------------------------------")
         self.tr.send([Tester.CMD_DUT_DISCONNECT])
         if self.tr.recv() != Tester.RESP_OK:
             raise RuntimeError("DUT disconnect failed")
 
     def test_setup(self, test, delay):
+        if self.debug:
+            print("---- TEST SETUP -----------------------------------")
         params = test.params
         if delay is not None:
             if test.type == Test.LOGIC:
@@ -108,6 +116,8 @@ class Tester:
             raise RuntimeError("Test setup failed")
 
     def vectors_load(self, test):
+        if self.debug:
+            print("---- VECTORS LOAD ---------------------------------")
         if self.debug:
             print(f"Test vectors ({len(test.vectors)}):")
             for v in test.vectors:
@@ -141,6 +151,8 @@ class Tester:
             raise RuntimeError("Vectors load failed")
 
     def run(self, loops):
+        if self.debug:
+            print("---- RUN ------------------------------------------")
         assert 1 <= loops <= 0xffff
 
         self.tr.send([Tester.CMD_RUN])
