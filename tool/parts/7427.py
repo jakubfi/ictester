@@ -21,8 +21,8 @@ class Part7427(PackageDIP14):
 
     tests = [
         Test("Complete logic", Test.LOGIC,
-            inputs=[1, 2, 13,  3, 4, 5,  8, 10, 11],
+            inputs=[1, 2, 13,  3, 4, 5,  9, 10, 11],
             outputs=[12, 6, 8],
-            body=[[3*x, 3*~x.vor()] for x in BV.range(0, 7)]
+            body=[[3*x, 3*~x.vor()] for x in BV.range(0, 8)]
         )
     ]
