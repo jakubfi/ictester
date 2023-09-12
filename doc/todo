@@ -9,7 +9,6 @@
 190 - SYNCHRONOUS UP/DOWN COUNTERS WITH DOWN/UP MODE CONTROL
 191 - SYNCHRONOUS UP/DOWN COUNTERS WITH DOWN/UP MODE CONTROL
 192 - UP/DOWN BCD Decade (8421) Counter
-245 - Octal Bus Transceivers With 3-State Outputs
 287 - PROM
 366 - 3-STATE HEX BUFFER
 367 - 3-STATE HEX BUFFER
@@ -38,7 +37,6 @@ debug verbosity?
 protocol frames
 PROM reading?
 EPROM reading?
-bidirectional ICs (pin reconfiguration)
 CHECKS: check everything early (protocol level if possible => no checks during testing)
 CHECKS: allow only meaningfull setups (anything out of ordinary => error)
 
