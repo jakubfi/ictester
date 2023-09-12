@@ -36,10 +36,10 @@ class BV(list):
         return BV(reversed(self))
 
     def vand(self):
-        return BV([reduce(lambda x, y: x and y, self)])
+        return reduce(lambda x, y: x and y, self)
 
     def vor(self):
-        return BV([reduce(lambda x, y: x or y, self)])
+        return reduce(lambda x, y: x or y, self)
 
     def __invert__(self):
         return BV(map(lambda x: not x, self))

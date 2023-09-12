@@ -23,7 +23,7 @@ class Part74LS51(PackageDIP14):
         inputs=[1, 12, 13,  9, 10, 11],
         outputs=[8],
         body=[
-            [[*abc, *_def],  [*~(abc.vand() | _def.vand())]]
+            [[*abc, *_def],  [not (abc.vand() or _def.vand())]]
             for abc in BV.range(0, 8)
             for _def in BV.range(0, 8)
         ]
@@ -33,7 +33,7 @@ class Part74LS51(PackageDIP14):
         inputs=[2, 3,  4, 5],
         outputs=[6],
         body=[
-            [[*ab, *cd],  [*~(ab.vand() | cd.vand())]]
+            [[*ab, *cd],  [not (ab.vand() or cd.vand())]]
             for ab in BV.range(0, 4)
             for cd in BV.range(0, 4)
         ]

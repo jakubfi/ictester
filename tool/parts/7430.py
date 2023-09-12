@@ -23,6 +23,6 @@ class Part7430(PackageDIP14):
         Test("Complete logic", Test.LOGIC,
             inputs=[1, 2, 3, 4, 5, 6, 11, 12],
             outputs=[8],
-            body=[[x, ~x.vand()] for x in BV.range(0, 256)]
+            body=[[x, [not x.vand()]] for x in BV.range(0, 256)]
         )
     ]

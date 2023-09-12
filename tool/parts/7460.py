@@ -32,7 +32,7 @@ class Part7460(PackageDIP14):
         inputs=[11, 10,  1, 2, 3, 13,  4, 5, 6, 8],
         outputs=[12, 9],
         body = [
-            [[0, 0, *i, *i],  [*~i.vand(), *~i.vand()]] for i in BV.range(0, 16)
+            [[0, 0, *i, *i],  [not i.vand(), not i.vand()]] for i in BV.range(0, 16)
         ]
     )
 

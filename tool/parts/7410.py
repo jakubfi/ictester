@@ -23,6 +23,6 @@ class Part7410(PackageDIP14):
         Test("Complete logic", Test.LOGIC,
             inputs=[1, 2, 13, 3, 4, 5, 9, 10, 11],
             outputs=[12, 6, 8],
-            body=[[3*x, 3*~x.vand()] for x in BV.range(0, 8)]
+            body=[[3*x, 3*[not x.vand()]] for x in BV.range(0, 8)]
         )
     ]

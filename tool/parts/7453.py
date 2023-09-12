@@ -32,7 +32,7 @@ class Part7453(PackageDIP14):
         body=lambda: [
             [
                 [*ab, *cd, *ef, 0, *gh], # '0' inserted for NC input 6
-                ~(ab.vand() | cd.vand() | ef.vand() | gh.vand())
+                [not (ab.vand() or cd.vand() or ef.vand() or gh.vand())]
             ]
             for ab in BV.range(0, 4)
             for cd in BV.range(0, 4)

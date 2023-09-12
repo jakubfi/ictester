@@ -106,7 +106,7 @@ class Part74181(PackageDIP24):
             inputs=[8,  3, 4, 5, 6,  7,  19, 21, 23, 2,  18, 20, 22, 1],
             outputs=[13, 11, 10, 9,  14],
             body=[
-                [[1, *BV.int(15, 4), 0, *a, *BV.int(0, 4)], [*a, *a.vand()]]
+                [[1, *BV.int(15, 4), 0, *a, *BV.int(0, 4)], [*a, a.vand()]]
                 for a in BV.range(0, 16)
             ]
         )
