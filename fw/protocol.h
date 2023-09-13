@@ -16,12 +16,13 @@ enum commands {
 };
 
 enum responses {
-	RESP_NONE	= 0,
-	RESP_HELLO	= 128,
-	RESP_OK		= 129,
-	RESP_PASS	= 130,
-	RESP_FAIL	= 131,
-	RESP_ERR	= 132,
+	RESP_NONE			= 0,
+	RESP_HELLO			= 128,
+	RESP_OK				= 129,
+	RESP_PASS			= 130,
+	RESP_FAIL			= 131,
+	RESP_ERR			= 132,
+	RESP_TIMING_FAIL	= 133,
 };
 
 enum error_types {

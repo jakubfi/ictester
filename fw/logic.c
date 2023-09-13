@@ -4,6 +4,7 @@
 #include <avr/io.h>
 #include <avr/cpufunc.h>
 #include <util/delay_basic.h>
+#include <util/delay.h>
 
 #include "zif.h"
 #include "mcu.h"
@@ -61,17 +62,32 @@ uint8_t handle_vectors_load(uint8_t dut_pin_count, uint8_t zif_vcc_pin)
 }
 
 // -----------------------------------------------------------------------
+static inline uint8_t retest(uint16_t pos, struct mcu_port_config *mcu_port)
+{
+	// Retest current vector after 5us.
+	// If it passes this time, it's a test timing error.
+	_delay_us(5);
+
+	if ((PINA & mcu_port[PA].mask) != vectors[pos].port[PA].out) return RESP_FAIL;
+	if ((PINB & mcu_port[PB].mask) != vectors[pos].port[PB].out) return RESP_FAIL;
+	if ((PINC & mcu_port[PC].mask) != vectors[pos].port[PC].out) return RESP_FAIL;
+
+	return RESP_TIMING_FAIL;
+}
+
+// -----------------------------------------------------------------------
 static inline uint8_t run_logic2(uint16_t delay, struct mcu_port_config *mcu_port)
 {
-	for (uint16_t pos=0 ; pos<vectors_count ; pos++) {
+	uint16_t pos;
+	for (pos=0 ; pos<vectors_count ; pos++) {
 		PORTB = vectors[pos].port[PB].in;
 		PORTC = vectors[pos].port[PC].in;
 
 		if (!vectors[pos].check) continue;
 		if (delay) _delay_loop_2(delay);
 
-		if ((PINB & mcu_port[PB].mask) != vectors[pos].port[PB].out) return RESP_FAIL;
-		if ((PINC & mcu_port[PC].mask) != vectors[pos].port[PC].out) return RESP_FAIL;
+		if ((PINB & mcu_port[PB].mask) != vectors[pos].port[PB].out) return retest(pos, mcu_port);
+		if ((PINC & mcu_port[PC].mask) != vectors[pos].port[PC].out) return retest(pos, mcu_port);
 	}
 
 	return RESP_PASS;
@@ -88,9 +104,9 @@ static inline uint8_t run_logic3(uint16_t delay, struct mcu_port_config *mcu_por
 		if (!vectors[pos].check) continue;
 		if (delay) _delay_loop_2(delay);
 
-		if ((PINA & mcu_port[PA].mask) != vectors[pos].port[PA].out) return RESP_FAIL;
-		if ((PINB & mcu_port[PB].mask) != vectors[pos].port[PB].out) return RESP_FAIL;
-		if ((PINC & mcu_port[PC].mask) != vectors[pos].port[PC].out) return RESP_FAIL;
+		if ((PINA & mcu_port[PA].mask) != vectors[pos].port[PA].out) return retest(pos, mcu_port);
+		if ((PINB & mcu_port[PB].mask) != vectors[pos].port[PB].out) return retest(pos, mcu_port);
+		if ((PINC & mcu_port[PC].mask) != vectors[pos].port[PC].out) return retest(pos, mcu_port);
 	}
 
 	return RESP_PASS;
@@ -99,6 +115,7 @@ static inline uint8_t run_logic3(uint16_t delay, struct mcu_port_config *mcu_por
 // -----------------------------------------------------------------------
 uint8_t run_logic(uint8_t dut_pin_count, uint16_t loops, uint8_t *params)
 {
+	uint8_t res;
 	volatile uint16_t delay = (params[1] << 8) + params[0];
 
 	// local copy for speed (pointer known at compile time)
@@ -117,11 +134,11 @@ uint8_t run_logic(uint8_t dut_pin_count, uint16_t loops, uint8_t *params)
 
 	if (dut_pin_count <= 16) {
 		for (uint16_t rep=0 ; rep<loops ; rep++) {
-			if (run_logic2(delay, mcu_port_copy) != RESP_PASS) return RESP_FAIL;
+			if ((res = run_logic2(delay, mcu_port_copy)) != RESP_PASS) return res;
 		}
 	} else {
 		for (uint16_t rep=0 ; rep<loops ; rep++) {
-			if (run_logic3(delay, mcu_port_copy) != RESP_PASS) return RESP_FAIL;
+			if ((res = run_logic3(delay, mcu_port_copy)) != RESP_PASS) return res;
 		}
 	}
 

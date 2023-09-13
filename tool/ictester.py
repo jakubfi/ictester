@@ -42,7 +42,9 @@ FAIL = '\033[91m\033[1m'
 OK = '\033[92m\033[1m'
 WARN = '\033[95m\033[1m'
 SKIP = '\033[93m\033[1m'
+HI = '\033[94m\033[1m'
 ENDC = '\033[0m'
+
 
 if '--list' in sys.argv:
     list_parts("--tests" in sys.argv)
@@ -95,6 +97,9 @@ test_count = len(all_tests)
 longest_desc = len(max(all_tests, key=len))
 
 tests_failed = 0
+tests_warning = 0
+tests_skipped = 0
+tests_passed = 0
 total_time = 0
 
 tester.dut_setup()
@@ -109,11 +114,16 @@ for test_name in all_tests:
     print(f" * Testing: {test_name:{longest_desc}s}   {stats:25}  ... ", end=endc, flush=True)
 
     if tests_failed:
-        print(f"\b\b\b\b{SKIP}SKIPPED{ENDC}")
+        tests_skipped += 1
+        print(f"\b\b\b\b{SKIP}SKIP{ENDC}")
     else:
         res, elapsed = tester.exec_test(test, loops, args.delay)
         if res == Tester.RESP_PASS:
+            tests_passed += 1
             print(f"\b\b\b\b{OK}PASS{ENDC}  ({elapsed:.2f} sec.)")
+        elif res == Tester.RESP_TIMING_FAIL:
+            tests_warning += 1
+            print(f"\b\b\b\b{WARN}TIMING ERROR{ENDC}")
         else:
             tests_failed += 1
             print(f"\b\b\b\b{FAIL}FAIL{ENDC}  ({elapsed:.2f} sec.)")
@@ -123,10 +133,20 @@ tester.dut_disconnect()
 if tests_failed != 0:
     result = f"{FAIL}PART DEFECTIVE"
     ret = 1
+elif tests_warning != 0:
+    result = f"{WARN}OUTPUT READ TIMING ERROR"
+    ret = 2
 else:
     result = f"{OK}PART OK"
     ret = 0
 
-print(f"\n{result}{ENDC}")
+print()
+print(f"Tests total: {HI}{len(all_tests)}{ENDC}, "
+      f"failed: {HI}{tests_failed}{ENDC}, "
+      f"warning: {HI}{tests_warning}{ENDC}, "
+      f"skipped: {HI}{tests_skipped}{ENDC}, "
+      f"passed: {HI}{tests_passed}{ENDC}"
+)
+print(f"{result}{ENDC}")
 
 sys.exit(ret)

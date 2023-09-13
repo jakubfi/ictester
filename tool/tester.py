@@ -16,6 +16,7 @@ class Tester:
     RESP_PASS = 130
     RESP_FAIL = 131
     RESP_ERR = 132
+    RESP_TIMING_FAIL = 133
 
     error_strings = {
         0: "Error code was not set",

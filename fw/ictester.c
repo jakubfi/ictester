@@ -159,7 +159,7 @@ static uint8_t handle_run()
 			break;
 	}
 
-	if (res != RESP_PASS) {
+	if (res == RESP_FAIL) {
 		handle_dut_disconnect(res);
 	}
 

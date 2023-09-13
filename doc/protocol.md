@@ -24,13 +24,14 @@ All 16-bit values are little-endian.
 
 ## Available responses
 
-| Response             | Value | Meaning                       |
-|----------------------|-------|-------------------------------|
-| `RESP_HELLO`         | 128   | Tester information            |
-| `RESP_OK`            | 129   | Command executed              |
-| `RESP_PASS`          | 130   | Test finished successfully    |
-| `RESP_FAIL`          | 131   | Test finished with failure    |
-| `RESP_ERR`           | 132   | Error                         |
+| Response             | Value | Meaning                                |
+|----------------------|-------|----------------------------------------|
+| `RESP_HELLO`         | 128   | Tester information                     |
+| `RESP_OK`            | 129   | Command executed                       |
+| `RESP_PASS`          | 130   | Test finished successfully             |
+| `RESP_FAIL`          | 131   | Test finished with failure             |
+| `RESP_ERR`           | 132   | Error                                  |
+| `RESP_TIMING_FAIL`   | 133   | Test finished with read timing error   |
 
 
 # Command description
@@ -316,6 +317,14 @@ Note that when test fails, DUT is immediately disconnected by the tester.
 
 * 1 BYTE: response: `RESP_FAIL`
 * `x` BYTES: failure description. Depends on the test type, see below
+
+## Test timing error
+
+This response is sent only for `CMD_TEST_RUN` command and indicates output read timing error.
+5 μs after the initial test vector failure, vector is tested again. If that second check
+passes, `RESP_TIMING_FAIL` is sent in response. Otherwise test fails with `RESP_FAIL`.
+
+* 1 BYTE: response: `RESP_TIMING_FAIL`
 
 ### `TEST_LOGIC` failure
 
