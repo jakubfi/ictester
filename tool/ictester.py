@@ -42,7 +42,7 @@ FAIL = '\033[91m\033[1m'
 OK = '\033[92m\033[1m'
 WARN = '\033[95m\033[1m'
 SKIP = '\033[93m\033[1m'
-HI = '\033[94m\033[1m'
+HI = '\033[97m\033[1m'
 ENDC = '\033[0m'
 
 
@@ -130,23 +130,28 @@ for test_name in all_tests:
 
 tester.dut_disconnect()
 
-if tests_failed != 0:
+print()
+print(f"Total tests: {HI}{len(all_tests)}{ENDC}", end="")
+if tests_failed:
+    print(f", failed: {FAIL}{tests_failed}{ENDC}", end="")
+if tests_warning:
+    print(f", warning: {WARN}{tests_warning}{ENDC}", end="")
+if tests_skipped:
+    print(f", skipped: {SKIP}{tests_skipped}{ENDC}", end="")
+if tests_passed:
+    print(f", passed: {OK}{tests_passed}{ENDC}", end="")
+print()
+
+if tests_failed:
     result = f"{FAIL}PART DEFECTIVE"
     ret = 1
-elif tests_warning != 0:
+elif tests_warning:
     result = f"{WARN}OUTPUT READ TIMING ERROR"
     ret = 2
 else:
     result = f"{OK}PART OK"
     ret = 0
 
-print()
-print(f"Tests total: {HI}{len(all_tests)}{ENDC}, "
-      f"failed: {HI}{tests_failed}{ENDC}, "
-      f"warning: {HI}{tests_warning}{ENDC}, "
-      f"skipped: {HI}{tests_skipped}{ENDC}, "
-      f"passed: {HI}{tests_passed}{ENDC}"
-)
 print(f"{result}{ENDC}")
 
 sys.exit(ret)
