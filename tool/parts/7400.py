@@ -21,7 +21,7 @@ class Part7400(PackageDIP14):
 
     tests = [
         Test("Complete logic", Test.LOGIC,
-            inputs=[1, 2, 4, 5, 10, 9, 13, 12],
+            inputs=[1, 2, 4, 5, 9, 10, 12, 13],
             outputs=[3, 6, 8, 11],
             body=[
                 [[*g1, *g2, *g3, *g4], [not g1.vand(), not g2.vand(), not g3.vand(), not g4.vand()]]
