@@ -5,12 +5,12 @@ class Part74194(PackageDIP16):
     desc = "4-bit bidirectional universal shift register"
     pin_cfg = {
         1: Pin("~CLR", PinType.IN),
-        2: Pin("SR SER", PinType.IN),
+        2: Pin("SR_SER", PinType.IN),
         3: Pin("A", PinType.IN),
         4: Pin("B", PinType.IN),
         5: Pin("C", PinType.IN),
         6: Pin("D", PinType.IN),
-        7: Pin("SL SER", PinType.IN),
+        7: Pin("SL_SER", PinType.IN),
         9: Pin("S0", PinType.IN),
         10: Pin("S1", PinType.IN),
         11: Pin("CLK", PinType.IN),

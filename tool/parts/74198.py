@@ -5,7 +5,7 @@ class Part74198(PackageDIP24):
     desc = "8-bit shift registers"
     pin_cfg = {
         1: Pin("S0", PinType.IN),
-        2: Pin("SR SER", PinType.IN),
+        2: Pin("SR_SER", PinType.IN),
         3: Pin("A", PinType.IN),
         4: Pin("QA", PinType.OUT),
         5: Pin("B", PinType.IN),
@@ -24,7 +24,7 @@ class Part74198(PackageDIP24):
         19: Pin("G", PinType.IN),
         20: Pin("QH", PinType.OUT),
         21: Pin("H", PinType.IN),
-        22: Pin("SL SER", PinType.IN),
+        22: Pin("SL_SER", PinType.IN),
         23: Pin("S1", PinType.IN),
     }
 

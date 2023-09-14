@@ -9,7 +9,7 @@ class Part74166(PackageDIP16):
         3: Pin("B", PinType.IN),
         4: Pin("C", PinType.IN),
         5: Pin("D", PinType.IN),
-        6: Pin("CLK INH", PinType.IN),
+        6: Pin("CLK_INH", PinType.IN),
         7: Pin("CLK", PinType.IN),
         9: Pin("~CLR", PinType.IN),
         10: Pin("E", PinType.IN),

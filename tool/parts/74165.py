@@ -17,7 +17,7 @@
 #        12: Pin("B", PinType.IN),
 #        13: Pin("C", PinType.IN),
 #        14: Pin("D", PinType.IN),
-#        15: Pin("CLK INH", PinType.IN),
+#        15: Pin("CLK_INH", PinType.IN),
 #    }
 #    test_all = Test(
 #        name="Complete logic",
