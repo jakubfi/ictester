@@ -48,3 +48,6 @@ class Transport:
         if self.debug:
             print(f"-> {b:>08b} {b}")
         return b
+
+    def recv_16le(self):
+        return self.recv() + (self.recv() << 8)

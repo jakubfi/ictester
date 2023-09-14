@@ -1,5 +1,6 @@
 import time
 from prototypes import Test
+from binvec import BV
 
 
 class Tester:
@@ -151,7 +152,7 @@ class Tester:
         if self.tr.recv() != Tester.RESP_OK:
             raise RuntimeError("Vectors load failed")
 
-    def run(self, loops):
+    def run(self, loops, test):
         if self.debug:
             print("---- RUN ------------------------------------------")
         assert 1 <= loops <= 0xffff
@@ -162,14 +163,24 @@ class Tester:
         start = time.time()
         result = self.tr.recv()
         elapsed = time.time() - start
+        failed_vector_num = None
+        failed_zif_vector = None
 
-        return result, elapsed
+        # Read failed vector data for LOGIC tests (natural DUT pin order)
+        if test.type == Test.LOGIC and result == Tester.RESP_FAIL:
+            failed_vector_num = self.tr.recv_16le()
+            failed_pin_vector = [*BV.int(self.tr.recv(), 8).reversed()]
+            failed_pin_vector.extend([*BV.int(self.tr.recv(), 8).reversed()])
+            if self.part.pincount > 16:
+                failed_pin_vector.extend([*BV.int(self.tr.recv(), 8).reversed()])
+
+        return result, elapsed, failed_vector_num, failed_pin_vector
 
     def exec_test(self, test, loops, delay):
         self.test_setup(test, delay)
         if test.type == Test.LOGIC:
             self.vectors_load(test)
-        res = self.run(loops)
+        res = self.run(loops, test)
         if self.debug:
             print(f"Bytes sent: {self.tr.bytes_sent}, received: {self.tr.bytes_received}")
         return res

@@ -54,4 +54,19 @@ uint16_t serial_rx_16le()
 	return tmp;
 }
 
+// -----------------------------------------------------------------------
+void serial_tx_16le(uint16_t v)
+{
+	serial_tx_char(v & 0xff);
+	serial_tx_char(v >> 8);
+}
+
+// -----------------------------------------------------------------------
+void serial_tx_bytes(uint8_t *data, uint8_t count)
+{
+	while (count--) {
+		serial_tx_char(*(data++));
+	}
+}
+
 // vim: tabstop=4 shiftwidth=4 autoindent

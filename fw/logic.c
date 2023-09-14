@@ -21,6 +21,9 @@ static struct vector {
 	} port[MCU_PORT_CNT];
 } vectors[MAX_VECTORS];
 
+uint8_t failed_vector[MCU_PORT_CNT];
+uint16_t failed_vector_pos;
+
 // -----------------------------------------------------------------------
 uint8_t handle_vectors_load(uint8_t dut_pin_count, uint8_t zif_vcc_pin)
 {
@@ -62,15 +65,21 @@ uint8_t handle_vectors_load(uint8_t dut_pin_count, uint8_t zif_vcc_pin)
 }
 
 // -----------------------------------------------------------------------
-static inline uint8_t retest(uint16_t pos, struct mcu_port_config *mcu_port)
+static uint8_t handle_failure(uint16_t pos, struct mcu_port_config *mcu_port)
 {
 	// Retest current vector after 5us.
 	// If it passes this time, it's a test timing error.
 	_delay_us(5);
 
-	if ((PINA & mcu_port[PA].mask) != vectors[pos].port[PA].out) return RESP_FAIL;
-	if ((PINB & mcu_port[PB].mask) != vectors[pos].port[PB].out) return RESP_FAIL;
-	if ((PINC & mcu_port[PC].mask) != vectors[pos].port[PC].out) return RESP_FAIL;
+	// store failed vector for the response data
+	failed_vector_pos = pos;
+	failed_vector[PA] = PINA;
+	failed_vector[PB] = PINB;
+	failed_vector[PC] = PINC;
+
+	if ((failed_vector[PA] & mcu_port[PA].mask) != vectors[pos].port[PA].out) return RESP_FAIL;
+	if ((failed_vector[PB] & mcu_port[PB].mask) != vectors[pos].port[PB].out) return RESP_FAIL;
+	if ((failed_vector[PC] & mcu_port[PC].mask) != vectors[pos].port[PC].out) return RESP_FAIL;
 
 	return RESP_TIMING_FAIL;
 }
@@ -86,8 +95,8 @@ static inline uint8_t run_logic2(uint16_t delay, struct mcu_port_config *mcu_por
 		if (!vectors[pos].check) continue;
 		if (delay) _delay_loop_2(delay);
 
-		if ((PINB & mcu_port[PB].mask) != vectors[pos].port[PB].out) return retest(pos, mcu_port);
-		if ((PINC & mcu_port[PC].mask) != vectors[pos].port[PC].out) return retest(pos, mcu_port);
+		if ((PINB & mcu_port[PB].mask) != vectors[pos].port[PB].out) return handle_failure(pos, mcu_port);
+		if ((PINC & mcu_port[PC].mask) != vectors[pos].port[PC].out) return handle_failure(pos, mcu_port);
 	}
 
 	return RESP_PASS;
@@ -104,9 +113,9 @@ static inline uint8_t run_logic3(uint16_t delay, struct mcu_port_config *mcu_por
 		if (!vectors[pos].check) continue;
 		if (delay) _delay_loop_2(delay);
 
-		if ((PINA & mcu_port[PA].mask) != vectors[pos].port[PA].out) return retest(pos, mcu_port);
-		if ((PINB & mcu_port[PB].mask) != vectors[pos].port[PB].out) return retest(pos, mcu_port);
-		if ((PINC & mcu_port[PC].mask) != vectors[pos].port[PC].out) return retest(pos, mcu_port);
+		if ((PINA & mcu_port[PA].mask) != vectors[pos].port[PA].out) return handle_failure(pos, mcu_port);
+		if ((PINB & mcu_port[PB].mask) != vectors[pos].port[PB].out) return handle_failure(pos, mcu_port);
+		if ((PINC & mcu_port[PC].mask) != vectors[pos].port[PC].out) return handle_failure(pos, mcu_port);
 	}
 
 	return RESP_PASS;
@@ -143,6 +152,18 @@ uint8_t run_logic(uint8_t dut_pin_count, uint16_t loops, uint8_t *params)
 	}
 
 	return RESP_PASS;
+}
+
+// -----------------------------------------------------------------------
+uint8_t *get_failed_vector()
+{
+	return failed_vector;
+}
+
+// -----------------------------------------------------------------------
+uint16_t get_failed_vector_pos()
+{
+	return failed_vector_pos;
 }
 
 // vim: tabstop=4 shiftwidth=4 autoindent

@@ -28,8 +28,8 @@ DUT:
 review all sequential ICs (command changes vs clock, clock polarity, test suitability)
 
 FW/protocol:
+univib: pullups
 full error handling (protocol)
-failed vector reporting
 cmd_hello
 protocol and fw versioning
 'IC state reset' non-test something
@@ -41,6 +41,7 @@ CHECKS: check everything early (protocol level if possible => no checks during t
 CHECKS: allow only meaningfull setups (anything out of ordinary => error)
 
 SW:
+bash completion
 better test params building
 names: LS/S when no regular family?
 name matching?

@@ -206,6 +206,24 @@ int main()
 		}
 
 		reply(resp);
+
+		// handle response data for failed LOGIC tests
+		if ((cmd == CMD_TEST_RUN) && (resp == RESP_FAIL) && (test_type == TEST_LOGIC)) {
+			uint8_t pin_data[3] = {0, 0, 0};
+			uint8_t *failed_vector = get_failed_vector();
+			// translate vector from MCU port order to natural DUT pin order
+			for (uint8_t pin=0 ; pin<dut_pin_count ; pin++) {
+				uint8_t zif_pin = zif_pos(dut_pin_count, pin);
+				uint8_t mcu_port = zif_mcu_port(zif_pin);
+				uint8_t mcu_port_bit = zif_mcu_port_bit(zif_pin);
+				bool bit = failed_vector[mcu_port] & _BV(mcu_port_bit);
+				pin_data[pin / 8] |= bit << (pin % 8);
+			}
+			serial_tx_16le(get_failed_vector_pos());
+			serial_tx_bytes(pin_data, 2);
+			if (dut_pin_count > 16) serial_tx_char(pin_data[2]);
+		}
+
 	}
 
 	return 0;

@@ -10,6 +10,13 @@ from tester import Tester
 from transport import Transport
 from parts import catalog
 
+FAIL = '\033[91m\033[1m'
+OK = '\033[92m\033[1m'
+WARN = '\033[95m\033[1m'
+SKIP = '\033[93m\033[1m'
+HI = '\033[97m\033[1m'
+ENDC = '\033[0m'
+
 
 # ------------------------------------------------------------------------
 def list_parts(list_tests=False):
@@ -33,18 +40,46 @@ def print_part_info(part):
     if part.missing_tests:
         print(f"{WARN}WARNING: missing tests: {part.missing_tests}{ENDC}")
 
+# ------------------------------------------------------------------------
+def vector_chunk_print(prefix, vector, widths, vector_other=None, color=""):
+    print(prefix, end="")
+    for n, i in enumerate(vector):
+        bitcolor = FAIL if vector_other and i != vector_other[n] else color
+        print(f"{bitcolor}{str(i):>{widths[n]+1}}{ENDC}", end="")
+
+# ------------------------------------------------------------------------
+def vector_print(label, inputs, outputs, i_width, o_width, i_other=None, o_other=None, color="", separator=""):
+    vector_chunk_print(f" {HI}{label:<5}{ENDC}", inputs, i_width, i_other, color)
+    vector_chunk_print(separator.center(5), outputs, o_width, o_other, color)
+    print()
+
+# ------------------------------------------------------------------------
+def print_failed_vector(part, test, failed_vector_num, failed_pin_vector, context=3):
+    i_failed = [int(failed_pin_vector[pin-1]) for pin in test.inputs]
+    o_failed = [int(failed_pin_vector[pin-1]) for pin in test.outputs]
+
+    i_names = [part.pins[pin].name for pin in test.inputs]
+    o_names = [part.pins[pin].name for pin in test.outputs]
+
+    i_width = [len(x) for x in i_names]
+    o_width = [len(x) for x in o_names]
+
+    print()
+    start_vec = max(failed_vector_num - context, 0)
+    vector_print("", i_names, o_names, i_width, o_width, color=HI, separator="->")
+    for i in range(start_vec, failed_vector_num+1):
+        inputs = [int(x) for x in test.vectors[i].input]
+        outputs = [int(x) for x in test.vectors[i].output]
+        if i < failed_vector_num:
+            vector_print(f"{i}:", inputs, outputs, i_width, o_width)
+        else:
+            vector_print(f"{i}:", i_failed, o_failed, i_width, o_width, inputs, outputs)
+    print()
+
 
 # ------------------------------------------------------------------------
 # --- Main ---------------------------------------------------------------
 # ------------------------------------------------------------------------
-
-FAIL = '\033[91m\033[1m'
-OK = '\033[92m\033[1m'
-WARN = '\033[95m\033[1m'
-SKIP = '\033[93m\033[1m'
-HI = '\033[97m\033[1m'
-ENDC = '\033[0m'
-
 
 if '--list' in sys.argv:
     list_parts("--tests" in sys.argv)
@@ -105,6 +140,7 @@ total_time = 0
 tester.dut_setup()
 
 for test_name in all_tests:
+    logic_fail_was_last = False
     test = tester.part.get_test(test_name)
     loops = args.loops if args.loops is not None else test.loops
 
@@ -117,20 +153,28 @@ for test_name in all_tests:
         tests_skipped += 1
         print(f"\b\b\b\b{SKIP}SKIP{ENDC}")
     else:
-        res, elapsed = tester.exec_test(test, loops, args.delay)
+        res, elapsed, failed_vector_num, zif_vector = tester.exec_test(test, loops, args.delay)
         if res == Tester.RESP_PASS:
             tests_passed += 1
             print(f"\b\b\b\b{OK}PASS{ENDC}  ({elapsed:.2f} sec.)")
         elif res == Tester.RESP_TIMING_FAIL:
             tests_warning += 1
             print(f"\b\b\b\b{WARN}TIMING ERROR{ENDC}")
+        elif res == Tester.RESP_FAIL:
+            tests_failed += 1
+            print(f"\b\b\b\b{FAIL}FAIL{ENDC}  ({elapsed:.2f} sec.)")
+            if test.type == test.LOGIC:
+                print_failed_vector(part, test, failed_vector_num, zif_vector)
+                logic_fail_was_last = True
         else:
             tests_failed += 1
             print(f"\b\b\b\b{FAIL}FAIL{ENDC}  ({elapsed:.2f} sec.)")
 
 tester.dut_disconnect()
 
-print()
+if not logic_fail_was_last:
+    print()
+
 print(f"Total tests: {HI}{len(all_tests)}{ENDC}", end="")
 if tests_failed:
     print(f", failed: {FAIL}{tests_failed}{ENDC}", end="")
