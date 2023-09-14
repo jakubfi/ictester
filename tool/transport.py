@@ -11,21 +11,17 @@ class Transport:
         self.bytes_sent = 0
         self.bytes_received = 0
 
-    @property
-    def s(self):
-        if not self._s:
-            self._s = serial.Serial(
-                self.port,
-                baudrate=self.speed,
-                bytesize=serial.EIGHTBITS,
-                parity=serial.PARITY_NONE,
-                stopbits=serial.STOPBITS_ONE,
-                timeout=None,
-                xonxoff=False,
-                rtscts=False,
-                dsrdtr=False
-            )
-        return self._s
+        self.s = serial.Serial(
+            self.port,
+            baudrate=self.speed,
+            bytesize=serial.EIGHTBITS,
+            parity=serial.PARITY_NONE,
+            stopbits=serial.STOPBITS_ONE,
+            timeout=None,
+            xonxoff=False,
+            rtscts=False,
+            dsrdtr=False
+        )
 
     def send(self, b):
         b = bytes(b)

@@ -40,10 +40,6 @@ class Tester:
     def __init__(self, part, transport, debug=False):
         self.part = part
         self.tr = transport
-
-        if len(self.tests_available()) != len(set(self.tests_available())):
-            raise RuntimeError(f"Test names for part {part.name} are not unique")
-
         self.debug = debug
 
     def tests_available(self):

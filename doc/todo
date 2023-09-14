@@ -43,13 +43,7 @@ CHECKS: allow only meaningfull setups (anything out of ordinary => error)
 SW:
 bash completion
 better test params building
-names: LS/S when no regular family?
-name matching?
- * exact name (SN7400, UCY7400),
- * common name (7400),
- * difflib fuzzy high similarity (0.8)
- * difflib fuzzy low similarity (0.7?)
-alternatively: suggestion when no exact/common match?
+names: LS/S when no regular family? common names? alternatives?
 
 HW:
 full HiZ testing (with ~1M to ground? always?)
