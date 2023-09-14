@@ -226,7 +226,7 @@ class TestVector():
         return [self.pin(i) for i in pins]
 
     def __str__(self):
-        return f"{self.input} -> {self.output}"
+        return f"{list(map(int, self.input))} -> {list(map(int, self.output))}"
 
 # ------------------------------------------------------------------------
 class Test():
