@@ -80,7 +80,7 @@ void mem_setup()
 	// blink RAS 8 times before using the chip
 	for (uint8_t i=0 ; i<8 ; i++) {
 		RAS_ON;
-		RAS_ON; // repeated twice, because 120ns min. pulse length
+		_NOP(); _NOP(); // 120ns min. pulse length
 		RAS_OFF;
 	}
 }

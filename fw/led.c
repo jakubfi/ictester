@@ -15,73 +15,23 @@ void led_init()
 }
 
 // -----------------------------------------------------------------------
+void led(uint8_t r, uint8_t g, uint8_t b)
+{
+	rgb_color color = {r, g, b};
+	led_strip_write(&color, 1);
+}
+
+// -----------------------------------------------------------------------
 void led_welcome()
 {
-	rgb_color color;
 	for (int8_t i=30 ; i>=0 ; i--) {
-		color.red = i;
-		color.green = i;
-		color.blue = i;
-		led_strip_write(&color, 1);
+		led(i, i, i);
 		_delay_ms(6);
 	}
 	for (uint8_t i=30 ; i>=3 ; i--) {
-		color.red = i;
-		color.green = i;
-		color.blue = i;
-		led_strip_write(&color, 1);
+		led(i, i, i);
 		_delay_ms(5);
 	}
-}
-
-// -----------------------------------------------------------------------
-void led_pass()
-{
-	rgb_color color;
-	color.red = 0;
-	color.green = 5;
-	color.blue = 0;
-	led_strip_write(&color, 1);
-}
-
-// -----------------------------------------------------------------------
-void led_fail()
-{
-	rgb_color color;
-	color.red = 5;
-	color.green = 0;
-	color.blue = 0;
-	led_strip_write(&color, 1);
-}
-
-// -----------------------------------------------------------------------
-void led_err()
-{
-	rgb_color color;
-	color.red = 4;
-	color.green = 0;
-	color.blue = 3;
-	led_strip_write(&color, 1);
-}
-
-// -----------------------------------------------------------------------
-void led_active()
-{
-	rgb_color color;
-	color.red = 5;
-	color.green = 2;
-	color.blue = 0;
-	led_strip_write(&color, 1);
-}
-
-// -----------------------------------------------------------------------
-void led_idle()
-{
-	rgb_color color;
-	color.red = 3;
-	color.green = 3;
-	color.blue = 3;
-	led_strip_write(&color, 1);
 }
 
 // vim: tabstop=4 shiftwidth=4 autoindent

@@ -26,7 +26,7 @@ uint8_t cfgnum_active = NO_CONFIG;
 // -----------------------------------------------------------------------
 static uint8_t handle_dut_setup()
 {
-	uint8_t pin_data[MAX_CONFIGS][24];
+	uint8_t pin_data[MAX_CONFIGS][ZIF_PIN_CNT];
 
 	// receive DUT configuration
 	dut_package_type = serial_rx_char();
@@ -95,7 +95,7 @@ static uint8_t handle_test_setup()
 // -----------------------------------------------------------------------
 static uint8_t do_connect(uint8_t cfgnum)
 {
-	led_active();
+	led(LED_ACTIVE);
 
 	if (!zif_connect(cfgnum)) {
 		return RESP_ERR;
@@ -123,10 +123,10 @@ static uint8_t handle_dut_disconnect(uint8_t resp)
 	zif_disconnect();
 	cfgnum_active = NO_CONFIG;
 
-	if (resp == RESP_ERR) led_err();
-	else if (resp == RESP_FAIL) led_fail();
-	else if (resp == RESP_PASS) led_pass();
-	else led_idle();
+	if (resp == RESP_ERR) led(LED_ERR);
+	else if (resp == RESP_FAIL) led(LED_FAIL);
+	else if (resp == RESP_PASS) led(LED_PASS);
+	else led(LED_IDLE);
 
 	return RESP_OK;
 }
@@ -202,7 +202,7 @@ int main()
 		}
 
 		if (resp == RESP_ERR) {
-			led_err();
+			led(LED_ERR);
 		}
 
 		reply(resp);

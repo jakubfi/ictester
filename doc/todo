@@ -5,11 +5,9 @@
 167 - synchronous decade rate multiplier
 169 - SYNCHRONOUS 4-BIT UP/DOWN BINARY COUNTERS
 173 - 4-BIT D-TYPE REGISTERS WITH 3-STATE OUTPU
-188 - PROM
 190 - SYNCHRONOUS UP/DOWN COUNTERS WITH DOWN/UP MODE CONTROL
 191 - SYNCHRONOUS UP/DOWN COUNTERS WITH DOWN/UP MODE CONTROL
 192 - UP/DOWN BCD Decade (8421) Counter
-287 - PROM
 366 - 3-STATE HEX BUFFER
 367 - 3-STATE HEX BUFFER
 373 - OCTAL D-TYPE TRANSPARENT LATCHES AND EDGE-TRIGGERED FLIP-FLOPS
@@ -35,8 +33,7 @@ protocol and fw versioning
 'IC state reset' non-test something
 debug verbosity?
 protocol frames
-PROM reading?
-EPROM reading?
+PROM/EPROM reading?
 CHECKS: check everything early (protocol level if possible => no checks during testing)
 CHECKS: allow only meaningfull setups (anything out of ordinary => error)
 

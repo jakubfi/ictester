@@ -3,10 +3,9 @@
 #include <stdbool.h>
 
 #include "protocol.h"
+#include "zif.h"
 #include "sw.h"
 #include "mcu.h"
-
-#define ZIF_PIN_CNT 24
 
 uint8_t zif_vcc_pin;
 

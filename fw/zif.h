@@ -3,6 +3,8 @@
 
 #include <inttypes.h>
 
+#define ZIF_PIN_CNT 24
+
 void zif_init();
 uint8_t zif_pos(uint8_t dut_pin_count, uint8_t dut_pin);
 bool zif_func(uint8_t cfgnum, uint8_t func, uint8_t zif_pin);
