@@ -1,4 +1,5 @@
 #include <inttypes.h>
+#include <stdlib.h>
 #include <stdbool.h>
 #include <avr/io.h>
 #include <avr/interrupt.h>
@@ -120,6 +121,7 @@ static inline uint8_t read_data(void)
 {
 	_NOP();
 	_NOP();
+	_NOP();
 	return PIN_DOUT & VAL_DO;
 }
 
@@ -221,14 +223,16 @@ static uint8_t march_step_page(uint8_t dir, uint8_t r, uint8_t w, uint16_t addr_
 uint8_t run_mem(uint16_t loops, uint8_t *params)
 {
 	march_fun m_funcs[4] = {
+		NULL,
 		march_step_rmw,
 		march_step_rw,
-		march_step_page,
 		march_step_page,
 	};
 
 	march_fun m_fun = m_funcs[params[1] & 0b11];
 	uint16_t address_space = params[0] == 2 ? 0x200 : 0x100;
+
+	if (!m_fun) return RESP_ERR;
 
 	for (uint16_t rep=0 ; rep<loops ; rep++) {
 		for (uint8_t i=0 ; i<MARCH_STEPS ; i++) {
