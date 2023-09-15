@@ -8,7 +8,7 @@
 #define A2 2 // analog switch 2, I2C bus A
 #define B0 3 // analog switch 0, I2C bus B (top right)
 #define B1 4 // analog switch 1, I2C bus B
-#define NA -1 // not connected
+#define NA 7 // not connected
 
 #define SW_CFG_ALL 0
 #define SW_CFG_GND_ONLY 1

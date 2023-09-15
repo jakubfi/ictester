@@ -11,8 +11,8 @@ uint8_t zif_vcc_pin;
 
 // Generic port/bit coordinates
 struct coord {
-	int8_t port : 4;
-	int8_t bit : 4;
+	uint8_t port : 4;
+	uint8_t bit : 4;
 };
 
 // Translates ZIF pin number (0-based) to MCU port/bit
@@ -145,7 +145,7 @@ void zif_pin_mask_clear(uint8_t cfgnum)
 // -----------------------------------------------------------------------
 void zif_pin_unmasked(uint8_t cfgnum, uint8_t zif_pin)
 {
-	int8_t port_pos = zif_mcu_port(zif_pin);
+	uint8_t port_pos = zif_mcu_port(zif_pin);
 	uint8_t port_bit = zif_mcu_port_bit(zif_pin);
 	mcu_pin_unmasked(cfgnum, port_pos, port_bit);
 }
