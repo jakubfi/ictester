@@ -160,7 +160,7 @@ class Tester:
         result = self.tr.recv()
         elapsed = time.time() - start
         failed_vector_num = None
-        failed_zif_vector = None
+        failed_pin_vector = None
 
         # Read failed vector data for LOGIC tests (natural DUT pin order)
         if test.type == Test.LOGIC and result == Tester.RESP_FAIL:
