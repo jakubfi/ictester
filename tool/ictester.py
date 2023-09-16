@@ -34,7 +34,7 @@ def print_parts(list_tests=False):
             print(f"{name:7s} {part.package_name:6s} {part.desc}")
             if (list_tests):
                 for t in part.tests:
-                    print(f"  * ({len(t.vectors)} vectors) {t.name}")
+                    print(f"  * {t.name} ({len(t.vectors)} vectors)")
 
 # ------------------------------------------------------------------------
 def print_part_info(part):
@@ -81,20 +81,24 @@ def print_failed_vector(part, test, failed_vector_num, failed_pin_vector, contex
 # ------------------------------------------------------------------------
 def parse_cmd():
     # check early to not require "part" argument
-    if '--list' in sys.argv:
-        print_parts("--tests" in sys.argv)
+    if '--list-all' in sys.argv or '--list' in sys.argv:
+        print_parts(list_tests='--list-all' in sys.argv)
         sys.exit(0)
 
     parser = argparse.ArgumentParser(description='IC tester controller')
     parser.add_argument('--device', default=None, help='Serial port where the IC tester is connected')
     parser.add_argument('--loops', type=int, default=None, help='Loop count (1..65535)')
+    parser.add_argument('--test', type=int, default=None, help='Test number to run')
     parser.add_argument('--delay', type=float, default=None, help='additional DUT output read delay in μs for logic tests (13107 μs max, rounded to nearest 0.2 μs)')
     parser.add_argument('--list', action="store_true", help='List all supported parts')
-    parser.add_argument('--tests', action="store_true", help='When listing parts, list also tests for each part')
+    parser.add_argument('--list-all', action="store_true", help='List all supported parts and all tests for each part')
     parser.add_argument('--debug', action="store_true", help='Enable debug output')
     parser.add_argument('--debug-serial', action="store_true", help='Enable serial comms debug output')
     parser.add_argument('part', help='Part symbol')
     args = parser.parse_args()
+
+    if args.test is not None and args.test <= 0:
+        parser.error("Test numbers start from 1")
 
     if args.loops is not None and (args.loops <= 0 or args.loops > 65535):
         parser.error("Loops should be between 1 and 65535")
@@ -150,7 +154,15 @@ except SerialException as e:
 tester = Tester(part, transport, debug=args.debug)
 tester.dut_setup()
 
-all_tests = tester.tests_available()
+if args.test:
+    try:
+        all_tests = [tester.tests_available()[args.test-1]]
+    except IndexError:
+        print(f"Test number {args.test} is not available for {part.name}")
+        sys.exit(70)
+else:
+    all_tests = tester.tests_available()
+
 longest_desc = max(map(len, all_tests))
 
 tests_failed = 0
