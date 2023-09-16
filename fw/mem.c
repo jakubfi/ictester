@@ -18,9 +18,10 @@
 #define PORT_WE		PORTC
 #define PORT_DIN	PORTC
 #define PORT_CAS	PORTB
+#define PORT_DOUT	PORTB
 #define PIN_DOUT	PINB
-#define PORT_ADDR_L		PORTC
-#define PORT_ADDR_H		PORTB
+#define PORT_ADDR_L	PORTC
+#define PORT_ADDR_H	PORTB
 
 #define VAL_WE		_BV(2)
 #define VAL_RAS		_BV(3)
@@ -35,6 +36,8 @@
 #define CAS_OFF		PORT_CAS |= VAL_CAS
 #define CAS_ON		PORT_CAS &= ~VAL_CAS
 
+#define DOUT_PULLUP	(PORT_DOUT & VAL_DO)
+
 #define READ_ZERO 0
 #define READ_ONE  VAL_DO
 #define READ_NONE 255
@@ -45,9 +48,10 @@
 #define DIR_DOWN 1
 
 enum mem_test_type {
-	MEM_TEST_MARCH_RMW		= 0,
-	MEM_TEST_MARCH_RW		= 1,
-	MEM_TEST_MARCH_PAGE		= 2,
+	MEM_TEST_UNKNOWN		= 0,
+	MEM_TEST_MARCH_RMW		= 1,
+	MEM_TEST_MARCH_RW		= 2,
+	MEM_TEST_MARCH_PAGE		= 3,
 };
 
 struct march {
@@ -103,7 +107,7 @@ static inline void set_row_addr(uint16_t addr, uint8_t dir)
 {
 	if (dir == DIR_DOWN) addr = ~addr;
 	PORT_ADDR_L = addr_low(addr) | VAL_WE | VAL_RAS;
-	PORT_ADDR_H = addr_high(addr) | VAL_CAS;
+	PORT_ADDR_H = DOUT_PULLUP | addr_high(addr) | VAL_CAS;
 	RAS_ON;
 }
 
@@ -112,7 +116,7 @@ static inline void set_col_addr(uint16_t addr, uint8_t dir)
 {
 	if (dir == DIR_DOWN) addr = ~addr;
 	PORT_ADDR_L = addr_low(addr) | VAL_WE;
-	PORT_ADDR_H = addr_high(addr) | VAL_CAS;
+	PORT_ADDR_H = DOUT_PULLUP | addr_high(addr) | VAL_CAS;
 	CAS_ON;
 }
 
@@ -223,10 +227,10 @@ static uint8_t march_step_page(uint8_t dir, uint8_t r, uint8_t w, uint16_t addr_
 uint8_t run_mem(uint16_t loops, uint8_t *params)
 {
 	march_fun m_funcs[4] = {
-		NULL,
-		march_step_rmw,
-		march_step_rw,
-		march_step_page,
+		[MEM_TEST_UNKNOWN] = NULL,
+		[MEM_TEST_MARCH_RMW] = march_step_rmw,
+		[MEM_TEST_MARCH_RW] = march_step_rw,
+		[MEM_TEST_MARCH_PAGE] = march_step_page,
 	};
 
 	march_fun m_fun = m_funcs[params[1] & 0b11];
