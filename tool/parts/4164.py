@@ -3,6 +3,7 @@ from prototypes import (PackageDIP16_rotated, Pin, PinType, Test)
 class Part4164(PackageDIP16_rotated):
     SIZE_64 = 1
     SIZE_256 = 2
+    MEM_TEST_SPEED = 0
     MEM_TEST_MARCH_C_MINUS_RMW = 1
     MEM_TEST_MARCH_C_MINUS_RW = 2
     MEM_TEST_MARCH_C_MINUS_PAGE = 3
@@ -22,7 +23,7 @@ class Part4164(PackageDIP16_rotated):
         11: Pin("A4", PinType.IN),
         12: Pin("A3", PinType.IN),
         13: Pin("A6", PinType.IN),
-        14: Pin("Dout", PinType.OUT),
+        14: Pin("Dout", PinType.ST3),
         15: Pin("~CAS", PinType.IN),
     }
 
@@ -40,6 +41,10 @@ class Part4164(PackageDIP16_rotated):
         ),
         Test("MARCH C- Page access mode", Test.DRAM, default_inputs, default_outputs,
             params=[SIZE_64, MEM_TEST_MARCH_C_MINUS_PAGE],
+            loops=1,
+        ),
+        Test("CAS-Dout delay (use oscilloscope)", Test.DRAM, default_inputs, default_outputs,
+            params=[SIZE_64, MEM_TEST_SPEED],
             loops=1,
         ),
     ]

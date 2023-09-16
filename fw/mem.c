@@ -48,7 +48,7 @@
 #define DIR_DOWN 1
 
 enum mem_test_type {
-	MEM_TEST_UNKNOWN		= 0,
+	MEM_TEST_SPEED			= 0,
 	MEM_TEST_MARCH_RMW		= 1,
 	MEM_TEST_MARCH_RW		= 2,
 	MEM_TEST_MARCH_PAGE		= 3,
@@ -224,18 +224,52 @@ static uint8_t march_step_page(uint8_t dir, uint8_t r, uint8_t w, uint16_t addr_
 }
 
 // -----------------------------------------------------------------------
+void test_speed(uint16_t loops)
+{
+	uint8_t w = 0;
+	for (uint16_t addr_col=0 ; addr_col < 256 ; addr_col++) {
+		for (uint16_t addr_row=0 ; addr_row < 256 ; addr_row++) {
+			set_row_addr(addr_row, DIR_UP);
+			set_col_addr(addr_col, DIR_UP);
+			write_data(w);
+			w ^= WRITE_ONE;
+			CAS_OFF;
+			RAS_OFF;
+		}
+	}
+
+	for (uint16_t rep=0 ; rep<loops ; rep++) {
+		for (uint16_t addr_col=0 ; addr_col < 256 ; addr_col++) {
+			for (uint16_t addr_row=0 ; addr_row < 256 ; addr_row++) {
+				set_row_addr(addr_row, DIR_UP);
+				set_col_addr(addr_col, DIR_UP);
+				read_data();
+				CAS_OFF;
+				RAS_OFF;
+			}
+		}
+	}
+}
+
+// -----------------------------------------------------------------------
 uint8_t run_mem(uint16_t loops, uint8_t *params)
 {
 	march_fun m_funcs[4] = {
-		[MEM_TEST_UNKNOWN] = NULL,
+		[MEM_TEST_SPEED] = NULL,
 		[MEM_TEST_MARCH_RMW] = march_step_rmw,
 		[MEM_TEST_MARCH_RW] = march_step_rw,
 		[MEM_TEST_MARCH_PAGE] = march_step_page,
 	};
 
-	march_fun m_fun = m_funcs[params[1] & 0b11];
+	uint8_t mem_test_type = params[1] & 0b11;
 	uint16_t address_space = params[0] == 2 ? 0x200 : 0x100;
 
+	if (mem_test_type == MEM_TEST_SPEED) {
+		test_speed(loops);
+		return RESP_PASS;
+	}
+
+	march_fun m_fun = m_funcs[mem_test_type];
 	if (!m_fun) return RESP_ERR;
 
 	for (uint16_t rep=0 ; rep<loops ; rep++) {
