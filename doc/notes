@@ -1,0 +1,11 @@
+* Outputs by default have weak pullups connected to make sure MCU inputs are driven
+  in case of broken internal IC connections. This can be disabled.
+* 3-state outputs aren't really fully tested. Weak pullup ensures reading "1" when output is in HiZ state,
+  which allows for catching at least some faults.
+* Open-emmiters are "X" outputs of gate expanders (eg. 74H62 or 7460). Pulled low with output driven
+  low (sink) on MCU side.
+* C and R/C univibrator connections have to be active at the same time.
+
+
+ICs with slow outputs: 7447 (extra-slow: 5us rise total), 74H62, 7489, 74156, 74170, 780101
+

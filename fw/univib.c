@@ -34,6 +34,7 @@ enum test_types {
 #define VAL_121_B _BV(4)
 #define VAL_121_Q _BV(5)
 #define VAL_121_NQ _BV(0)
+#define VAL_121_Q_PULLUPS (_BV(0) | _BV(5))
 
 // 74122
 
@@ -44,6 +45,7 @@ enum test_types {
 #define VAL_122_CLR _BV(4)
 #define VAL_122_NQ _BV(5)
 #define VAL_122_Q _BV(1)
+#define VAL_122_Q_PULLUPS _BV(5)
 
 // 74123 1 and 2
 
@@ -52,6 +54,7 @@ enum test_types {
 #define VAL_123_CLR _BV(2)
 #define VAL_123_Q _BV(4)
 #define VAL_123_NQ _BV(3)
+#define VAL_123_Q_PULLUPS (_BV(3) | _BV(4))
 
 // trig and notrig conditions
 
@@ -144,6 +147,7 @@ static const __flash struct univib_test {
 	uint8_t val_clear;					// input for clear
 	uint8_t val_clear_trig;				// input for clear with trigger active
 	uint8_t val_q, val_nq;				// Q, ~Q pin values
+	uint8_t val_q_pullups;				// Q/~Q positions on trigger port (that may be pulled up)
 	const __flash uint8_t *trigs;		// all triggers
 	const __flash uint8_t *notrigs;		// all non-triggers
 } univib_test[4] = {
@@ -156,6 +160,7 @@ static const __flash struct univib_test {
 		.val_clear = 0,
 		.val_q = VAL_121_Q,
 		.val_nq = VAL_121_NQ,
+		.val_q_pullups = VAL_121_Q_PULLUPS,
 		.trigs = trigs_121,
 		.notrigs = notrigs_121,
 	},
@@ -169,6 +174,7 @@ static const __flash struct univib_test {
 		.val_clear_trig = VAL_122_B1 | VAL_122_B2,
 		.val_q = VAL_122_Q,
 		.val_nq = VAL_122_NQ,
+		.val_q_pullups = VAL_122_Q_PULLUPS,
 		.trigs = trigs_122,
 		.notrigs = notrigs_122,
 	},
@@ -182,6 +188,7 @@ static const __flash struct univib_test {
 		.val_clear_trig = VAL_123_B,
 		.val_q = VAL_123_Q,
 		.val_nq = VAL_123_NQ,
+		.val_q_pullups = VAL_123_Q_PULLUPS,
 		.trigs = trigs_123,
 		.notrigs = notrigs_123,
 	},
@@ -195,6 +202,7 @@ static const __flash struct univib_test {
 		.val_clear_trig = VAL_123_B,
 		.val_q = VAL_123_Q,
 		.val_nq = VAL_123_NQ,
+		.val_q_pullups = VAL_123_Q_PULLUPS,
 		.trigs = trigs_123,
 		.notrigs = notrigs_123,
 	},
@@ -210,7 +218,7 @@ static const __flash struct univib_test {
 // -----------------------------------------------------------------------
 static inline void input_set(const __flash struct univib_test *uvt, uint8_t val)
 {
-	*uvt->port_trig = val;
+	*uvt->port_trig = (*uvt->port_trig & uvt->val_q_pullups) | val;
 	_NOP(); _NOP();
 }
 
@@ -218,7 +226,7 @@ static inline void input_set(const __flash struct univib_test *uvt, uint8_t val)
 static inline void trig(const __flash struct univib_test *uvt, uint8_t val)
 {
 	input_set(uvt, val);
-	*uvt->port_trig = uvt->val_notrig;
+	*uvt->port_trig = (*uvt->port_trig & uvt->val_q_pullups) | uvt->val_notrig;
 }
 
 // -----------------------------------------------------------------------

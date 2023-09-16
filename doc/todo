@@ -1,3 +1,6 @@
+--- DUT ------------------------------------------------------------------
+review all sequential ICs (command changes vs clock, clock polarity, test suitability)
+
 92 - DECADE, DIVIDE-BY-TWELVE AND BINARY COUNTERS
 124 - VCO
 138 - 3-line to 8-line decoder / demultiplexer
@@ -22,27 +25,22 @@
 646 - octal bus transceivers and registers
 657 - octal transceiver with parity generator/checker and 3-state outputs
 
-DUT:
-review all sequential ICs (command changes vs clock, clock polarity, test suitability)
-
-FW/protocol:
-univib: pullups
+--- FW/protocol ----------------------------------------------------------
 full error handling (protocol)
+  * check everything early (protocol level if possible => no checks during testing)
+  * allow only meaningfull setups (anything out of ordinary => error)
 cmd_hello
-protocol and fw versioning
-'IC state reset' non-test something
-debug verbosity?
+protocol and fw versioning?
+'IC state reset' non-test something? is it required?
 protocol frames
 PROM/EPROM reading?
-CHECKS: check everything early (protocol level if possible => no checks during testing)
-CHECKS: allow only meaningfull setups (anything out of ordinary => error)
 
-SW:
-bash completion
-better test params building
+--- SW -------------------------------------------------------------------
+bash completion?
+better test params building (after protocol changes)
 names: LS/S when no regular family? common names? alternatives?
 
-HW:
+--- HW -------------------------------------------------------------------
 full HiZ testing (with ~1M to ground? always?)
 MCU pin over-current protection (120 ohm)
 DUT current measuremet (VCC? GND?)
