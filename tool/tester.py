@@ -1,23 +1,32 @@
 import time
+from enum import Enum
 from prototypes import Test
 from binvec import BV
 
+Cmd = Enum("Cmd",
+    names=[
+        ("HELLO", 1),
+        ("DUT_SETUP", 2),
+        ("DUT_CONNECT", 3),
+        ("TEST_SETUP", 4),
+        ("VECTORS_LOAD", 5),
+        ("RUN", 6),
+        ("DUT_DISCONNECT", 7),
+    ]
+)
+
+Resp = Enum("Response",
+    names=[
+        ("HELLO", 128),
+        ("OK", 129),
+        ("PASS", 130),
+        ("FAIL", 131),
+        ("ERR", 132),
+        ("TIMING_FAIL", 133),
+    ]
+)
 
 class Tester:
-    CMD_HELLO = 1
-    CMD_DUT_SETUP = 2
-    CMD_DUT_CONNECT = 3
-    CMD_TEST_SETUP = 4
-    CMD_VECTORS_LOAD = 5
-    CMD_RUN = 6
-    CMD_DUT_DISCONNECT = 7
-
-    RESP_HELLO = 128
-    RESP_OK = 129
-    RESP_PASS = 130
-    RESP_FAIL = 131
-    RESP_ERR = 132
-    RESP_TIMING_FAIL = 133
 
     error_strings = {
         0: "Error code was not set",
@@ -48,43 +57,23 @@ class Tester:
     def dut_setup(self):
         if self.debug:
             print("---- DUT SETUP ------------------------------------")
-        cfg_count = 0
-        for pin in self.part.pins.values():
-            if len(pin.zif_func) > cfg_count:
-                cfg_count = len(pin.zif_func)
-        assert 5 > cfg_count > 0
-        self.tr.send([Tester.CMD_DUT_SETUP, self.part.package_type, self.part.pincount, cfg_count])
-
-        if self.debug:
-            print(f"DUT pin definitions, {cfg_count} configuration(-s) available:")
-
-        for cfgnum in range(0, cfg_count):
-            if self.debug:
-                print(f"Configuration {cfgnum}:")
-            for num, pin in sorted(self.part.pins.items()):
-                try:
-                    pin_func = pin.zif_func[cfgnum]
-                except IndexError:
-                    pin_func = pin.zif_func[0]
-                if self.debug:
-                    print(f'{num:-3} {pin.name:6} {pin.role.name:5} ZIF {pin_func.name}')
-                self.tr.send([pin_func.value])
-
-        if self.tr.recv() != Tester.RESP_OK:
+        self.tr.send([Cmd.DUT_SETUP.value])
+        self.tr.send(self.part)
+        if self.tr.recv() != Resp.OK.value:
             raise RuntimeError("DUT setup failed")
 
     def dut_connect(self, cfgnum):
         if self.debug:
             print("---- DUT CONNECT ----------------------------------")
-        self.tr.send([Tester.CMD_DUT_CONNECT, cfgnum])
-        if self.tr.recv() != Tester.RESP_OK:
+        self.tr.send([Cmd.DUT_CONNECT.value, cfgnum])
+        if self.tr.recv() != Resp.OK.value:
             raise RuntimeError("DUT connect failed")
 
     def dut_disconnect(self):
         if self.debug:
             print("---- DUT DISCONNECT -------------------------------")
-        self.tr.send([Tester.CMD_DUT_DISCONNECT])
-        if self.tr.recv() != Tester.RESP_OK:
+        self.tr.send([Cmd.DUT_DISCONNECT.value])
+        if self.tr.recv() != Resp.OK.value:
             raise RuntimeError("DUT disconnect failed")
 
     def test_setup(self, test, delay):
@@ -97,7 +86,7 @@ class Tester:
                 params[0] = delay_val & 0xff
                 params[1] = delay_val >> 8
 
-        self.tr.send([Tester.CMD_TEST_SETUP, test.cfgnum, test.type, *params])
+        self.tr.send([Cmd.TEST_SETUP.value, test.cfgnum, test.type, *params])
 
         data = [
             1 if i in test.pins else 0
@@ -110,7 +99,7 @@ class Tester:
             print(f"DUT outputs: {test.outputs}")
         self.tr.send_bitarray(data)
 
-        if self.tr.recv() != Tester.RESP_OK:
+        if self.tr.recv() != Resp.OK.value:
             raise RuntimeError("Test setup failed")
 
     def vectors_load(self, test):
@@ -123,7 +112,7 @@ class Tester:
 
         assert len(test.vectors) <= Tester.MAX_VECTORS
 
-        self.tr.send([Tester.CMD_VECTORS_LOAD])
+        self.tr.send([Cmd.VECTORS_LOAD.value])
         self.tr.send_16le(len(test.vectors))
 
         if self.debug:
@@ -145,7 +134,7 @@ class Tester:
 
             self.tr.send_bitarray(data)
 
-        if self.tr.recv() != Tester.RESP_OK:
+        if self.tr.recv() != Resp.OK.value:
             raise RuntimeError("Vectors load failed")
 
     def run(self, loops, test):
@@ -153,7 +142,7 @@ class Tester:
             print("---- RUN ------------------------------------------")
         assert 1 <= loops <= 0xffff
 
-        self.tr.send([Tester.CMD_RUN])
+        self.tr.send([Cmd.RUN.value])
         self.tr.send_16le(loops)
 
         start = time.time()
@@ -163,7 +152,7 @@ class Tester:
         failed_pin_vector = None
 
         # Read failed vector data for LOGIC tests (natural DUT pin order)
-        if test.type == Test.LOGIC and result == Tester.RESP_FAIL:
+        if test.type == Test.LOGIC and result == Resp.FAIL.value:
             failed_vector_num = self.tr.recv_16le()
             failed_pin_vector = [*BV.int(self.tr.recv(), 8).reversed()]
             failed_pin_vector.extend([*BV.int(self.tr.recv(), 8).reversed()])

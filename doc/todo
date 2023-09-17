@@ -39,6 +39,7 @@ PROM/EPROM reading?
 bash completion?
 better test params building (after protocol changes)
 names: LS/S when no regular family? common names? alternatives?
+debug vs logging
 
 --- HW -------------------------------------------------------------------
 full HiZ testing (with ~1M to ground? always?)

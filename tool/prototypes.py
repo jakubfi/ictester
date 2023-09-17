@@ -1,7 +1,6 @@
 import inspect
 from enum import Enum
 
-
 # ------------------------------------------------------------------------
 def partimport(part_name):
     '''
@@ -99,6 +98,7 @@ class Part:
         self.pins = {}
         self.pins.update(self.package_pins)
         self.pins.update(self.pin_cfg)
+        self.debug = False
 
     def get_test(self, name):
         return next(t for t in self.tests if t.name == name)
@@ -114,6 +114,32 @@ class Part:
     @property
     def gnd(self):
         return list(k for k, v in self.pins.items() if v.role == PinType.GND)
+
+    def __bytes__(self):
+        data = []
+        cfg_count = 0
+        for pin in self.pins.values():
+            if len(pin.zif_func) > cfg_count:
+                cfg_count = len(pin.zif_func)
+        assert 5 > cfg_count > 0
+        data.extend([self.package_type, self.pincount, cfg_count])
+
+        if self.debug:
+            print(f"DUT pin definitions, {cfg_count} configuration(-s) available:")
+
+        for cfgnum in range(0, cfg_count):
+            if self.debug:
+                print(f"Configuration {cfgnum}:")
+            for num, pin in sorted(self.pins.items()):
+                try:
+                    pin_func = pin.zif_func[cfgnum]
+                except IndexError:
+                    pin_func = pin.zif_func[0]
+                if self.debug:
+                    print(f'{num:-3} {pin.name:6} {pin.role.name:5} ZIF {pin_func.name}')
+                data.append(pin_func.value)
+
+        return bytes(data)
 
 
 # ------------------------------------------------------------------------

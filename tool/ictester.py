@@ -8,7 +8,7 @@ import difflib
 import serial.tools.list_ports as listports
 from serial.serialutil import SerialException
 
-from tester import Tester
+from tester import (Resp, Tester)
 from transport import Transport
 from parts import catalog
 
@@ -144,6 +144,7 @@ def get_serial_port(device):
 
 args = parse_cmd()
 part = get_part(args.part.upper())
+part.debug = args.debug
 serial_port = get_serial_port(args.device)
 
 try:
@@ -189,19 +190,19 @@ for test_name in all_tests:
         print(f"\b\b\b\b{SKIP}SKIP{ENDC}")
     else:
         res, elapsed, failed_vector_num, failed_pin_vector = tester.exec_test(test, loops, args.delay)
-        if res == Tester.RESP_PASS:
+        if res == Resp.PASS.value:
             tests_passed += 1
             print(f"\b\b\b\b{OK}PASS{ENDC}  ({elapsed:.2f} sec.)")
-        elif res == Tester.RESP_TIMING_FAIL:
+        elif res == Resp.TIMING_FAIL.value:
             tests_warning += 1
             print(f"\b\b\b\b{WARN}TIMING ERROR{ENDC}")
-        elif res == Tester.RESP_FAIL:
+        elif res == Resp.FAIL.value:
             tests_failed += 1
             print(f"\b\b\b\b{FAIL}FAIL{ENDC}  ({elapsed:.2f} sec.)")
             if test.type == test.LOGIC:
                 print_failed_vector(part, test, failed_vector_num, failed_pin_vector)
                 logic_fail_was_last = True
-        elif res == Tester.RESP_ERR:
+        elif res == Resp.ERR.value:
             tests_failed += 1
             print(f"\b\b\b\b{FAIL}ERROR{ENDC}")
         else:
