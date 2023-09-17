@@ -1,5 +1,5 @@
 from binvec import BV
-from prototypes import (PackageDIP14, Pin, PinType, Test)
+from prototypes import (PackageDIP14, Pin, PinType, TestUnivib)
 
 class Part74121(PackageDIP14):
     UNI_74121 = 0
@@ -25,8 +25,8 @@ class Part74121(PackageDIP14):
     default_outputs=[6, 1]
 
     tests = [
-        Test("No trigger", Test.UNIVIB, default_inputs, default_outputs, params=[UNI_74121, 0]),
-        Test("Trigger", Test.UNIVIB, default_inputs, default_outputs, params=[UNI_74121, 1]),
+        TestUnivib("No trigger", UNI_74121, 0, inputs=default_inputs, outputs=default_outputs),
+        TestUnivib("Trigger", UNI_74121, 1, inputs=default_inputs, outputs=default_outputs),
     ]
 
 

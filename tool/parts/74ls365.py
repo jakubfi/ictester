@@ -1,5 +1,5 @@
 from binvec import BV
-from prototypes import (PackageDIP16, Pin, PinType, Test)
+from prototypes import (PackageDIP16, Pin, PinType, TestLogic)
 
 class Part7404(PackageDIP16):
     name = "74LS365"
@@ -20,11 +20,9 @@ class Part7404(PackageDIP16):
         14: Pin("4A", PinType.IN),
         15: Pin("~E2", PinType.IN),
     }
-    # with weak pullup, disabled (HiZ) outputs require more time to settle
-    read_delay_us = 2.6
 
     tests = [
-        Test("Outputs enabled", Test.LOGIC,
+        TestLogic("Outputs enabled",
             inputs=[1, 15,  2, 4, 6, 14, 12, 10],
             outputs=[3, 5, 7, 13, 11, 9],
             body=[
@@ -32,8 +30,8 @@ class Part7404(PackageDIP16):
                 for x in BV.range(0, 2)
             ]
         ),
-        Test("Outputs disabled", Test.LOGIC,
-            params=list(round(read_delay_us/0.2).to_bytes(2, 'little')),
+        TestLogic("Outputs disabled",
+            read_delay_us=2.6,  # with weak pullup, disabled (HiZ) outputs require more time to settle
             inputs=[1, 15,  2, 4, 6, 14, 12, 10],
             outputs=[3, 5, 7, 13, 11, 9],
             body=[

@@ -1,5 +1,5 @@
 from binvec import BV
-from prototypes import (PackageDIP16, Pin, PinType, Test)
+from prototypes import (PackageDIP16, Pin, PinType, TestLogic)
 
 class Part74182(PackageDIP16):
     name = "74182"
@@ -21,7 +21,7 @@ class Part74182(PackageDIP16):
         15: Pin("~P2", PinType.IN),
     }
 
-    test_g = Test("~G", Test.LOGIC,
+    test_g = TestLogic("~G",
         inputs=[5, 14, 1, 3, 6, 15, 2],
         outputs=[10],
         loops=64,
@@ -36,7 +36,7 @@ class Part74182(PackageDIP16):
             for v in BV.range(0, 128)
         ]
     )
-    test_p = Test("~P", Test.LOGIC,
+    test_p = TestLogic("~P",
         inputs=[2, 4, 6, 15],
         outputs=[7],
         loops=64,
@@ -45,7 +45,7 @@ class Part74182(PackageDIP16):
             for v in BV.range(0, 16)
         ]
     )
-    test_cnx = Test("Cn+x", Test.LOGIC,
+    test_cnx = TestLogic("Cn+x",
         inputs=[3, 4, 13],
         outputs=[12],
         loops=64,
@@ -54,7 +54,7 @@ class Part74182(PackageDIP16):
             for v in BV.range(0, 8)
         ]
     )
-    test_cny = Test("Cn+y", Test.LOGIC,
+    test_cny = TestLogic("Cn+y",
         inputs=[1, 3, 2, 4, 13],
         outputs=[11],
         loops=64,
@@ -63,7 +63,7 @@ class Part74182(PackageDIP16):
             for v in BV.range(0, 32)
         ]
     )
-    test_cnz = Test("Cn+z", Test.LOGIC,
+    test_cnz = TestLogic("Cn+z",
         inputs=[14, 1, 3, 15, 2, 4, 13],
         outputs=[9],
         loops=64,

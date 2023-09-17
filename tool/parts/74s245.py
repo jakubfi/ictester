@@ -1,5 +1,5 @@
 from binvec import BV
-from prototypes import (PackageDIP20, Pin, PinType, ZIFFunc, Test)
+from prototypes import (PackageDIP20, Pin, PinType, ZIFFunc, TestLogic)
 
 in_out_hiz = [ZIFFunc.OUT, ZIFFunc.IN_PU_WEAK, ZIFFunc.IN_PU_STRONG]
 out_in_hiz = [ZIFFunc.IN_PU_WEAK, ZIFFunc.OUT, ZIFFunc.IN_PU_STRONG]
@@ -29,21 +29,21 @@ class Part74S245(PackageDIP20):
     }
 
     tests = [
-        Test("A->B", Test.LOGIC,
+        TestLogic("A->B",
             cfgnum=0, # A: inputs, B: outputs
             loops=512,
             inputs=[1, 19,  2, 3, 4, 5, 6, 7, 8, 9],
             outputs=[18, 17, 16, 15, 14, 13, 12, 11],
             body=[[[1, 0, *v], v] for v in BV.range(0, 256)]
         ),
-        Test("B->A", Test.LOGIC,
+        TestLogic("B->A",
             cfgnum=1, # A: outputs, B: inputs
             loops=512,
             inputs=[1, 19,  18, 17, 16, 15, 14, 13, 12, 11],
             outputs=[2, 3, 4, 5, 6, 7, 8, 9],
             body=[[[0, 0, *v], v] for v in BV.range(0, 256)]
         ),
-        Test("A/B HiZ", Test.LOGIC,
+        TestLogic("A/B HiZ",
             cfgnum=2, # A and B: HiZ, pulled up strong
             inputs=[1, 19],
             outputs=[18, 17, 16, 15, 14, 13, 12, 11, 2, 3, 4, 5, 6, 7, 8, 9],

@@ -1,5 +1,5 @@
 from binvec import BV
-from prototypes import (PackageDIP16, Pin, PinType, Test)
+from prototypes import (PackageDIP16, Pin, PinType, TestLogic)
 
 class Part7442(PackageDIP16):
     name = "7442"
@@ -21,7 +21,7 @@ class Part7442(PackageDIP16):
         15: Pin("A", PinType.IN),
     }
 
-    test_async = Test("Asynchronous operation", Test.LOGIC,
+    test_async = TestLogic("Asynchronous operation",
         inputs=[12, 13, 14, 15],
         outputs=[11, 10, 9, 7, 6, 5, 4, 3, 2, 1],
         body=[[BV.int(i, 4),  ~BV.bit(i, 10)] for i in range(0, 2**4)]

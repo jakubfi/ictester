@@ -1,4 +1,4 @@
-from prototypes import (PackageDIP24, Pin, PinType, Test)
+from prototypes import (PackageDIP24, Pin, PinType, TestLogic)
 
 class Part74198(PackageDIP24):
     name = "74198"
@@ -36,13 +36,13 @@ class Part74198(PackageDIP24):
     # NOTE: clock is inhibited whe S0 and S1 are low
     # NOTE: CLEAR is async
 
-    test_load = Test("Parallel load", Test.LOGIC, default_inputs, default_outputs,
+    test_load = TestLogic("Parallel load", default_inputs, default_outputs,
         body=[
             [[1,  1, 1,  '-',  0, 0,  0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0]],
             [[1,  1, 1,  '-',  0, 0,  1, 1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1, 1]],
         ]
     )
-    test_clear = Test("Clear", Test.LOGIC, default_inputs, default_outputs,
+    test_clear = TestLogic("Clear", default_inputs, default_outputs,
         body=[
             # load 1s
             [[1,  1, 1,  '-',  0, 0,  1, 1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1, 1]],
@@ -50,7 +50,7 @@ class Part74198(PackageDIP24):
             [[0,  1, 1,  1,  0, 0,  1, 1, 1, 1, 1, 1, 1, 1], [0, 0, 0, 0, 0, 0, 0, 0]],
         ]
     )
-    test_rshift = Test("Shift right", Test.LOGIC, default_inputs, default_outputs,
+    test_rshift = TestLogic("Shift right", default_inputs, default_outputs,
         body=[
             # clear
             [[0,  1, 1,  1,  0, 0,  1, 1, 1, 1, 1, 1, 1, 1], [0, 0, 0, 0, 0, 0, 0, 0]],
@@ -66,7 +66,7 @@ class Part74198(PackageDIP24):
             [[1,  0, 1,  '-',  0, 0,  0, 0, 0, 0, 0, 0, 0, 0], [0, 1, 0, 1, 0, 1, 0, 1]],
         ]
     )
-    test_lshift = Test("Shift left", Test.LOGIC, default_inputs, default_outputs,
+    test_lshift = TestLogic("Shift left", default_inputs, default_outputs,
         body=[
             # clear
             [[0,  1, 1,  1,  0, 0,  1, 1, 1, 1, 1, 1, 1, 1], [0, 0, 0, 0, 0, 0, 0, 0]],
@@ -82,7 +82,7 @@ class Part74198(PackageDIP24):
             [[1,  1, 0,  '-',  0, 0,  0, 0, 0, 0, 0, 0, 0, 0], [1, 0, 1, 0, 1, 0, 1, 0]],
         ]
     )
-    test_clk_inhibit = Test("Clock inhibit", Test.LOGIC, default_inputs, default_outputs,
+    test_clk_inhibit = TestLogic("Clock inhibit", default_inputs, default_outputs,
         body=[
             # clear
             [[0,  1, 1,  1,  0, 0,  1, 1, 1, 1, 1, 1, 1, 1], [0, 0, 0, 0, 0, 0, 0, 0]],

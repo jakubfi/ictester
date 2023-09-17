@@ -1,5 +1,5 @@
 from binvec import BV
-from prototypes import (Test, partimport)
+from prototypes import ( TestLogic, partimport)
 
 class Part780101(partimport("7489")):
     name = "780101"
@@ -33,14 +33,12 @@ class Part780101(partimport("7489")):
             ]
 
         body = []
-        # 780101 outputs normally require much stronger pullup than what's available in the tester
-        read_delay_us = 0.6
 
         for v in BV.range(0, 16):
             body.extend(rw_cycle(v))
 
-        return Test("Complete array", Test.LOGIC,
-            params=list(round(read_delay_us/0.2).to_bytes(2, 'little')),
+        return TestLogic("Complete array",
+            read_delay_us=0.6,  # 780101 outputs normally require much stronger pullup than what's available in the tester
             inputs=[1, 15, 14, 13,  4, 6, 10, 12,  2, 3],
             outputs=[5, 7, 9, 11],
             body=body,

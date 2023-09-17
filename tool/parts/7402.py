@@ -1,5 +1,5 @@
 from binvec import BV
-from prototypes import (PackageDIP14, Pin, PinType, Test)
+from prototypes import (PackageDIP14, Pin, PinType, TestLogic)
 
 class Part7402(PackageDIP14):
     name = "7402"
@@ -20,7 +20,7 @@ class Part7402(PackageDIP14):
     }
 
     tests = [
-        Test("Complete logic", Test.LOGIC,
+        TestLogic("Complete logic",
             inputs=[2, 3, 5, 6, 8, 9, 11, 12],
             outputs=[1, 4, 10, 13],
             body=[

@@ -1,4 +1,4 @@
-from prototypes import (Pin, PinType, PackageDIP16, Test)
+from prototypes import (Pin, PinType, PackageDIP16, TestLogic)
 from binvec import BV
 
 class Part74156(PackageDIP16):
@@ -20,28 +20,28 @@ class Part74156(PackageDIP16):
         14: Pin("~2G", PinType.IN),
         15: Pin("~2C", PinType.IN),
     }
+
     # 74156 OC outputs are too slow to run full-speed with 5k pull-ups
     read_delay_us = 0.4
-
     default_inputs = [3, 13,  2, 1,  14, 15]
     default_outputs = [4, 5, 6, 7,  12, 11, 10, 9]
 
-    test_inhibit = Test("Inhibit", Test.LOGIC, default_inputs, default_outputs,
-        params=list(round(read_delay_us/0.2).to_bytes(2, 'little')),
+    test_inhibit = TestLogic("Inhibit", default_inputs, default_outputs,
+        read_delay_us=read_delay_us,
         body=[
             [[*addr, 1, data, 1, data],  8*[1]]
             for addr in BV.range(0, 4)
             for data in [0, 1]
         ]
     )
-    test_select_0 = Test("Select 0", Test.LOGIC, default_inputs, default_outputs,
-        params=list(round(read_delay_us/0.2).to_bytes(2, 'little')),
+    test_select_0 = TestLogic("Select 0", default_inputs, default_outputs,
+        read_delay_us=read_delay_us,
         body=[
             [[*BV.int(addr, 2), 0, 0,  0, 0],  [1, 1, 1, 1, *~BV.bit(addr, 4)]] for addr in range(0, 4)
         ]
     )
-    test_select_1 = Test("Select 1", Test.LOGIC, default_inputs, default_outputs,
-        params=list(round(read_delay_us/0.2).to_bytes(2, 'little')),
+    test_select_1 = TestLogic("Select 1", default_inputs, default_outputs,
+        read_delay_us=read_delay_us,
         body=[
             [[*BV.int(addr, 2), 0, 1,  0, 1],  [*~BV.bit(addr, 4), 1, 1, 1, 1]] for addr in range(0, 4)
         ]

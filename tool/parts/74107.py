@@ -1,4 +1,4 @@
-from prototypes import (PackageDIP14, Pin, PinType, Test)
+from prototypes import (PackageDIP14, Pin, PinType, TestLogic)
 
 class Part74107(PackageDIP14):
     name = "74107"
@@ -18,7 +18,7 @@ class Part74107(PackageDIP14):
         13: Pin("~1CLR", PinType.IN),
     }
 
-    test_all = Test("Complete logic", Test.LOGIC,
+    test_all = TestLogic("Complete logic",
         inputs=[1, 4, 12, 13,  8, 11, 9, 10],
         outputs=[3, 2,  5, 6],
         body=[

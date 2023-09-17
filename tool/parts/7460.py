@@ -1,5 +1,5 @@
 from binvec import BV
-from prototypes import (PackageDIP14, Pin, PinType, Test)
+from prototypes import (PackageDIP14, Pin, PinType, TestLogic)
 
 '''
 NOTE on testing expanders:
@@ -28,7 +28,7 @@ class Part7460(PackageDIP14):
         13: Pin("1D", PinType.IN),
     }
 
-    test_async = Test("Asynchronous operation", Test.LOGIC,
+    test_async = TestLogic("Asynchronous operation",
         inputs=[11, 10,  1, 2, 3, 13,  4, 5, 6, 8],
         outputs=[12, 9],
         body = [

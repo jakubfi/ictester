@@ -1,5 +1,5 @@
 from binvec import BV
-from prototypes import (PackageDIP14, Pin, PinType, Test)
+from prototypes import (PackageDIP14, Pin, PinType, TestLogic)
 
 class Part74H87(PackageDIP14):
     name = "74H87"
@@ -22,16 +22,16 @@ class Part74H87(PackageDIP14):
     default_inputs = [8, 1,  2, 5, 10, 13]
     default_outputs = [3, 6, 9, 12]
 
-    test_true = Test("True", Test.LOGIC, default_inputs, default_outputs,
+    test_true = TestLogic("True", default_inputs, default_outputs,
         body=[[[0, 1, *i], i] for i in BV.range(0, 16)]
     )
-    test_complement = Test("Complement", Test.LOGIC, default_inputs, default_outputs,
+    test_complement = TestLogic("Complement", default_inputs, default_outputs,
         body=[[[0, 0, *i], ~i] for i in BV.range(0, 16)]
     )
-    test_zero = Test("Zero", Test.LOGIC, default_inputs, default_outputs,
+    test_zero = TestLogic("Zero", default_inputs, default_outputs,
         body=[[[1, 1, *i], BV.int(0, 4)] for i in BV.range(0, 16)]
     )
-    test_one = Test("One", Test.LOGIC, default_inputs, default_outputs,
+    test_one = TestLogic("One", default_inputs, default_outputs,
         body=[[[1, 0, *i], ~BV.int(0, 4)] for i in BV.range(0, 16)]
     )
 

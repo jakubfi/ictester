@@ -1,4 +1,4 @@
-from prototypes import (PackageDIP16, Pin, PinType, Test)
+from prototypes import (PackageDIP16, Pin, PinType, TestLogic)
 
 class Part7447(PackageDIP16):
     name = "7447"
@@ -19,12 +19,10 @@ class Part7447(PackageDIP16):
         14: Pin("g", PinType.OC),
         15: Pin("f", PinType.OC),
     }
-    # 7447 outputs are very slow, signal rise is ~5us
-    read_delay_us = 2
 
     # TODO: full coverage
-    test_async = Test("Asynchronous operation", Test.LOGIC,
-        params=list(round(read_delay_us/0.2).to_bytes(2, 'little')),
+    test_async = TestLogic("Asynchronous operation",
+        read_delay_us=2,  # 7447 outputs are very slow, signal rise is ~5us
         inputs=[6, 2, 1, 7,  3, 5, 4],
         outputs=[13, 12, 11, 10, 9, 15, 14],
         body=[

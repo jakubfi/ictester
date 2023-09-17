@@ -1,4 +1,4 @@
-from prototypes import (PackageDIP16, Pin, PinType, Test)
+from prototypes import (PackageDIP16, Pin, PinType, TestLogic)
 
 class Part74194(PackageDIP16):
     name = "74194"
@@ -23,7 +23,7 @@ class Part74194(PackageDIP16):
     default_inputs = [1,  10, 9,  11,  7, 2,  3, 4, 5, 6]
     default_outputs = [15, 14, 13, 12]
 
-    test_load = Test("Load", Test.LOGIC, default_inputs, default_outputs,
+    test_load = TestLogic("Load", default_inputs, default_outputs,
         body=[
             # load 1's
             [[1,  1, 1,  '/',  0, 0,  1, 1, 1, 1], [1, 1, 1, 1]],
@@ -36,7 +36,7 @@ class Part74194(PackageDIP16):
 
         ]
     )
-    test_shright = Test("Shift right", Test.LOGIC, default_inputs, default_outputs,
+    test_shright = TestLogic("Shift right", default_inputs, default_outputs,
         body=[
             # shift right, insert 1's
             [[1,  0, 1,  '/',  0, 1,  0, 0, 0, 0], [1, 0, 0, 0]],
@@ -50,7 +50,7 @@ class Part74194(PackageDIP16):
             [[1,  0, 1,  '/',  1, 0,  1, 1, 1, 1], [0, 0, 0, 0]],
         ]
     )
-    test_shleft = Test("Shift left", Test.LOGIC, default_inputs, default_outputs,
+    test_shleft = TestLogic("Shift left", default_inputs, default_outputs,
         body=[
             # shift left, insert 1's
             [[1,  1, 0,  '/',  1, 0,  0, 0, 0, 0], [0, 0, 0, 1]],
@@ -65,7 +65,7 @@ class Part74194(PackageDIP16):
 
         ]
     )
-    test_clear = Test("Clear", Test.LOGIC, default_inputs, default_outputs,
+    test_clear = TestLogic("Clear", default_inputs, default_outputs,
         body=[
             # load 1's
             [[1,  1, 1,  '/',  0, 0,  1, 1, 1, 1], [1, 1, 1, 1]],

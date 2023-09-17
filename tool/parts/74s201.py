@@ -1,5 +1,5 @@
 from binvec import BV
-from prototypes import (PackageDIP16, Pin, PinType, Test)
+from prototypes import (PackageDIP16, Pin, PinType, TestLogic)
 
 class Part74S201(PackageDIP16):
     name = "74S201"
@@ -32,21 +32,21 @@ class Part74S201(PackageDIP16):
     default_inputs = [12,  3, 4, 5,  1, 2, 15, 7, 9, 10, 11, 14,  13]
     default_outputs = [6]
 
-    test_rw = Test("R/W all address space", Test.LOGIC, default_inputs, default_outputs,
+    test_rw = TestLogic("R/W all address space", default_inputs, default_outputs,
         loops=32,
         body=lambda: Part74S201.for_all_addr(0,  0, 0, 0,  0,  1)  # write '0', output = high impedance
             + Part74S201.for_all_addr(1,  0, 0, 0,  0,  1)  # read, output = '1'
             + Part74S201.for_all_addr(0,  0, 0, 0,  1,  1)  # write '1', output = high impedance
             + Part74S201.for_all_addr(1,  0, 0, 0,  0,  0)  # read, output = '0'
     )
-    test_inhibit_read = Test("Inhibit read", Test.LOGIC, default_inputs, default_outputs,
+    test_inhibit_read = TestLogic("Inhibit read", default_inputs, default_outputs,
         loops=32,
         body=lambda: Part74S201.for_all_addr(0,  0, 0, 0,  1,  1)  # write '1', output = high impedance
             + Part74S201.for_all_addr(1,  0, 0, 1,  0,  1)  # inhibit read, output = high impedance
             + Part74S201.for_all_addr(1,  0, 1, 0,  0,  1)  # inhibit read, output = high impedance
             + Part74S201.for_all_addr(1,  1, 0, 0,  0,  1)  # inhibit read, output = high impedance
     )
-    test_inhibit_write = Test("Inhibit write", Test.LOGIC, default_inputs, default_outputs,
+    test_inhibit_write = TestLogic("Inhibit write", default_inputs, default_outputs,
         loops=32,
         body=lambda: Part74S201.for_all_addr(0,  0, 0, 0,  1,  1)  # write '1', output = high impedance
             + [[[1, 1, 1, 1,  0, 0, 0, 0, 0, 0, 0, 0,  0], [1]]]  # set inhibit

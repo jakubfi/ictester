@@ -1,4 +1,4 @@
-from prototypes import (PackageDIP16, Pin, PinType, Test)
+from prototypes import (PackageDIP16, Pin, PinType, TestLogic)
 
 class Part74174(PackageDIP16):
     name = "74174"
@@ -23,7 +23,7 @@ class Part74174(PackageDIP16):
     default_inputs = [1, 9,  3, 4, 6, 11, 13, 14]
     default_outputs = [2, 5, 7, 10, 12, 15]
 
-    test_sync = Test("Synchronous operation", Test.LOGIC, default_inputs, default_outputs,
+    test_sync = TestLogic("Synchronous operation", default_inputs, default_outputs,
         body=[
             [[1, '/',  0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0]],
             [[1, '/',  1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1]],
@@ -31,7 +31,7 @@ class Part74174(PackageDIP16):
             [[1, '/',  1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1]],
         ]
     )
-    test_async = Test("Asynchronous operation", Test.LOGIC, default_inputs, default_outputs,
+    test_async = TestLogic("Asynchronous operation", default_inputs, default_outputs,
         body=[
             # clear
             [[0, 0,  1, 1, 1, 1, 1, 1], [0, 0, 0, 0, 0, 0]],

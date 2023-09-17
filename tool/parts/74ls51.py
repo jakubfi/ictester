@@ -1,5 +1,5 @@
 from binvec import BV
-from prototypes import (PackageDIP14, Pin, PinType, Test)
+from prototypes import (PackageDIP14, Pin, PinType, TestLogic)
 
 class Part74LS51(PackageDIP14):
     name = "74LS51"
@@ -19,7 +19,7 @@ class Part74LS51(PackageDIP14):
         13: Pin("1C", PinType.IN),
     }
 
-    test_gate1 = Test("Gate 1", Test.LOGIC,
+    test_gate1 = TestLogic("Gate 1",
         inputs=[1, 12, 13,  9, 10, 11],
         outputs=[8],
         body=[
@@ -29,7 +29,7 @@ class Part74LS51(PackageDIP14):
         ]
     )
 
-    test_gate2 = Test("Gate 2", Test.LOGIC,
+    test_gate2 = TestLogic("Gate 2",
         inputs=[2, 3,  4, 5],
         outputs=[6],
         body=[

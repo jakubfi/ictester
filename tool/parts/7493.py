@@ -1,4 +1,4 @@
-from prototypes import (PackageDIP14_vcc5, Pin, PinType, Test)
+from prototypes import (PackageDIP14_vcc5, Pin, PinType, TestLogic)
 
 class Part7493(PackageDIP14_vcc5):
     name = "7493"
@@ -18,7 +18,7 @@ class Part7493(PackageDIP14_vcc5):
         14: Pin("CKA", PinType.IN),
     }
 
-    test_count = Test("Count", Test.LOGIC,
+    test_count = TestLogic("Count",
         inputs=[2, 3,  14, 1],
         outputs=[12, 9, 8, 11],
         body=[

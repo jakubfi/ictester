@@ -1,5 +1,5 @@
 from binvec import BV
-from prototypes import (PackageDIP14, Pin, PinType, Test)
+from prototypes import (PackageDIP14, Pin, PinType, TestLogic)
 
 class Part74H52(PackageDIP14):
     name = "74H52"
@@ -21,7 +21,7 @@ class Part74H52(PackageDIP14):
 
     missing_tests = "Gate expansion is not tested"
 
-    test_async = Test("Asynchronous operation", Test.LOGIC,
+    test_async = TestLogic("Asynchronous operation",
         inputs=[1, 2,  3, 4, 5,  10, 11,  12, 13],
         outputs=[8],
         loops=128,

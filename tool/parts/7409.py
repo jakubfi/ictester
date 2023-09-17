@@ -1,5 +1,5 @@
 from binvec import BV
-from prototypes import (partimport, Pin, PinType, Test)
+from prototypes import (partimport, Pin, PinType)
 
 class Part7409(partimport("7408")):
     name = "7409"

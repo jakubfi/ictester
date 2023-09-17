@@ -1,5 +1,5 @@
 from binvec import BV
-from prototypes import (PackageDIP20, Pin, PinType, ZIFFunc, Test)
+from prototypes import (PackageDIP20, Pin, PinType, ZIFFunc, TestLogic)
 
 class Part74S240(PackageDIP20):
     name = "74S240"
@@ -24,21 +24,19 @@ class Part74S240(PackageDIP20):
         18: Pin("~1Y1", PinType.ST3),
         19: Pin("~2G", PinType.IN),
     }
-    # with weak pullup, disabled (HiZ) outputs require more time to settle
-    read_delay_us = 2
 
     default_inputs = [1,  2, 4, 6, 8,  19,  11, 13, 15, 17]
     default_outputs = [18, 16, 14, 12,  9, 7, 5, 3]
 
     tests = [
-        Test("Outputs enabled", Test.LOGIC, default_inputs, default_outputs,
+        TestLogic("Outputs enabled", default_inputs, default_outputs,
             body=[
                 [[0,  1, 1, 1, 1,  0,  1, 1, 1, 1], [0, 0, 0, 0,  0, 0, 0, 0]],
                 [[0,  0, 0, 0, 0,  0,  0, 0, 0, 0], [1, 1, 1, 1,  1, 1, 1, 1]],
             ]
         ),
-        Test("Outputs disabled", Test.LOGIC, default_inputs, default_outputs,
-            params=list(round(read_delay_us/0.2).to_bytes(2, 'little')),
+        TestLogic("Outputs disabled", default_inputs, default_outputs,
+            read_delay_us=2,  # with weak pullup, disabled (HiZ) outputs require more time to settle
             body=[
                 [[1,  1, 1, 1, 1,  1,  1, 1, 1, 1], [1, 1, 1, 1,  1, 1, 1, 1]],
                 [[1,  0, 0, 0, 0,  1,  0, 0, 0, 0], [1, 1, 1, 1,  1, 1, 1, 1]],

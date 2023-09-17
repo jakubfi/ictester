@@ -1,5 +1,6 @@
 import inspect
 from enum import Enum
+from binvec import BV
 
 # ------------------------------------------------------------------------
 def partimport(part_name):
@@ -24,6 +25,12 @@ ZIFFunc = Enum("ZIFFunc", names=[
         ("OUT_SOURCE", 7),
         ("VCC", 128),
         ("GND", 129),
+    ]
+)
+TestType = Enum("TestType", names=[
+        ("LOGIC", 1),
+        ("DRAM", 2),
+        ("UNIVIB", 3),
     ]
 )
 
@@ -251,24 +258,124 @@ class TestVector():
     def __str__(self):
         return f"{list(map(int, self.input))} -> {list(map(int, self.output))}"
 
+    def __bytes__(self):
+        pin_data = self.by_pins(sorted(self.test.part.pins))
+        # If output is empty, that means DUT outputs shouldn't be checked
+        # Protocol marks such case with "1" on VCC position
+        if not self.output:
+            for vcc in self.test.part.vcc:
+                pin_data[vcc-1] = 1
+
+        pin_data = list(reversed(pin_data))
+
+        if self.test.debug:
+            check = " NC" if not v.output else ""
+            print(f" {list(map(int, pin_data))}{check}")
+
+        return bytes(BV(pin_data))
+
+
 # ------------------------------------------------------------------------
-class Test():
-    LOGIC = 1
-    DRAM = 2
-    UNIVIB = 3
+class Test:
+    def __init__(self, ttype, name, loops, cfgnum):
+        self.type = ttype
+        self.name = name
+        self.loops = loops
+        self.cfgnum = cfgnum
+        self.part = None
+
+    def attach_part(self, part):
+        self.part = part
+
+    def __bytes__(self):
+        data = bytes([self.cfgnum, self.type.value])
+
+        if self.debug:
+            print(f"Test type: {self.type.name}")
+            print(f"Configuration used: {self.cfgnum}")
+
+        return data
+
+# ------------------------------------------------------------------------
+class TestDRAM(Test):
+    def __init__(self, name, mem_test_type, mem_size, loops=1, cfgnum=0):
+        super(TestDRAM, self).__init__(TestType.DRAM, name, loops, cfgnum)
+        self.mem_test_type = mem_test_type
+        self.mem_size = mem_size
+        self.vectors = []
+        # TODO: not really necessary?
+        self.inputs = [1, 2, 3, 4, 5, 6, 7, 9, 10, 11, 12, 13, 15]
+        self.outputs = [14]
+
+    @property
+    def pins(self):
+        return self.inputs + self.outputs
+
+    def __bytes__(self):
+        data = super().__bytes__()
+        data += bytes([self.mem_size, self.mem_test_type, 0, 0])
+
+        if self.debug:
+            print(f"DRAM size: {self.mem_size}, test: {self.mem_test_type}")
+
+        # TODO: not really necessary?
+        pin_data = [
+            1 if i in self.pins else 0
+            for i in reversed(sorted(self.part.pins))
+        ]
+        data += bytes(BV(pin_data))
+
+        return data
+
+
+# ------------------------------------------------------------------------
+class TestUnivib(Test):
+    def __init__(self, name, univib_type, univib_test_type, inputs, outputs, loops=1024, cfgnum=0):
+        super(TestUnivib, self).__init__(TestType.UNIVIB, name, loops, cfgnum)
+        self.univib_type = univib_type
+        self.univib_test_type = univib_test_type
+        self.vectors = []
+        # TODO: not really necessary?
+        self.inputs = inputs
+        self.outputs = outputs
+
+    @property
+    def pins(self):
+        return self.inputs + self.outputs
+
+    def __bytes__(self):
+        data = super().__bytes__()
+        data += bytes([self.univib_type, self.univib_test_type, 0, 0])
+
+        if self.debug:
+            print(f"Univibrator type: {self.univib_type}, test: {self.univib_test_type}")
+
+        # TODO: not really necessary?
+        pin_data = [
+            1 if i in self.pins else 0
+            for i in reversed(sorted(self.part.pins))
+        ]
+        data += bytes(BV(pin_data))
+
+        return data
+
+
+# ------------------------------------------------------------------------
+class TestLogic(Test):
 
     MAX_TEST_PARAMS = 4
 
-    def __init__(self, name, ttype, inputs, outputs, params=[], body=[], loops=1024, cfgnum=0):
-        self.name = name
-        self.type = ttype
+    def __init__(self, name, inputs, outputs, params=[], body=[], loops=1024, cfgnum=0, read_delay_us=0):
+        super(TestLogic, self).__init__(TestType.LOGIC, name, loops, cfgnum)
         self.params = params + [0] * (self.MAX_TEST_PARAMS - len(params))
-        self.loops = loops
         self.inputs = inputs
         self.outputs = outputs
         self._body = body
         self._vectors = None
-        self.cfgnum = cfgnum
+        self.read_delay_us = read_delay_us
+
+    def set_delay(self, read_delay_us):
+        self.read_delay_us = read_delay_us
 
     @property
     def pins(self):
@@ -301,3 +408,22 @@ class Test():
         if not self._vectors:
             self._vectors = [TestVector(v, self) for v in self.body]
         return self._vectors
+
+    def __bytes__(self):
+        data = super().__bytes__()
+        data += round(self.read_delay_us/0.2).to_bytes(2, 'little')
+        data += bytes([0, 0])
+
+        pin_data = [
+            1 if i in self.pins else 0
+            for i in reversed(sorted(self.part.pins))
+        ]
+        if self.debug:
+            print(f"Additional read delay: {self.read_delay_us} us")
+            print(f"DUT inputs: {self.inputs}")
+            print(f"DUT outputs: {self.outputs}")
+
+        data += bytes(BV(pin_data))
+
+        return data
+

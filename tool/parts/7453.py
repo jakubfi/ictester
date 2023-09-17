@@ -1,5 +1,5 @@
 from binvec import BV
-from prototypes import (PackageDIP14, Pin, PinType, Test)
+from prototypes import (PackageDIP14, Pin, PinType, TestLogic)
 
 class Part7453(PackageDIP14):
     name = "7453"
@@ -20,12 +20,9 @@ class Part7453(PackageDIP14):
     }
 
     missing_tests = "Gate expansion is not tested"
-    # 7453 outputs, although TTL,  are a tad slow with no serious load
-    read_delay_us = 0.4
 
-
-    test_async = Test("Asynchronous operation", Test.LOGIC,
-        params=list(round(read_delay_us/0.2).to_bytes(2, 'little')),
+    test_async = TestLogic("Asynchronous operation",
+        read_delay_us=0.4,  # 7453 outputs, although TTL,  are a tad slow with no serious load
         inputs=[1, 13, 2, 3, 4, 5, 6, 9, 10],
         outputs=[8],
         loops=256,

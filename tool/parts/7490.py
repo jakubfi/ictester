@@ -1,4 +1,4 @@
-from prototypes import (PackageDIP14_vcc5, Pin, PinType, Test)
+from prototypes import (PackageDIP14_vcc5, Pin, PinType, TestLogic)
 
 class Part7490(PackageDIP14_vcc5):
     name = "7490"
@@ -21,7 +21,7 @@ class Part7490(PackageDIP14_vcc5):
     default_inputs = [2, 3,  6, 7,  14, 1]
     default_outputs = [11, 8, 9, 12]
 
-    test_count_cka = Test("Count CKA", Test.LOGIC, default_inputs, default_outputs,
+    test_count_cka = TestLogic("Count CKA", default_inputs, default_outputs,
         body=[
             # reset R0
             [[1, 1,  1, 0,  0, 0], [0, 0, 0, 0]],
@@ -31,7 +31,7 @@ class Part7490(PackageDIP14_vcc5):
             [[0, 0,  0, 0,  '\\', 0], [0, 0, 0, 1]],
         ]
     )
-    test_count_ckb = Test("Count CKB", Test.LOGIC, default_inputs, default_outputs,
+    test_count_ckb = TestLogic("Count CKB", default_inputs, default_outputs,
         body=[
             # reset R0
             [[1, 1,  1, 0,  0, 0], [0, 0, 0, 0]],
@@ -47,7 +47,7 @@ class Part7490(PackageDIP14_vcc5):
             [[0, 0,  0, 0,  0, '\\'], [0, 1, 1, 0]],
         ]
     )
-    test_resets = Test("Resets", Test.LOGIC, default_inputs, default_outputs,
+    test_resets = TestLogic("Resets", default_inputs, default_outputs,
         body=[
             # reset R0
             [[1, 1,  1, 0,  0, 0], [0, 0, 0, 0]],

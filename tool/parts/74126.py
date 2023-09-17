@@ -1,4 +1,4 @@
-from prototypes import (PackageDIP14, Pin, PinType, Test)
+from prototypes import (PackageDIP14, Pin, PinType, TestLogic)
 from binvec import BV
 
 class Part74126(PackageDIP14):
@@ -19,11 +19,8 @@ class Part74126(PackageDIP14):
         13: Pin("4G", PinType.IN),
     }
 
-    # switching to HiZ with 5k pullups requires some time
-    read_delay_us = 2
-
-    test_all = Test("Complete logic", Test.LOGIC,
-        params=list(round(read_delay_us/0.2).to_bytes(2, 'little')),
+    test_all = TestLogic("Complete logic",
+        read_delay_us=2,  # switching to HiZ with 5k pullups requires some time
         inputs=[1, 4, 10, 13,  2, 5, 9, 12],
         outputs=[3, 6, 8, 11],
         body=[

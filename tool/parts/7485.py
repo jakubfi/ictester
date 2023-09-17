@@ -1,5 +1,5 @@
 from binvec import BV
-from prototypes import (PackageDIP16, Pin, PinType, Test)
+from prototypes import (PackageDIP16, Pin, PinType, TestLogic)
 
 class Part7485(PackageDIP16):
     name = "7485"
@@ -21,7 +21,7 @@ class Part7485(PackageDIP16):
         15: Pin("A3", PinType.IN),
     }
 
-    test_all_0 = Test("Full logic (A=B = 0)", Test.LOGIC,
+    test_all_0 = TestLogic("Full logic (A=B = 0)",
         inputs=[2, 3, 4,  15, 13, 12, 10,  1, 14, 11, 9],
         outputs=[7, 6, 5],
         loops=256,
@@ -40,7 +40,7 @@ class Part7485(PackageDIP16):
         ]
     )
 
-    test_all_1 = Test("Full logic (A=B = 1)", Test.LOGIC,
+    test_all_1 = TestLogic("Full logic (A=B = 1)",
         inputs=[2, 3, 4,  15, 13, 12, 10,  1, 14, 11, 9],
         outputs=[7, 6, 5],
         loops=256,

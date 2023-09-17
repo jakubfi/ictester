@@ -1,4 +1,4 @@
-from prototypes import (PackageDIP16, Pin, PinType, Test)
+from prototypes import (PackageDIP16, Pin, PinType, TestLogic)
 
 class Part74166(PackageDIP16):
     name = "74166"
@@ -27,7 +27,7 @@ class Part74166(PackageDIP16):
     default_inputs = [9, 15,  6, 7,  1,  2, 3, 4, 5, 10, 11, 12, 14]
     default_outputs = [13]
 
-    test_shift = Test("Load, Shift", Test.LOGIC, default_inputs, default_outputs,
+    test_shift = TestLogic("Load, Shift", default_inputs, default_outputs,
         body=[
             # load all 1s
             [[1, 0,  0, '/',  0,  1, 1, 1, 1, 1, 1, 1, 1], [1]],
@@ -51,7 +51,7 @@ class Part74166(PackageDIP16):
             [[1, 1,  0, '/',  1,  0, 0, 0, 0, 0, 0, 0, 0], [1]],
         ]
     )
-    test_clear = Test("Load, Clear", Test.LOGIC, default_inputs, default_outputs,
+    test_clear = TestLogic("Load, Clear", default_inputs, default_outputs,
         body=[
             # load
             [[1, 0,  0, '/',  0,  1, 1, 1, 1, 1, 1, 1, 1], [1]],
@@ -68,7 +68,7 @@ class Part74166(PackageDIP16):
             [[1, 1,  0, '/',  1,  0, 0, 0, 0, 0, 0, 0, 0], [1]],
         ]
     )
-    test_inhibit_load = Test("Clear, Inhibit Load", Test.LOGIC, default_inputs, default_outputs,
+    test_inhibit_load = TestLogic("Clear, Inhibit Load", default_inputs, default_outputs,
         body=[
             # clear (+pull clock and clock inhibit high)
             [[0, 0,  1, 1,  0,  0, 0, 0, 0, 0, 0, 0, 0], [0]],
@@ -77,7 +77,7 @@ class Part74166(PackageDIP16):
             [[1, 0,  1, '/',  0,  1, 1, 1, 1, 1, 1, 1, 1], [0]],
         ]
     )
-    test_inhibit_shift = Test("Clear, Inhibit Shift", Test.LOGIC, default_inputs, default_outputs,
+    test_inhibit_shift = TestLogic("Clear, Inhibit Shift", default_inputs, default_outputs,
         body=[
             # clear (+pull clock and clock inhibit high)
             [[0, 0,  1, 1,  0,  0, 0, 0, 0, 0, 0, 0, 0], [0]],

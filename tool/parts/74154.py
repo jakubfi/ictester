@@ -1,5 +1,5 @@
 from binvec import BV
-from prototypes import (PackageDIP24, Pin, PinType, Test)
+from prototypes import (PackageDIP24, Pin, PinType, TestLogic)
 
 class Part74154(PackageDIP24):
     name = "74154"
@@ -32,14 +32,14 @@ class Part74154(PackageDIP24):
     default_inputs = [18, 19,  20, 21, 22, 23]
     default_outputs = [17, 16, 15, 14, 13, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1]
 
-    test_inhibit = Test("Inhibit", Test.LOGIC, default_inputs, default_outputs,
+    test_inhibit = TestLogic("Inhibit", default_inputs, default_outputs,
         body=[
             [[*select, *addr],  ~BV.int(0, 16)]
             for addr in BV.range(0, 16)
             for select in [[0, 1], [1, 0], [1, 1]]
         ]
     )
-    test_select = Test("Select", Test.LOGIC, default_inputs, default_outputs,
+    test_select = TestLogic("Select", default_inputs, default_outputs,
         body=[[[0, 0, *BV.int(addr, 4)],  [*~BV.bit(addr, 16)]] for addr in range(0, 16)]
     )
 

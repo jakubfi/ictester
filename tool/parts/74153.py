@@ -1,5 +1,5 @@
 from binvec import BV
-from prototypes import (PackageDIP16, Pin, PinType, Test)
+from prototypes import (PackageDIP16, Pin, PinType, TestLogic)
 
 class Part74153(PackageDIP16):
     name = "74153"
@@ -24,16 +24,16 @@ class Part74153(PackageDIP16):
     default_inputs = [2, 14,  1,  3, 4, 5, 6,  15,  13, 12, 11, 10]
     default_outputs = [7, 9]
 
-    test_select_0 = Test("Select 0", Test.LOGIC, default_inputs, default_outputs,
+    test_select_0 = TestLogic("Select 0", default_inputs, default_outputs,
         body=[[[*BV.int(addr, 2), *(2*[0, *~BV.bit(addr, 4)])],  [0, 0]] for addr in range(0, 4)]
     )
-    test_select_1 = Test("Select 1", Test.LOGIC, default_inputs, default_outputs,
+    test_select_1 = TestLogic("Select 1", default_inputs, default_outputs,
         body=[[[*BV.int(addr, 2), *(2*[0, *BV.bit(addr, 4)])],  [1, 1]] for addr in range(0, 4)]
     )
-    test_inhibit_0 = Test("Inhibit 0", Test.LOGIC, default_inputs, default_outputs,
+    test_inhibit_0 = TestLogic("Inhibit 0", default_inputs, default_outputs,
         body=[[[*addr, *(2*[1, 0, 0, 0, 0])],  [0, 0]] for addr in BV.range(0, 4)]
     )
-    test_inhibit_1 = Test("Inhibit 1", Test.LOGIC, default_inputs, default_outputs,
+    test_inhibit_1 = TestLogic("Inhibit 1", default_inputs, default_outputs,
         body=[[[*addr, *(2*[1, 1, 1, 1, 1])],  [0, 0]] for addr in BV.range(0, 4)]
     )
 

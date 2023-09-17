@@ -1,4 +1,4 @@
-from prototypes import (PackageDIP16, Pin, PinType, Test)
+from prototypes import (PackageDIP16, Pin, PinType, TestLogic)
 
 class Part74170(PackageDIP16):
     name = "74170"
@@ -23,7 +23,7 @@ class Part74170(PackageDIP16):
     default_inputs = [13, 14, 12,  4, 5, 11,  15, 1, 2, 3]
     default_outputs = [10, 9, 7, 6]
 
-    test_bits = Test("Bit storage test", Test.LOGIC, default_inputs, default_outputs,
+    test_bits = TestLogic("Bit storage test", default_inputs, default_outputs,
         body=[
             # R/W 0's
             [[0, 0, 0,  0, 0, 1,  0, 0, 0, 0], [1, 1, 1, 1]],
@@ -61,7 +61,7 @@ class Part74170(PackageDIP16):
         ]
     )
 
-    test_addr = Test("Addressing test", Test.LOGIC, default_inputs, default_outputs,
+    test_addr = TestLogic("Addressing test", default_inputs, default_outputs,
         body=[
             # W: 0 0 0 0
             [[0, 0, 0,  0, 0, 1,  0, 0, 0, 0], [1, 1, 1, 1]],
@@ -85,7 +85,7 @@ class Part74170(PackageDIP16):
             [[0, 0, 1,  1, 1, 0,  0, 0, 0, 0], [1, 0, 0, 0]],
         ]
     )
-    test_rw = Test("Simultaneous read/write", Test.LOGIC, default_inputs, default_outputs,
+    test_rw = TestLogic("Simultaneous read/write", default_inputs, default_outputs,
         body=[
             [[0, 0, 0,  0, 0, 1,  0, 0, 0, 1], [1, 1, 1, 1]],
             [[0, 0, 1,  0, 0, 1,  0, 0, 0, 1], [1, 1, 1, 1]],

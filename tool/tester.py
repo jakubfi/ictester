@@ -1,6 +1,6 @@
 import time
 from enum import Enum
-from prototypes import Test
+from prototypes import (Test, TestType)
 from binvec import BV
 
 Cmd = Enum("Cmd",
@@ -79,26 +79,9 @@ class Tester:
     def test_setup(self, test, delay):
         if self.debug:
             print("---- TEST SETUP -----------------------------------")
-        params = test.params
-        if delay is not None:
-            if test.type == Test.LOGIC:
-                delay_val = round(delay/0.2)
-                params[0] = delay_val & 0xff
-                params[1] = delay_val >> 8
 
-        self.tr.send([Cmd.TEST_SETUP.value, test.cfgnum, test.type, *params])
-
-        data = [
-            1 if i in test.pins else 0
-            for i in reversed(sorted(self.part.pins))
-        ]
-        if self.debug:
-            print(f"Configuration used: {test.cfgnum}")
-            print(f"Test pin usage map: {data}")
-            print(f"DUT inputs: {test.inputs}")
-            print(f"DUT outputs: {test.outputs}")
-        self.tr.send_bitarray(data)
-
+        self.tr.send([Cmd.TEST_SETUP.value])
+        self.tr.send(test)
         if self.tr.recv() != Resp.OK.value:
             raise RuntimeError("Test setup failed")
 
@@ -119,20 +102,7 @@ class Tester:
             print("Binary vectors:")
 
         for v in test.vectors:
-            data = v.by_pins(sorted(self.part.pins))
-            # If output is empty, that means DUT outputs shouldn't be checked
-            # Protocol marks such case with "1" on VCC position
-            if not v.output:
-                for vcc in self.part.vcc:
-                    data[vcc-1] = 1
-
-            data = list(reversed(data))
-
-            if self.debug:
-                check = " NC" if not v.output else ""
-                print(f" {list(map(int, data))}{check}")
-
-            self.tr.send_bitarray(data)
+            self.tr.send(v)
 
         if self.tr.recv() != Resp.OK.value:
             raise RuntimeError("Vectors load failed")
@@ -152,7 +122,7 @@ class Tester:
         failed_pin_vector = None
 
         # Read failed vector data for LOGIC tests (natural DUT pin order)
-        if test.type == Test.LOGIC and result == Resp.FAIL.value:
+        if test.type == TestType.LOGIC and result == Resp.FAIL.value:
             failed_vector_num = self.tr.recv_16le()
             failed_pin_vector = [*BV.int(self.tr.recv(), 8).reversed()]
             failed_pin_vector.extend([*BV.int(self.tr.recv(), 8).reversed()])
@@ -163,7 +133,7 @@ class Tester:
 
     def exec_test(self, test, loops, delay):
         self.test_setup(test, delay)
-        if test.type == Test.LOGIC:
+        if test.type == TestType.LOGIC:
             self.vectors_load(test)
         res = self.run(loops, test)
         if self.debug:

@@ -1,4 +1,4 @@
-from prototypes import (PackageDIP16_vcc5, Pin, PinType, Test)
+from prototypes import (PackageDIP16_vcc5, Pin, PinType, TestLogic)
 
 class Part7475(PackageDIP16_vcc5):
     name = "7475"
@@ -20,7 +20,7 @@ class Part7475(PackageDIP16_vcc5):
         16: Pin("1Q", PinType.OUT),
     }
 
-    test_async = Test("Asynchronous operation", Test.LOGIC,
+    test_async = TestLogic("Asynchronous operation",
         inputs=[2, 3, 13,  6, 7, 4],
         outputs=[16, 1,  15, 14,  10, 11,  9, 8],
         body=[
