@@ -17,7 +17,7 @@ def partimport(part_name):
 PinType = Enum("PinType", ["IN", "OUT", "BIDI", "OC", "ST3", "OE", "C", "RC", "VCC", "GND", "NC"])
 ZIFFunc = Enum("ZIFFunc", names=[
         ("OUT", 1),
-        ("IN", 2),
+        ("IN_HIZ", 2),
         ("IN_PU_STRONG", 3),
         ("IN_PU_WEAK", 4),
         ("OUT_SINK", 5),
@@ -25,7 +25,6 @@ ZIFFunc = Enum("ZIFFunc", names=[
         ("OUT_SOURCE", 7),
         ("VCC", 128),
         ("GND", 129),
-        ("IN_HIZ", 255),
     ]
 )
 
@@ -35,10 +34,10 @@ class Pin:
 
     _pin_zif_allowed_funcs = {
         PinType.IN: [ZIFFunc.OUT],
-        PinType.OUT: [ZIFFunc.IN_PU_WEAK, ZIFFunc.IN_PU_STRONG, ZIFFunc.IN],
-        PinType.BIDI: [ZIFFunc.OUT, ZIFFunc.IN_PU_WEAK, ZIFFunc.IN_PU_STRONG, ZIFFunc.IN],
-        PinType.OC: [ZIFFunc.IN_PU_STRONG, ZIFFunc.IN_PU_WEAK, ZIFFunc.IN],
-        PinType.ST3: [ZIFFunc.IN_PU_WEAK, ZIFFunc.IN, ZIFFunc.IN_PU_STRONG],
+        PinType.OUT: [ZIFFunc.IN_PU_WEAK, ZIFFunc.IN_PU_STRONG, ZIFFunc.IN_HIZ],
+        PinType.BIDI: [ZIFFunc.OUT, ZIFFunc.IN_PU_WEAK, ZIFFunc.IN_PU_STRONG, ZIFFunc.IN_HIZ],
+        PinType.OC: [ZIFFunc.IN_PU_STRONG, ZIFFunc.IN_PU_WEAK, ZIFFunc.IN_HIZ],
+        PinType.ST3: [ZIFFunc.IN_PU_WEAK, ZIFFunc.IN_HIZ, ZIFFunc.IN_PU_STRONG],
         PinType.OE: [ZIFFunc.OUT_SINK],
         PinType.C: [ZIFFunc.C],
         PinType.RC: [ZIFFunc.IN_PU_STRONG],
@@ -90,6 +89,8 @@ class Part:
     }
 
     pincount = 0
+    package_type = None
+    package_pins = {}
     name = None
     tests = None
     missing_tests = None
@@ -113,10 +114,6 @@ class Part:
     @property
     def gnd(self):
         return list(k for k, v in self.pins.items() if v.role == PinType.GND)
-
-    @property
-    def package_variant(self):
-        return f"VCC@pin{self.vcc[0]}"
 
 
 # ------------------------------------------------------------------------
@@ -190,22 +187,22 @@ class PackageDIP16_vcc5_gnd13(Part):
 
 
 # ------------------------------------------------------------------------
-class PackageDIP24(Part):
-    pincount = 24
-    package_type = Part.DIP
-    package_pins = {
-        12: Pin("GND", PinType.GND),
-        24: Pin("VCC", PinType.VCC),
-    }
-
-
-# ------------------------------------------------------------------------
 class PackageDIP20(Part):
     pincount = 20
     package_type = Part.DIP
     package_pins = {
         10: Pin("GND", PinType.GND),
         20: Pin("VCC", PinType.VCC),
+    }
+
+
+# ------------------------------------------------------------------------
+class PackageDIP24(Part):
+    pincount = 24
+    package_type = Part.DIP
+    package_pins = {
+        12: Pin("GND", PinType.GND),
+        24: Pin("VCC", PinType.VCC),
     }
 
 
@@ -220,7 +217,7 @@ class TestVector():
         try:
             return [*self.input, *self.output][self.test.pins.index(pin)]
         except (IndexError, ValueError):
-            return 0
+            return False
 
     def by_pins(self, pins):
         return [self.pin(i) for i in pins]

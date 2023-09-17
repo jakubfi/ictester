@@ -66,7 +66,7 @@ bool mcu_func(uint8_t cfgnum, uint8_t func, uint8_t port_pos, uint8_t port_bit)
 		case ZIF_OUT:
 			mcu_port[cfgnum][port_pos].output |= _BV(port_bit);
 			break;
-		case ZIF_IN:
+		case ZIF_IN_HIZ:
 			mcu_port[cfgnum][port_pos].input |= _BV(port_bit);
 			break;
 		case ZIF_IN_PU_WEAK:

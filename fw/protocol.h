@@ -54,7 +54,7 @@ enum package_type {
 
 enum zif_pin_function {
 	ZIF_OUT				= 1,
-	ZIF_IN				= 2,
+	ZIF_IN_HIZ			= 2,
 	ZIF_IN_PU_STRONG	= 3,
 	ZIF_IN_PU_WEAK		= 4,
 	ZIF_OUT_SINK		= 5,
@@ -62,7 +62,6 @@ enum zif_pin_function {
 	ZIF_OUT_SOURCE		= 7,
 	ZIF_VCC				= 128,
 	ZIF_GND				= 129,
-	ZIF_IN_HIZ			= 255
 };
 
 void reply(uint8_t res);

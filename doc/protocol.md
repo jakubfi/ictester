@@ -70,7 +70,7 @@ change from test to test.
 | ZIF Function        | Value | MCU Pin Function          | SW Function      | Default DUT use            |
 |---------------------|-------|---------------------------|------------------|----------------------------|
 | `ZIF_OUT`           | 1     | output                    | -                | TTL input                  |
-| `ZIF_IN`            | 2     | input HiZ                 | -                | TTL output                 |
+| `ZIF_IN_HIZ`        | 2     | input HiZ                 | -                | TTL output, not connected  |
 | `ZIF_IN_PU_STRONG`  | 3     | input HiZ                 | pull-up 4.7 kΩ   | open-collector output      |
 | `ZIF_IN_PU_WEAK`    | 4     | input with weak pullup    | -                | TTL output, 3-state output |
 | `ZIF_OUT_SINK`      | 5     | output driven low (sink)  | -                | open-emitter               |
@@ -78,7 +78,6 @@ change from test to test.
 | `ZIF_OUT_SOURCE`    | 7     | output driven high (sink) | -                | -                          |
 | `ZIF_VCC`           | 128   | input HiZ                 | VDUT (+5 V)      | VCC (+5 V)                 |
 | `ZIF_GND`           | 129   | input HiZ                 | GND              | GND                        |
-| `ZIF_HIZ`           | 255   | input HiZ                 | -                | not connected, unused      |
 
 ### Valid responses
 
