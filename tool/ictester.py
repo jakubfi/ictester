@@ -180,9 +180,6 @@ for test_name in all_tests:
     logic_fail_was_last = False
     test = tester.part.get_test(test_name)
     test.debug = args.debug
-    test.attach_part(part)
-    if args.delay is not None:
-        test.set_delay(args.delay)
     loops = args.loops if args.loops is not None else test.loops
 
     plural = "s" if loops != 1 else ""
@@ -194,20 +191,20 @@ for test_name in all_tests:
         tests_skipped += 1
         print(f"\b\b\b\b{SKIP}SKIP{ENDC}")
     else:
-        res, elapsed, failed_vector_num, failed_pin_vector = tester.exec_test(test, loops, args.delay)
-        if res == Resp.PASS.value:
+        resp, elapsed, failed_vector_num, failed_pin_vector = tester.exec_test(test, loops, args.delay)
+        if resp == Resp.PASS:
             tests_passed += 1
             print(f"\b\b\b\b{OK}PASS{ENDC}  ({elapsed:.2f} sec.)")
-        elif res == Resp.TIMING_FAIL.value:
+        elif resp == Resp.TIMING_FAIL:
             tests_warning += 1
             print(f"\b\b\b\b{WARN}TIMING ERROR{ENDC}")
-        elif res == Resp.FAIL.value:
+        elif resp == Resp.FAIL:
             tests_failed += 1
             print(f"\b\b\b\b{FAIL}FAIL{ENDC}  ({elapsed:.2f} sec.)")
             if test.type == TestType.LOGIC:
                 print_failed_vector(part, test, failed_vector_num, failed_pin_vector)
                 logic_fail_was_last = True
-        elif res == Resp.ERR.value:
+        elif resp == Resp.ERR:
             tests_failed += 1
             print(f"\b\b\b\b{FAIL}ERROR{ENDC}")
         else:

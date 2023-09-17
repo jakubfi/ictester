@@ -76,7 +76,7 @@ class Tester:
         if self.tr.recv() != Resp.OK.value:
             raise RuntimeError("DUT disconnect failed")
 
-    def test_setup(self, test, delay):
+    def test_setup(self, test):
         if self.debug:
             print("---- TEST SETUP -----------------------------------")
 
@@ -116,23 +116,26 @@ class Tester:
         self.tr.send_16le(loops)
 
         start = time.time()
-        result = self.tr.recv()
+        resp = Resp(self.tr.recv())
         elapsed = time.time() - start
         failed_vector_num = None
         failed_pin_vector = None
 
         # Read failed vector data for LOGIC tests (natural DUT pin order)
-        if test.type == TestType.LOGIC and result == Resp.FAIL.value:
+        if test.type == TestType.LOGIC and resp == Resp.FAIL:
             failed_vector_num = self.tr.recv_16le()
             failed_pin_vector = [*BV.int(self.tr.recv(), 8).reversed()]
             failed_pin_vector.extend([*BV.int(self.tr.recv(), 8).reversed()])
             if self.part.pincount > 16:
                 failed_pin_vector.extend([*BV.int(self.tr.recv(), 8).reversed()])
 
-        return result, elapsed, failed_vector_num, failed_pin_vector
+        return resp, elapsed, failed_vector_num, failed_pin_vector
 
     def exec_test(self, test, loops, delay):
-        self.test_setup(test, delay)
+        test.attach_part(self.part)
+        if delay is not None:
+            test.set_delay(delay)
+        self.test_setup(test)
         if test.type == TestType.LOGIC:
             self.vectors_load(test)
         res = self.run(loops, test)

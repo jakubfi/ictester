@@ -27,6 +27,11 @@ ZIFFunc = Enum("ZIFFunc", names=[
         ("GND", 129),
     ]
 )
+Package = Enum("Package",
+    names=[
+        ("DIP", 1),
+    ]
+)
 TestType = Enum("TestType", names=[
         ("LOGIC", 1),
         ("DRAM", 2),
@@ -93,7 +98,6 @@ class Pin:
         PinType.NC: [ZIFFunc.IN_HIZ],
     }
 
-
     def __init__(self, name, role, zif_func=None):
         assert role in self._pin_zif_allowed_funcs
         self.name = name
@@ -114,13 +118,6 @@ class Pin:
 
 # ------------------------------------------------------------------------
 class Part:
-
-    DIP = 1
-
-    _type_names = {
-        DIP: "DIP",
-    }
-
     pincount = 0
     package_type = None
     package_pins = {}
@@ -139,7 +136,7 @@ class Part:
 
     @property
     def package_name(self):
-        return f"{self._type_names[self.package_type]}{self.pincount}"
+        return f"{self.package_type.name}{self.pincount}"
 
     @property
     def vcc(self):
@@ -156,7 +153,7 @@ class Part:
             if len(pin.zif_func) > cfg_count:
                 cfg_count = len(pin.zif_func)
         assert 5 > cfg_count > 0
-        data.extend([self.package_type, self.pincount, cfg_count])
+        data.extend([self.package_type.value, self.pincount, cfg_count])
 
         if self.debug:
             print(f"DUT pin definitions, {cfg_count} configuration(-s) available:")
@@ -179,7 +176,7 @@ class Part:
 # ------------------------------------------------------------------------
 class PackageDIP14(Part):
     pincount = 14
-    package_type = Part.DIP
+    package_type = Package.DIP
     package_pins = {
         7: Pin("GND", PinType.GND),
         14: Pin("VCC", PinType.VCC),
@@ -189,7 +186,7 @@ class PackageDIP14(Part):
 # ------------------------------------------------------------------------
 class PackageDIP14_vcc5(Part):
     pincount = 14
-    package_type = Part.DIP
+    package_type = Package.DIP
     package_pins = {
         5: Pin("VCC", PinType.VCC),
         10: Pin("GND", PinType.GND),
@@ -199,7 +196,7 @@ class PackageDIP14_vcc5(Part):
 # ------------------------------------------------------------------------
 class PackageDIP14_vcc4(Part):
     pincount = 14
-    package_type = Part.DIP
+    package_type = Package.DIP
     package_pins = {
         4: Pin("VCC", PinType.VCC),
         11: Pin("GND", PinType.GND),
@@ -209,7 +206,7 @@ class PackageDIP14_vcc4(Part):
 # ------------------------------------------------------------------------
 class PackageDIP16(Part):
     pincount = 16
-    package_type = Part.DIP
+    package_type = Package.DIP
     package_pins = {
         8: Pin("GND", PinType.GND),
         16: Pin("VCC", PinType.VCC),
@@ -219,7 +216,7 @@ class PackageDIP16(Part):
 # ------------------------------------------------------------------------
 class PackageDIP16_rotated(Part):
     pincount = 16
-    package_type = Part.DIP
+    package_type = Package.DIP
     package_pins = {
         8: Pin("VCC", PinType.VCC),
         16: Pin("GND", PinType.GND),
@@ -229,7 +226,7 @@ class PackageDIP16_rotated(Part):
 # ------------------------------------------------------------------------
 class PackageDIP16_vcc5(Part):
     pincount = 16
-    package_type = Part.DIP
+    package_type = Package.DIP
     package_pins = {
         5: Pin("VCC", PinType.VCC),
         12: Pin("GND", PinType.GND),
@@ -239,7 +236,7 @@ class PackageDIP16_vcc5(Part):
 # ------------------------------------------------------------------------
 class PackageDIP16_vcc5_gnd13(Part):
     pincount = 16
-    package_type = Part.DIP
+    package_type = Package.DIP
     package_pins = {
         5: Pin("VCC", PinType.VCC),
         13: Pin("GND", PinType.GND),
@@ -249,7 +246,7 @@ class PackageDIP16_vcc5_gnd13(Part):
 # ------------------------------------------------------------------------
 class PackageDIP20(Part):
     pincount = 20
-    package_type = Part.DIP
+    package_type = Package.DIP
     package_pins = {
         10: Pin("GND", PinType.GND),
         20: Pin("VCC", PinType.VCC),
@@ -259,7 +256,7 @@ class PackageDIP20(Part):
 # ------------------------------------------------------------------------
 class PackageDIP24(Part):
     pincount = 24
-    package_type = Part.DIP
+    package_type = Package.DIP
     package_pins = {
         12: Pin("GND", PinType.GND),
         24: Pin("VCC", PinType.VCC),
@@ -296,7 +293,7 @@ class TestVector():
         pin_data = list(reversed(pin_data))
 
         if self.test.debug:
-            check = " NC" if not v.output else ""
+            check = " NC" if not self.output else ""
             print(f" {list(map(int, pin_data))}{check}")
 
         return bytes(BV(pin_data))
