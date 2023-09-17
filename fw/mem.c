@@ -261,8 +261,8 @@ uint8_t run_mem(uint16_t loops, uint8_t *params)
 		[MEM_TEST_MARCH_PAGE] = march_step_page,
 	};
 
-	uint8_t mem_test_type = params[1] & 0b11;
 	uint16_t address_space = params[0] == 2 ? 0x200 : 0x100;
+	uint8_t mem_test_type = params[1] & 0b11;
 
 	if (mem_test_type == MEM_TEST_SPEED) {
 		test_speed(loops);

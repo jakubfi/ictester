@@ -1,7 +1,7 @@
 #ifndef __PROTOCOL_H__
 #define __PROTOCOL_H__
 
-#define MAX_TEST_PARAMS 4
+#define MAX_TEST_PARAMS 2
 #define MAX_CONFIGS 4
 
 enum commands {

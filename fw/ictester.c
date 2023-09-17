@@ -72,10 +72,12 @@ static uint8_t handle_test_setup()
 		test_params[i] = serial_rx_char();
 	}
 
-	// read pin usage data
-	uint8_t pin_usage[3];
-	for (uint8_t i=0 ; i<dut_pin_count ; i+=8) {
-		pin_usage[i/8] = serial_rx_char();
+	uint8_t pin_usage[3] = {0xff, 0xff, 0xff};
+	if (test_type == TEST_LOGIC) {
+		// read pin usage data only for LOGIC tests
+		for (uint8_t i=0 ; i<dut_pin_count ; i+=8) {
+			pin_usage[i/8] = serial_rx_char();
+		}
 	}
 
 	zif_pin_mask_clear(cfgnum);

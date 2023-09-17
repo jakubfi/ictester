@@ -1,9 +1,7 @@
 from binvec import BV
-from prototypes import (PackageDIP14, Pin, PinType, TestUnivib)
+from prototypes import (PackageDIP14, Pin, PinType, TestUnivib, UnivibType, UnivibTestType)
 
 class Part74121(PackageDIP14):
-    UNI_74121 = 0
-
     name = "74121"
     desc = "Monostable Monovibrators With Schmitt-trigger Inputs"
     pin_cfg = {
@@ -21,12 +19,9 @@ class Part74121(PackageDIP14):
         13: Pin("NC", PinType.NC),
     }
 
-    default_inputs=[3, 4, 5]
-    default_outputs=[6, 1]
-
     tests = [
-        TestUnivib("No trigger", UNI_74121, 0, inputs=default_inputs, outputs=default_outputs),
-        TestUnivib("Trigger", UNI_74121, 1, inputs=default_inputs, outputs=default_outputs),
+        TestUnivib("No trigger", UnivibType.UNI_74121, UnivibTestType.NO_TRIGGER),
+        TestUnivib("Trigger", UnivibType.UNI_74121, UnivibTestType.TRIGGER),
     ]
 
 

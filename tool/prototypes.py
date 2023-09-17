@@ -33,7 +33,34 @@ TestType = Enum("TestType", names=[
         ("UNIVIB", 3),
     ]
 )
-
+DRAMType = Enum("DRAMType", names=[
+        ("DRAM_4164", 1),
+        ("DRAM_41256", 2),
+    ]
+)
+DRAMTestType = Enum("DRAMTestType", names=[
+        ("SPEED_CHECK", 0),
+        ("MARCH_C_MINUS_RMW", 1),
+        ("MARCH_C_MINUS_RW", 2),
+        ("MARCH_C_MINUS_PAGE", 3),
+    ]
+)
+UnivibType = Enum("UnivibType", names=[
+        ("UNI_74121", 0),
+        ("UNI_74122", 1),
+        ("UNI_74123_1", 2),
+        ("UNI_74123_2", 3),
+    ]
+)
+UnivibTestType = Enum("UnivibTestType", names=[
+        ("NO_TRIGGER", 0),
+        ("TRIGGER", 1),
+        ("RETRIGGER", 2),
+        ("CLEAR", 3),
+        ("NO_CROSS_TRIGGER", 4),
+        ("CLEAR_TRIGGER", 5),
+    ]
+)
 
 # ------------------------------------------------------------------------
 class Pin:
@@ -298,14 +325,11 @@ class Test:
 
 # ------------------------------------------------------------------------
 class TestDRAM(Test):
-    def __init__(self, name, mem_test_type, mem_size, loops=1, cfgnum=0):
+    def __init__(self, name, chip_test_type, chip_type, loops=1, cfgnum=0):
         super(TestDRAM, self).__init__(TestType.DRAM, name, loops, cfgnum)
-        self.mem_test_type = mem_test_type
-        self.mem_size = mem_size
+        self.chip_test_type = chip_test_type
+        self.chip_type = chip_type
         self.vectors = []
-        # TODO: not really necessary?
-        self.inputs = [1, 2, 3, 4, 5, 6, 7, 9, 10, 11, 12, 13, 15]
-        self.outputs = [14]
 
     @property
     def pins(self):
@@ -313,31 +337,21 @@ class TestDRAM(Test):
 
     def __bytes__(self):
         data = super().__bytes__()
-        data += bytes([self.mem_size, self.mem_test_type, 0, 0])
+        data += bytes([self.chip_type.value, self.chip_test_type.value])
 
         if self.debug:
-            print(f"DRAM size: {self.mem_size}, test: {self.mem_test_type}")
-
-        # TODO: not really necessary?
-        pin_data = [
-            1 if i in self.pins else 0
-            for i in reversed(sorted(self.part.pins))
-        ]
-        data += bytes(BV(pin_data))
+            print(f"DRAM size: {self.chip_type.name}, test: {self.chip_test_type.name}")
 
         return data
 
 
 # ------------------------------------------------------------------------
 class TestUnivib(Test):
-    def __init__(self, name, univib_type, univib_test_type, inputs, outputs, loops=1024, cfgnum=0):
+    def __init__(self, name, chip_type, chip_test_type, loops=1024, cfgnum=0):
         super(TestUnivib, self).__init__(TestType.UNIVIB, name, loops, cfgnum)
-        self.univib_type = univib_type
-        self.univib_test_type = univib_test_type
+        self.chip_type = chip_type
+        self.chip_test_type = chip_test_type
         self.vectors = []
-        # TODO: not really necessary?
-        self.inputs = inputs
-        self.outputs = outputs
 
     @property
     def pins(self):
@@ -345,17 +359,10 @@ class TestUnivib(Test):
 
     def __bytes__(self):
         data = super().__bytes__()
-        data += bytes([self.univib_type, self.univib_test_type, 0, 0])
+        data += bytes([self.chip_type.value, self.chip_test_type.value])
 
         if self.debug:
-            print(f"Univibrator type: {self.univib_type}, test: {self.univib_test_type}")
-
-        # TODO: not really necessary?
-        pin_data = [
-            1 if i in self.pins else 0
-            for i in reversed(sorted(self.part.pins))
-        ]
-        data += bytes(BV(pin_data))
+            print(f"Univibrator: {self.chip_type.name}, test: {self.chip_test_type.name}")
 
         return data
 
@@ -363,7 +370,7 @@ class TestUnivib(Test):
 # ------------------------------------------------------------------------
 class TestLogic(Test):
 
-    MAX_TEST_PARAMS = 4
+    MAX_TEST_PARAMS = 2
 
     def __init__(self, name, inputs, outputs, params=[], body=[], loops=1024, cfgnum=0, read_delay_us=0):
         super(TestLogic, self).__init__(TestType.LOGIC, name, loops, cfgnum)
@@ -412,7 +419,6 @@ class TestLogic(Test):
     def __bytes__(self):
         data = super().__bytes__()
         data += round(self.read_delay_us/0.2).to_bytes(2, 'little')
-        data += bytes([0, 0])
 
         pin_data = [
             1 if i in self.pins else 0

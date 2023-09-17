@@ -1,9 +1,7 @@
 from binvec import BV
-from prototypes import (PackageDIP14, Pin, PinType, TestUnivib)
+from prototypes import (PackageDIP14, Pin, PinType, TestUnivib, UnivibType, UnivibTestType)
 
 class Part74122(PackageDIP14):
-    UNI_74122 = 1
-
     name = "74122"
     desc = "Retriggerable Monostable Monovibrators"
     pin_cfg = {
@@ -21,14 +19,11 @@ class Part74122(PackageDIP14):
         13: Pin("Rext/Cext", PinType.RC),
     }
 
-    default_inputs=[1, 2, 3, 4, 5],
-    default_outputs=[8, 6],
-
     tests = [
-        TestUnivib("No trigger", UNI_74122, 0, inputs=default_inputs, outputs=default_outputs),
-        TestUnivib("Trigger", UNI_74122, 1, inputs=default_inputs, outputs=default_outputs),
-        TestUnivib("Retrigger", UNI_74122, 2, inputs=default_inputs, outputs=default_outputs),
-        TestUnivib("Clear", UNI_74122, 3, inputs=default_inputs, outputs=default_outputs),
+        TestUnivib("No trigger", UnivibType.UNI_74122, UnivibTestType.NO_TRIGGER),
+        TestUnivib("Trigger", UnivibType.UNI_74122, UnivibTestType.TRIGGER),
+        TestUnivib("Retrigger", UnivibType.UNI_74122, UnivibTestType.RETRIGGER),
+        TestUnivib("Clear", UnivibType.UNI_74122, UnivibTestType.CLEAR),
     ]
 
 

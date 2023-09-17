@@ -1,13 +1,6 @@
-from prototypes import (PackageDIP16_rotated, Pin, PinType, TestDRAM)
+from prototypes import (PackageDIP16_rotated, Pin, PinType, TestDRAM, DRAMType, DRAMTestType)
 
 class Part41256(PackageDIP16_rotated):
-    SIZE_64 = 1
-    SIZE_256 = 2
-    MEM_TEST_SPEED = 0
-    MEM_TEST_MARCH_C_MINUS_RMW = 1
-    MEM_TEST_MARCH_C_MINUS_RW = 2
-    MEM_TEST_MARCH_C_MINUS_PAGE = 3
-
     name = "41256"
     desc = "262144 x 1bit DRAM memory"
     pin_cfg = {
@@ -28,8 +21,8 @@ class Part41256(PackageDIP16_rotated):
     }
 
     tests = [
-        TestDRAM("MARCH C- Read-Modify-Write mode", MEM_TEST_MARCH_C_MINUS_RMW, SIZE_256),
-        TestDRAM("MARCH C- Read+Write mode", MEM_TEST_MARCH_C_MINUS_RW, SIZE_256),
-        TestDRAM("MARCH C- Page access mode", MEM_TEST_MARCH_C_MINUS_PAGE, SIZE_256),
-        TestDRAM("CAS-Dout delay (use oscilloscope)", MEM_TEST_SPEED, SIZE_256),
+        TestDRAM("MARCH C- Read-Modify-Write mode", DRAMType.DRAM_41256, DRAMTestType.MARCH_C_MINUS_RMW),
+        TestDRAM("MARCH C- Read+Write mode", DRAMType.DRAM_41256, DRAMTestType.MARCH_C_MINUS_RW),
+        TestDRAM("MARCH C- Page access mode", DRAMType.DRAM_41256, DRAMTestType.MARCH_C_MINUS_PAGE),
+        TestDRAM("CAS-Dout delay (use oscilloscope)", DRAMType.DRAM_41256, DRAMTestType.SPEED_CHECK),
     ]

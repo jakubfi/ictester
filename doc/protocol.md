@@ -8,7 +8,8 @@ Dialog between the software and the tester are conducted using messages. There a
  * responses.
 
 Dialog is always initiated with a command sent by the software controlling the tester. Tester always responds with a response.
-All 16-bit values are little-endian.
+
+All BYTES are unsigned. All WORDS are unsigned 16-bit values, little-endian.
 
 ## Available commands
 
@@ -165,7 +166,7 @@ Test parameters:
 * `n` BYTES: I/O pin usage in test vectors (n=2 for 14-pin and 16-pin devices, n=3 for >16-pin devices):
   * each bit: 1=I/O pin used by the test, 0=pin not used by the test
   * 1st byte contains lowest pin numbers, bit 0 in each byte describes pin with the lowest number
-* 2 BYTES: additional delay (in 200 ns units) before checking DUT outputs. 0 for no delay.
+* 1 WORD: additional delay (in 200 ns units) before checking DUT outputs. 0 for no delay.
 
 #### 4164 and 41256 DRAM memory test
 
@@ -177,7 +178,7 @@ Test parameters:
 
 Test parameters:
 
-* 1 BYTE: chip type:
+* 1 BYTE: tested device:
   * 1 = 4164 (64kbit),
   * 2 = 41256 (256kbit).
 * 1 BYTE: test type:
@@ -189,12 +190,12 @@ Test parameters:
 
 `TEST_UNIVIB` (3) is designed to test 74121, 74122 and 74123 univibrators. Test does not use vectors and uses the following parameters:
 
-* 1 BYTE: device to test:
+* 1 BYTE: tested device:
   * 0 = 74121,
   * 1 = 74122,
   * 2 = 74123 univibrator 1,
   * 3 = 74123 univibrator 2
-* 1 BYTE: test to run:
+* 1 BYTE: test type:
   * 0 = conditions which should not trigger the device
   * 1 = conditions that should trigger the device
   * 2 = retrigger (not available for 74121)
@@ -209,7 +210,7 @@ Upload test vectors. Requires the test to be set up first. Test needs to use vec
 ### Command format
 
 * 1 BYTE: command: `CMD_VECTORS_LOAD`
-* 2 BYTES: `v` = number of test vectors, >0.
+* 1 WORD: `v` = number of test vectors, >0.
 * `v` VECTORS
 
 Each vector consists of 2 (for <=16-pin devices) or 3 (for >16-pin devices) BYTES.
@@ -249,7 +250,7 @@ the DUT. If the test fails, DUT is immediately disconnected.
 ### Command format
 
 * 1 BYTE: command: `CMD_TEST_RUN`
-* 2 BYTES: number of loops, 0 for infinite testing.
+* 1 WORD: number of loops, 0 for infinite testing.
 
 ### Valid responses
 
@@ -327,12 +328,12 @@ passes, `RESP_TIMING_FAIL` is sent in response. Otherwise test fails with `RESP_
 
 ### `TEST_LOGIC` failure
 
-  * 2 BYTES: vector number that test failed on
+  * 1 WORD: vector number that test failed on
   * `n` bytes of pin data - failing vector. Format as in the test configuration.
 
 ### `TEST_DRAM` failure
 
-  * 2 BYTES: failing address
+  * 1 WORD: failing address
   * 1 BYTE: failing MARCH C- step
 
 ### `TEST_UNIVIB` failure
