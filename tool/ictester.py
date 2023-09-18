@@ -5,6 +5,7 @@ import argparse
 import math
 import re
 import difflib
+import logging
 import serial.tools.list_ports as listports
 from serial.serialutil import SerialException
 
@@ -20,6 +21,8 @@ SKIP = '\033[93m\033[1m'
 HI = '\033[97m\033[1m'
 ENDC = '\033[0m'
 
+logging.basicConfig(format='%(message)s', level=logging.CRITICAL)
+logger = logging.getLogger('ictester')
 
 # ------------------------------------------------------------------------
 def print_parts(list_tests=False):
@@ -87,16 +90,20 @@ def parse_cmd():
         sys.exit(0)
 
     parser = argparse.ArgumentParser(description='IC tester controller')
-    parser.add_argument('--device', default=None, help='Serial port where the IC tester is connected')
-    parser.add_argument('--loops', type=int, default=None, help='Loop count (1..65535)')
-    parser.add_argument('--test', type=int, default=None, help='Test number to run')
-    parser.add_argument('--delay', type=float, default=None, help='additional DUT output read delay in μs for logic tests (13107 μs max, rounded to nearest 0.2 μs)')
-    parser.add_argument('--list', action="store_true", help='List all supported parts')
-    parser.add_argument('--list-all', action="store_true", help='List all supported parts and all tests for each part')
-    parser.add_argument('--debug', action="store_true", help='Enable debug output')
-    parser.add_argument('--debug-serial', action="store_true", help='Enable serial comms debug output')
+    parser.add_argument('-d', '--device', default=None, help='Serial port where the IC tester is connected')
+    parser.add_argument('-l', '--loops', type=int, default=None, help='Loop count (1..65535)')
+    parser.add_argument('-t', '--test', type=int, default=None, help='Test number to run')
+    parser.add_argument('-D', '--delay', type=float, default=None, help='additional DUT output read delay in μs for logic tests (13107 μs max, rounded to nearest 0.2 μs)')
+    parser.add_argument('-L', '--list', action="store_true", help='List all supported parts')
+    parser.add_argument('-A', '--list-all', action="store_true", help='List all supported parts and all tests for each part')
+    parser.add_argument('-v', '--verbose', action="count", default=0, help='Verbose output. Twice for even more verbosity')
     parser.add_argument('part', help='Part symbol')
     args = parser.parse_args()
+
+    if args.verbose > 1:
+        logger.setLevel(logging.DEBUG)
+    elif args.verbose > 0:
+        logger.setLevel(logging.INFO)
 
     if args.test is not None and args.test <= 0:
         parser.error("Test numbers start from 1")
@@ -145,15 +152,14 @@ def get_serial_port(device):
 
 args = parse_cmd()
 part = get_part(args.part.upper())
-part.debug = args.debug
 serial_port = get_serial_port(args.device)
 
 try:
-    transport = Transport(serial_port, 500000, debug=args.debug_serial)
+    transport = Transport(serial_port, 500000)
 except SerialException as e:
     print(f"Could not open connection to the tester: {e}")
     sys.exit(80)
-tester = Tester(part, transport, debug=args.debug)
+tester = Tester(part, transport)
 tester.dut_setup()
 
 if args.test:
@@ -179,11 +185,10 @@ print()
 for test_name in all_tests:
     logic_fail_was_last = False
     test = tester.part.get_test(test_name)
-    test.debug = args.debug
     loops = args.loops if args.loops is not None else test.loops
 
     plural = "s" if loops != 1 else ""
-    endc = "\n" if args.debug else ""
+    endc = "\n" if logger.isEnabledFor(logging.INFO) else ""
     stats = f"({len(test.vectors)} vectors, {loops} loop{plural})"
     print(f" * Testing: {test_name:{longest_desc}s}   {stats:25}  ... ", end=endc, flush=True)
 

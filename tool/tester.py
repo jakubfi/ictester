@@ -1,7 +1,10 @@
 import time
+import logging
 from enum import Enum
 from prototypes import (Test, TestType)
 from binvec import BV
+
+logger = logging.getLogger('ictester')
 
 Cmd = Enum("Cmd",
     names=[
@@ -46,39 +49,34 @@ class Tester:
 
     MAX_VECTORS = 1024
 
-    def __init__(self, part, transport, debug=False):
+    def __init__(self, part, transport):
         self.part = part
         self.tr = transport
-        self.debug = debug
 
     def tests_available(self):
         return [t.name for t in self.part.tests]
 
     def dut_setup(self):
-        if self.debug:
-            print("---- DUT SETUP ------------------------------------")
+        logger.info("---- DUT SETUP ------------------------------------")
         self.tr.send([Cmd.DUT_SETUP.value])
         self.tr.send(self.part)
         if self.tr.recv() != Resp.OK.value:
             raise RuntimeError("DUT setup failed")
 
     def dut_connect(self, cfgnum):
-        if self.debug:
-            print("---- DUT CONNECT ----------------------------------")
+        logger.info("---- DUT CONNECT ----------------------------------")
         self.tr.send([Cmd.DUT_CONNECT.value, cfgnum])
         if self.tr.recv() != Resp.OK.value:
             raise RuntimeError("DUT connect failed")
 
     def dut_disconnect(self):
-        if self.debug:
-            print("---- DUT DISCONNECT -------------------------------")
+        logger.info("---- DUT DISCONNECT -------------------------------")
         self.tr.send([Cmd.DUT_DISCONNECT.value])
         if self.tr.recv() != Resp.OK.value:
             raise RuntimeError("DUT disconnect failed")
 
     def test_setup(self, test):
-        if self.debug:
-            print("---- TEST SETUP -----------------------------------")
+        logger.info("\n---- TEST SETUP -----------------------------------")
 
         self.tr.send([Cmd.TEST_SETUP.value])
         self.tr.send(test)
@@ -86,20 +84,18 @@ class Tester:
             raise RuntimeError("Test setup failed")
 
     def vectors_load(self, test):
-        if self.debug:
-            print("---- VECTORS LOAD ---------------------------------")
-        if self.debug:
-            print(f"Test vectors ({len(test.vectors)}):")
+        if logger.isEnabledFor(logging.INFO):
+            logger.info("---- VECTORS LOAD ---------------------------------")
+            logger.info("Test vectors (%s)", len(test.vectors))
             for v in test.vectors:
-                print(f" {v}")
+                logger.info(v)
 
         assert len(test.vectors) <= Tester.MAX_VECTORS
 
         self.tr.send([Cmd.VECTORS_LOAD.value])
         self.tr.send_16le(len(test.vectors))
 
-        if self.debug:
-            print("Binary vectors:")
+        logger.info("Binary vectors:")
 
         for v in test.vectors:
             self.tr.send(v)
@@ -108,8 +104,7 @@ class Tester:
             raise RuntimeError("Vectors load failed")
 
     def run(self, loops, test):
-        if self.debug:
-            print("---- RUN ------------------------------------------")
+        logger.info("---- RUN ------------------------------------------")
         assert 1 <= loops <= 0xffff
 
         self.tr.send([Cmd.RUN.value])
@@ -139,6 +134,5 @@ class Tester:
         if test.type == TestType.LOGIC:
             self.vectors_load(test)
         res = self.run(loops, test)
-        if self.debug:
-            print(f"Bytes sent: {self.tr.bytes_sent}, received: {self.tr.bytes_received}")
+        logger.info("Bytes sent: %s, received: %s", self.tr.bytes_sent, self.tr.bytes_received)
         return res

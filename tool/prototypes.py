@@ -1,6 +1,9 @@
 import inspect
+import logging
 from enum import Enum
 from binvec import BV
+
+logger = logging.getLogger('ictester')
 
 # ------------------------------------------------------------------------
 def partimport(part_name):
@@ -129,7 +132,6 @@ class Part:
         self.pins = {}
         self.pins.update(self.package_pins)
         self.pins.update(self.pin_cfg)
-        self.debug = False
 
     def get_test(self, name):
         return next(t for t in self.tests if t.name == name)
@@ -155,19 +157,16 @@ class Part:
         assert 5 > cfg_count > 0
         data.extend([self.package_type.value, self.pincount, cfg_count])
 
-        if self.debug:
-            print(f"DUT pin definitions, {cfg_count} configuration(-s) available:")
+        logger.info("DUT pin definitions, %s configuration(-s) available:", cfg_count)
 
         for cfgnum in range(0, cfg_count):
-            if self.debug:
-                print(f"Configuration {cfgnum}:")
+            logger.info("Configuration %s:", cfgnum)
             for num, pin in sorted(self.pins.items()):
                 try:
                     pin_func = pin.zif_func[cfgnum]
                 except IndexError:
                     pin_func = pin.zif_func[0]
-                if self.debug:
-                    print(f'{num:-3} {pin.name:6} {pin.role.name:5} ZIF {pin_func.name}')
+                logger.info('%3s %6s %5s ZIF %s', num, pin.name, pin.role.name, pin_func.name)
                 data.append(pin_func.value)
 
         return bytes(data)
@@ -292,9 +291,7 @@ class TestVector():
 
         pin_data = list(reversed(pin_data))
 
-        if self.test.debug:
-            check = " NC" if not self.output else ""
-            print(f" {list(map(int, pin_data))}{check}")
+        logger.info("%s%s", list(map(int, pin_data)), ' NC' if not self.output else '')
 
         return bytes(BV(pin_data))
 
@@ -314,9 +311,8 @@ class Test:
     def __bytes__(self):
         data = bytes([self.cfgnum, self.type.value])
 
-        if self.debug:
-            print(f"Test type: {self.type.name}")
-            print(f"Configuration used: {self.cfgnum}")
+        logger.info("Test type: %s", self.type.name)
+        logger.info("Configuration used: %s", self.cfgnum)
 
         return data
 
@@ -336,8 +332,7 @@ class TestDRAM(Test):
         data = super().__bytes__()
         data += bytes([self.chip_type.value, self.chip_test_type.value])
 
-        if self.debug:
-            print(f"DRAM size: {self.chip_type.name}, test: {self.chip_test_type.name}")
+        logger.info("DRAM size: %s, test: %s", self.chip_type.name, self.chip_test_type.name)
 
         return data
 
@@ -358,8 +353,7 @@ class TestUnivib(Test):
         data = super().__bytes__()
         data += bytes([self.chip_type.value, self.chip_test_type.value])
 
-        if self.debug:
-            print(f"Univibrator: {self.chip_type.name}, test: {self.chip_test_type.name}")
+        logger.info("Univibrator: %s, test: %s", self.chip_type.name, self.chip_test_type.name)
 
         return data
 
@@ -421,10 +415,9 @@ class TestLogic(Test):
             1 if i in self.pins else 0
             for i in reversed(sorted(self.part.pins))
         ]
-        if self.debug:
-            print(f"Additional read delay: {self.read_delay_us} us")
-            print(f"DUT inputs: {self.inputs}")
-            print(f"DUT outputs: {self.outputs}")
+        logger.info("Additional read delay: %s μs", self.read_delay_us)
+        logger.info("DUT inputs: %s", self.inputs)
+        logger.info("DUT outputs: %s", self.outputs)
 
         data += bytes(BV(pin_data))
 

@@ -38,7 +38,7 @@ PROM/EPROM reading?
 --- SW -------------------------------------------------------------------
 bash completion?
 names: LS/S when no regular family? common names? alternatives?
-debug vs logging
+chip autodetection
 
 --- HW -------------------------------------------------------------------
 full HiZ testing (with ~1M to ground? always?)
