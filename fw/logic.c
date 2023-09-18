@@ -81,7 +81,7 @@ static uint8_t handle_failure(uint16_t pos, struct mcu_port_config *mcu_port)
 	if ((failed_vector[PB] & mcu_port[PB].mask) != vectors[pos].port[PB].out) return RESP_FAIL;
 	if ((failed_vector[PC] & mcu_port[PC].mask) != vectors[pos].port[PC].out) return RESP_FAIL;
 
-	return RESP_TIMING_FAIL;
+	return RESP_TIMING_ERROR;
 }
 
 // -----------------------------------------------------------------------

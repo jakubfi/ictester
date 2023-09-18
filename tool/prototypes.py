@@ -133,9 +133,6 @@ class Part:
         self.pins.update(self.package_pins)
         self.pins.update(self.pin_cfg)
 
-    def get_test(self, name):
-        return next(t for t in self.tests if t.name == name)
-
     @property
     def package_name(self):
         return f"{self.package_type.name}{self.pincount}"

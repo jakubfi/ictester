@@ -22,7 +22,7 @@ enum responses {
 	RESP_PASS			= 130,
 	RESP_FAIL			= 131,
 	RESP_ERR			= 132,
-	RESP_TIMING_FAIL	= 133,
+	RESP_TIMING_ERROR	= 133,
 };
 
 enum error_types {

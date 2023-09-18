@@ -25,7 +25,8 @@ Resp = Enum("Response",
         ("PASS", 130),
         ("FAIL", 131),
         ("ERR", 132),
-        ("TIMING_FAIL", 133),
+        ("TIMING_ERROR", 133),
+        ("SKIP", 9999999)  # not a part of the protocol
     ]
 )
 
@@ -52,9 +53,11 @@ class Tester:
     def __init__(self, part, transport):
         self.part = part
         self.tr = transport
-
-    def tests_available(self):
-        return [t.name for t in self.part.tests]
+        self.failed_vector_num = None
+        self.failed_pin_vector = None
+        self.passed = 0
+        self.warning = 0
+        self.failed = 0
 
     def dut_setup(self):
         logger.info("---- DUT SETUP ------------------------------------")
@@ -77,7 +80,6 @@ class Tester:
 
     def test_setup(self, test):
         logger.info("\n---- TEST SETUP -----------------------------------")
-
         self.tr.send([Cmd.TEST_SETUP.value])
         self.tr.send(test)
         if self.tr.recv() != Resp.OK.value:
@@ -113,18 +115,26 @@ class Tester:
         start = time.time()
         resp = Resp(self.tr.recv())
         elapsed = time.time() - start
-        failed_vector_num = None
-        failed_pin_vector = None
+
+        if resp == Resp.PASS:
+            self.passed += 1
+        elif resp == Resp.TIMING_ERROR:
+            self.warning += 1
+        else:
+            self.failed += 1
 
         # Read failed vector data for LOGIC tests (natural DUT pin order)
         if test.type == TestType.LOGIC and resp == Resp.FAIL:
-            failed_vector_num = self.tr.recv_16le()
-            failed_pin_vector = [*BV.int(self.tr.recv(), 8).reversed()]
-            failed_pin_vector.extend([*BV.int(self.tr.recv(), 8).reversed()])
+            self.failed_vector_num = self.tr.recv_16le()
+            self.failed_pin_vector = [*BV.int(self.tr.recv(), 8).reversed()]
+            self. failed_pin_vector.extend([*BV.int(self.tr.recv(), 8).reversed()])
             if self.part.pincount > 16:
-                failed_pin_vector.extend([*BV.int(self.tr.recv(), 8).reversed()])
+                self.failed_pin_vector.extend([*BV.int(self.tr.recv(), 8).reversed()])
 
-        return resp, elapsed, failed_vector_num, failed_pin_vector
+        return resp, elapsed
+
+    def get_failed_vector(self):
+        return self.failed_vector_num, self.failed_pin_vector
 
     def exec_test(self, test, loops, delay):
         test.attach_part(self.part)

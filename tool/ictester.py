@@ -21,6 +21,16 @@ SKIP = '\033[93m\033[1m'
 HI = '\033[97m\033[1m'
 ENDC = '\033[0m'
 
+result_color = {
+    Resp.HELLO: OK,
+    Resp.OK: OK,
+    Resp.PASS: OK,
+    Resp.FAIL: FAIL,
+    Resp.ERR: FAIL,
+    Resp.TIMING_ERROR: WARN,
+    Resp.SKIP: SKIP,
+}
+
 logging.basicConfig(format='%(message)s', level=logging.CRITICAL)
 logger = logging.getLogger('ictester')
 
@@ -164,79 +174,66 @@ tester.dut_setup()
 
 if args.test:
     try:
-        all_tests = [tester.tests_available()[args.test-1]]
+        run_tests = [part.tests[args.test-1]]
     except IndexError:
         print(f"Test number {args.test} is not available for {part.name}")
         sys.exit(70)
 else:
-    all_tests = tester.tests_available()
+    run_tests = part.tests
 
-longest_desc = max(map(len, all_tests))
+longest_desc = max(len(t.name) for t in run_tests)
 
-tests_failed = 0
-tests_warning = 0
-tests_skipped = 0
-tests_passed = 0
 total_time = 0
 
 print_part_info(part)
 print()
 
-for test_name in all_tests:
-    logic_fail_was_last = False
-    test = tester.part.get_test(test_name)
+for test in run_tests:
     loops = args.loops if args.loops is not None else test.loops
 
     plural = "s" if loops != 1 else ""
-    endc = "\n" if logger.isEnabledFor(logging.INFO) else ""
     stats = f"({len(test.vectors)} vectors, {loops} loop{plural})"
-    print(f" * Testing: {test_name:{longest_desc}s}   {stats:25}  ... ", end=endc, flush=True)
+    endc = "\n" if logger.isEnabledFor(logging.INFO) else ""
+    print(f" * Testing: {test.name:{longest_desc}s}   {stats:25}  ... ", end=endc, flush=True)
 
-    if tests_failed:
-        tests_skipped += 1
-        print(f"\b\b\b\b{SKIP}SKIP{ENDC}")
+    if not tester.failed:
+        resp, elapsed = tester.exec_test(test, loops, args.delay)
     else:
-        resp, elapsed, failed_vector_num, failed_pin_vector = tester.exec_test(test, loops, args.delay)
-        if resp == Resp.PASS:
-            tests_passed += 1
-            print(f"\b\b\b\b{OK}PASS{ENDC}  ({elapsed:.2f} sec.)")
-        elif resp == Resp.TIMING_FAIL:
-            tests_warning += 1
-            print(f"\b\b\b\b{WARN}TIMING ERROR{ENDC}")
-        elif resp == Resp.FAIL:
-            tests_failed += 1
-            print(f"\b\b\b\b{FAIL}FAIL{ENDC}  ({elapsed:.2f} sec.)")
-            if test.type == TestType.LOGIC:
-                print_failed_vector(part, test, failed_vector_num, failed_pin_vector)
-                logic_fail_was_last = True
-        elif resp == Resp.ERR:
-            tests_failed += 1
-            print(f"\b\b\b\b{FAIL}ERROR{ENDC}")
-        else:
-            tests_failed += 1
-            print(f"\b\b\b\b{FAIL}????{ENDC}")
+        resp = Resp.SKIP
+
+    print(f"\b\b\b\b{result_color[resp]}{resp.name}{ENDC}", end="")
+    if resp in (Resp.PASS, Resp.FAIL):
+        print(f"  ({elapsed:.2f} sec.)", end="")
+    print()
+
+    if resp == Resp.FAIL:
+        if test.type == TestType.LOGIC:
+            failed_vector_num, failed_pin_vector = tester.get_failed_vector()
+            print_failed_vector(part, test, failed_vector_num, failed_pin_vector)
 
 # required only on success, but just in case do it always
 tester.dut_disconnect()
 
-if not logic_fail_was_last:
+if resp != Resp.FAIL:
     print()
 
-print(f"Total tests: {HI}{len(all_tests)}{ENDC}", end="")
-if tests_failed:
-    print(f", failed: {FAIL}{tests_failed}{ENDC}", end="")
-if tests_warning:
-    print(f", warning: {WARN}{tests_warning}{ENDC}", end="")
+tests_skipped = len(part.tests) - (tester.failed + tester.warning + tester.passed)
+
+print(f"Total tests: {HI}{len(run_tests)}{ENDC}", end="")
+if tester.failed:
+    print(f", failed: {FAIL}{tester.failed}{ENDC}", end="")
+if tester.warning:
+    print(f", warning: {WARN}{tester.warning}{ENDC}", end="")
 if tests_skipped:
     print(f", skipped: {SKIP}{tests_skipped}{ENDC}", end="")
-if tests_passed:
-    print(f", passed: {OK}{tests_passed}{ENDC}", end="")
+if tester.passed:
+    print(f", passed: {OK}{tester.passed}{ENDC}", end="")
 print()
 
-if tests_failed:
+if tester.failed:
     result = f"{FAIL}PART DEFECTIVE"
     ret = 1
-elif tests_warning:
+elif tester.warning:
     result = f"{WARN}OUTPUT READ TIMING ERROR"
     ret = 2
 else:
