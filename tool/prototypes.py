@@ -315,7 +315,7 @@ class Test:
 
 # ------------------------------------------------------------------------
 class TestDRAM(Test):
-    def __init__(self, name, chip_test_type, chip_type, loops=1, cfgnum=0):
+    def __init__(self, name, chip_type, chip_test_type, loops=1, cfgnum=0):
         super(TestDRAM, self).__init__(TestType.DRAM, name, loops, cfgnum)
         self.chip_test_type = chip_test_type
         self.chip_type = chip_type
@@ -329,7 +329,7 @@ class TestDRAM(Test):
         data = super().__bytes__()
         data += bytes([self.chip_type.value, self.chip_test_type.value])
 
-        logger.info("DRAM size: %s, test: %s", self.chip_type.name, self.chip_test_type.name)
+        logger.info("DRAM chip: %s, test: %s", self.chip_type.name, self.chip_test_type.name)
 
         return data
 
