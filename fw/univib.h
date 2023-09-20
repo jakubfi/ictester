@@ -3,7 +3,8 @@
 
 #include <inttypes.h>
 
-uint8_t run_univib(uint16_t loops, uint8_t *params);
+uint8_t univib_test_setup(struct univib_params *params);
+uint8_t run_univib(uint16_t loops);
 
 #endif
 

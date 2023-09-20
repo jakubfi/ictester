@@ -1,6 +1,22 @@
 #include <inttypes.h>
+#include <stdbool.h>
 
 #include "serial.h"
+
+// -----------------------------------------------------------------------
+bool receive_cmd(uint8_t *buf, uint16_t buf_size)
+{
+	uint16_t size = serial_rx_16le();
+
+	if (size > buf_size) {
+		// flush incomming data
+		while (size--) serial_rx_char();
+		return false;
+	} else {
+		serial_rx_bytes(buf, size);
+		return true;
+	}
+}
 
 // -----------------------------------------------------------------------
 void reply(uint8_t resp) 

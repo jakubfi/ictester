@@ -13,50 +13,47 @@
 
 #define LINK_SPEED 500000
 #define NO_CONFIG -1
+#define BUF_SIZE 2048
+uint8_t buf[BUF_SIZE];
 
 uint8_t dut_package_type;
 uint8_t dut_pin_count;
-
 uint8_t test_type;
-uint8_t test_params[MAX_TEST_PARAMS];
 
 uint8_t cfgnum;
 uint8_t cfgnum_active = NO_CONFIG;
 
 // -----------------------------------------------------------------------
-static uint8_t handle_dut_setup()
+static uint8_t handle_dut_setup(struct cmd_dut_setup *data)
 {
-	uint8_t pin_data[MAX_CONFIGS][ZIF_PIN_CNT];
+	dut_package_type = data->package;
+	dut_pin_count = data->pin_count;
 
-	// receive DUT configuration
-	dut_package_type = serial_rx_char();
-	dut_pin_count = serial_rx_char();
-	uint8_t pincfg_cnt = serial_rx_char();
-	for (uint8_t cfgnum=0 ; cfgnum<pincfg_cnt ; cfgnum++) {
-		for (uint8_t i=0 ; i<dut_pin_count ; i++) {
-			pin_data[cfgnum][i] = serial_rx_char();
-		}
-	}
-
-	// check DUT pinout
-	if (
-		((dut_pin_count != 14) && (dut_pin_count != 16) && (dut_pin_count != 20) && (dut_pin_count != 24))
-		|| (dut_package_type != PACKAGE_DIP)
-	) {
+	if ((dut_pin_count != 14) && (dut_pin_count != 16) && (dut_pin_count != 20) && (dut_pin_count != 24)) {
+		// invalid number of DUT pins
 		return RESP_ERR;
 	}
-
-	if ((pincfg_cnt < 1) || (pincfg_cnt > MAX_CONFIGS)) {
+	if (dut_package_type != PACKAGE_DIP) {
+		// unknown package type
+		return RESP_ERR;
+	}
+	if ((data->cfg_count < 1) || (data->cfg_count > MAX_CONFIGS)) {
+		// invalid number of pin configurations
 		return RESP_ERR;
 	}
 
 	zif_config_clear();
 
 	// prepare port configuration based on provided DUT pin config
-	for (uint8_t cfgnum=0 ; cfgnum<pincfg_cnt ; cfgnum++) {
-		for (uint8_t i=0 ; i<dut_pin_count ; i++) {
-			uint8_t zif_pin = zif_pos(dut_pin_count, i);
-			if (!zif_func(cfgnum, pin_data[cfgnum][i], zif_pin)) return RESP_ERR;
+	for (uint8_t cfgnum=0 ; cfgnum<data->cfg_count ; cfgnum++) {
+		zif_config_select(cfgnum);
+		for (uint8_t dut_pin=0 ; dut_pin<dut_pin_count ; dut_pin++) {
+			uint8_t pin_func = data->configs[cfgnum * dut_pin_count + dut_pin];
+			uint8_t zif_pin = zif_pos(dut_pin_count, dut_pin);
+			if (!zif_func(pin_func, zif_pin)) {
+				// cannot set pin function, cause set downstream(?)
+				return RESP_ERR;
+			}
 		}
 	}
 
@@ -64,47 +61,48 @@ static uint8_t handle_dut_setup()
 }
 
 // -----------------------------------------------------------------------
-static uint8_t handle_test_setup()
+static uint8_t handle_test_setup(struct cmd_test_setup *data)
 {
-	cfgnum = serial_rx_char();
-	test_type = serial_rx_char();
-	for (uint8_t i=0 ; i<MAX_TEST_PARAMS ; i++) {
-		test_params[i] = serial_rx_char();
+	if (data->cfg_num >= MAX_CONFIGS) {
+		// wrong configuration number
+		// TODO: really check if configuration exists (has been set for the DUT)
+		return RESP_ERR;
 	}
 
-	uint8_t pin_usage[3] = {0xff, 0xff, 0xff};
-	if (test_type == TEST_LOGIC) {
-		// read pin usage data only for LOGIC tests
-		for (uint8_t i=0 ; i<dut_pin_count ; i+=8) {
-			pin_usage[i/8] = serial_rx_char();
-		}
-	}
+	cfgnum = data->cfg_num;
+	zif_config_select(cfgnum);
+	test_type = data->test_type;
 
-	zif_pin_mask_clear(cfgnum);
-
-	// fill in port masks
-	for (uint8_t i=0 ; i<dut_pin_count ; i++) {
-		uint8_t pin_used = (pin_usage[i/8] >> (i%8)) & 1;
-		if (pin_used) {
-			uint8_t zif_pin = zif_pos(dut_pin_count, i);
-			zif_pin_unmasked(cfgnum, zif_pin);
-		}
+	switch (test_type) {
+		case TEST_LOGIC:
+			logic_test_setup(dut_pin_count, (struct logic_params*) data->params);
+			break;
+		case TEST_DRAM:
+			mem_test_setup((struct mem_params*) data->params);
+			break;
+		case TEST_UNIVIB:
+			univib_test_setup((struct univib_params*) data->params);
+			break;
+		default:
+			// unknown test type
+			return RESP_ERR;
 	}
 
 	return RESP_OK;
 }
 
 // -----------------------------------------------------------------------
-static uint8_t do_connect(uint8_t cfgnum)
+static uint8_t do_connect()
 {
 	led(LED_ACTIVE);
 
-	if (!zif_connect(cfgnum)) {
+	if (!zif_connect()) {
+		// cannot connect the DUT, cause set downstream.
 		return RESP_ERR;
 	}
 
 	if (test_type == TEST_DRAM) {
-		mem_setup();
+		mem_init();
 	}
 
 	cfgnum_active = cfgnum;
@@ -113,10 +111,11 @@ static uint8_t do_connect(uint8_t cfgnum)
 }
 
 // -----------------------------------------------------------------------
-static uint8_t handle_dut_connect()
+static uint8_t handle_dut_connect(struct cmd_dut_connect *data)
 {
-	cfgnum = serial_rx_char();
-	return do_connect(cfgnum);
+	cfgnum = data->cfg_num;
+	zif_config_select(cfgnum);
+	return do_connect();
 }
 
 // -----------------------------------------------------------------------
@@ -125,35 +124,35 @@ static uint8_t handle_dut_disconnect(uint8_t resp)
 	zif_disconnect();
 	cfgnum_active = NO_CONFIG;
 
-	if (resp == RESP_ERR) led(LED_ERR);
-	else if (resp == RESP_FAIL) led(LED_FAIL);
-	else if (resp == RESP_PASS) led(LED_PASS);
-	else led(LED_IDLE);
+	switch (resp) {
+		case RESP_ERR: led(LED_ERR); break;
+		case RESP_FAIL: led(LED_FAIL); break;
+		case RESP_PASS: led(LED_PASS); break;
+		default: led(LED_IDLE); break;
+	}
 
 	return RESP_OK;
 }
 
 // -----------------------------------------------------------------------
-static uint8_t handle_run()
+static uint8_t handle_run(struct cmd_run *data)
 {
 	uint8_t res = RESP_PASS;
 
-	uint16_t loops = serial_rx_16le();
-
 	if (cfgnum_active != cfgnum) {
-		res = do_connect(cfgnum);
+		res = do_connect();
 		if (res != RESP_OK) return res;
 	}
 
 	switch (test_type) {
 		case TEST_LOGIC:
-			res = run_logic(dut_pin_count, loops, test_params);
+			res = run_logic(dut_pin_count, data->loops);
 			break;
 		case TEST_DRAM:
-			res = run_mem(loops, test_params);
+			res = run_mem(data->loops);
 			break;
 		case TEST_UNIVIB:
-			res = run_univib(loops, test_params);
+			res = run_univib(data->loops);
 			break;
 		default:
 			// unknown test type
@@ -176,31 +175,38 @@ int main()
 	led_init();
 	led_welcome();
 
-	while (true) {
-		uint8_t resp;
-		int cmd = serial_rx_char();
+	uint8_t resp;
+	struct cmd *cmd;
 
-		switch (cmd) {
-			case CMD_DUT_SETUP:
-				resp = handle_dut_setup();
-				break;
-			case CMD_DUT_CONNECT:
-				resp = handle_dut_connect();
-				break;
-			case CMD_TEST_SETUP:
-				resp = handle_test_setup();
-				break;
-			case CMD_VECTORS_LOAD:
-				resp = handle_vectors_load(dut_pin_count, zif_get_vcc_pin());
-				break;
-			case CMD_TEST_RUN:
-				resp = handle_run();
-				break;
-			case CMD_DUT_DISCONNECT:
-				resp = handle_dut_disconnect(resp);
-				break;
-			default:
-				resp = RESP_ERR;
+	while (true) {
+		if (!receive_cmd(buf, BUF_SIZE)) {
+			// command didn't fit in the buffer
+			resp = RESP_ERR;
+		} else {
+			cmd = (struct cmd*) buf;
+			switch (cmd->cmd) {
+				case CMD_DUT_SETUP:
+					resp = handle_dut_setup((struct cmd_dut_setup*) cmd->data);
+					break;
+				case CMD_DUT_CONNECT:
+					resp = handle_dut_connect((struct cmd_dut_connect*) cmd->data);
+					break;
+				case CMD_TEST_SETUP:
+					resp = handle_test_setup((struct cmd_test_setup*) cmd->data);
+					break;
+				case CMD_VECTORS_LOAD:
+					resp = handle_vectors_load((struct vectors*) cmd->data, dut_pin_count, zif_get_vcc_pin());
+					break;
+				case CMD_TEST_RUN:
+					resp = handle_run((struct cmd_run*) cmd->data);
+					break;
+				case CMD_DUT_DISCONNECT:
+					resp = handle_dut_disconnect(resp);
+					break;
+				default:
+					// unknown command
+					resp = RESP_ERR;
+			}
 		}
 
 		if (resp == RESP_ERR) {
@@ -210,7 +216,7 @@ int main()
 		reply(resp);
 
 		// handle response data for failed LOGIC tests
-		if ((cmd == CMD_TEST_RUN) && (resp == RESP_FAIL) && (test_type == TEST_LOGIC)) {
+		if ((resp == RESP_FAIL) && (test_type == TEST_LOGIC) && (cmd->cmd == CMD_TEST_RUN)) {
 			uint8_t pin_data[3] = {0, 0, 0};
 			uint8_t *failed_vector = get_failed_vector();
 			// translate vector from MCU port order to natural DUT pin order

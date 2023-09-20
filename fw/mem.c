@@ -47,11 +47,17 @@
 #define DIR_UP 0
 #define DIR_DOWN 1
 
+enum mem_chip_type {
+	MEM_4164	= 1,
+	MEM_41256	= 2,
+};
+
 enum mem_test_type {
 	MEM_TEST_SPEED			= 0,
 	MEM_TEST_MARCH_RMW		= 1,
 	MEM_TEST_MARCH_RW		= 2,
 	MEM_TEST_MARCH_PAGE		= 3,
+	MEM_TEST_MAX			= MEM_TEST_MARCH_PAGE
 };
 
 struct march {
@@ -72,8 +78,20 @@ static const struct march march_cm[MARCH_STEPS] = {
 
 typedef uint8_t (*march_fun)(uint8_t dir, uint8_t r, uint8_t w, uint16_t addr_space);
 
+uint8_t mem_device;
+uint8_t mem_test_type;
+
 // -----------------------------------------------------------------------
-void mem_setup()
+uint8_t mem_test_setup(struct mem_params *params)
+{
+	mem_device = params->device;
+	mem_test_type = params->test_type;
+	// TODO: check device and test type
+	return RESP_OK;
+}
+
+// -----------------------------------------------------------------------
+void mem_init()
 {
 	CAS_OFF;
 	RAS_OFF;
@@ -252,7 +270,7 @@ void test_speed(uint16_t loops)
 }
 
 // -----------------------------------------------------------------------
-uint8_t run_mem(uint16_t loops, uint8_t *params)
+uint8_t run_mem(uint16_t loops)
 {
 	march_fun m_funcs[4] = {
 		[MEM_TEST_SPEED] = NULL,
@@ -261,16 +279,30 @@ uint8_t run_mem(uint16_t loops, uint8_t *params)
 		[MEM_TEST_MARCH_PAGE] = march_step_page,
 	};
 
-	uint16_t address_space = params[0] == 2 ? 0x200 : 0x100;
-	uint8_t mem_test_type = params[1] & 0b11;
+	uint16_t address_space;
+	switch (mem_device) {
+		case MEM_4164:
+			address_space = 0x100;
+			break;
+		case MEM_41256:
+			address_space = 0x200;
+			break;
+		default:
+			// unknown chip type
+			return RESP_ERR;
+	}
 
 	if (mem_test_type == MEM_TEST_SPEED) {
 		test_speed(loops);
 		return RESP_PASS;
 	}
 
+	if (mem_test_type > MEM_TEST_MAX) {
+		// unknown test type
+		return RESP_ERR;
+	}
+
 	march_fun m_fun = m_funcs[mem_test_type];
-	if (!m_fun) return RESP_ERR;
 
 	for (uint16_t rep=0 ; rep<loops ; rep++) {
 		for (uint8_t i=0 ; i<MARCH_STEPS ; i++) {

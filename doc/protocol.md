@@ -163,10 +163,10 @@ setting its inputs to given values and checking if IC outputs match test vector 
 
 Test parameters:
 
+* 1 WORD: additional delay (in 200 ns units) before checking DUT outputs. 0 for no delay.
 * `n` BYTES: I/O pin usage in test vectors (n=2 for 14-pin and 16-pin devices, n=3 for >16-pin devices):
   * each bit: 1=I/O pin used by the test, 0=pin not used by the test
   * 1st byte contains lowest pin numbers, bit 0 in each byte describes pin with the lowest number
-* 1 WORD: additional delay (in 200 ns units) before checking DUT outputs. 0 for no delay.
 
 #### 4164 and 41256 DRAM memory test
 

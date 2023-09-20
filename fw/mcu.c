@@ -7,7 +7,13 @@
 #define NO_CONFIG -1
 
 struct mcu_port_config mcu_port[MAX_CONFIGS][MCU_PORT_CNT];
-uint8_t current_config;
+struct mcu_port_config *mcu_config;
+
+// -----------------------------------------------------------------------
+void mcu_config_select(uint8_t cfgnum)
+{
+	mcu_config = mcu_port[cfgnum];
+}
 
 // -----------------------------------------------------------------------
 void mcu_disconnect()
@@ -18,19 +24,17 @@ void mcu_disconnect()
 	PORTB = 0;
 	DDRC = 0;
 	PORTC = 0;
-	current_config = NO_CONFIG;
 }	   
 
 // -----------------------------------------------------------------------
-void mcu_connect(uint8_t cfgnum)
+void mcu_connect()
 {
-	current_config = cfgnum;
-	DDRA  = mcu_port[cfgnum][PA].output;
-	DDRB  = mcu_port[cfgnum][PB].output;
-	DDRC  = mcu_port[cfgnum][PC].output;
-	PORTA = mcu_port[cfgnum][PA].pullup;
-	PORTB = mcu_port[cfgnum][PB].pullup;
-	PORTC = mcu_port[cfgnum][PC].pullup;
+	DDRA  = mcu_config[PA].output;
+	DDRB  = mcu_config[PB].output;
+	DDRC  = mcu_config[PC].output;
+	PORTA = mcu_config[PA].pullup;
+	PORTB = mcu_config[PB].pullup;
+	PORTC = mcu_config[PC].pullup;
 }
 
 // -----------------------------------------------------------------------
@@ -46,37 +50,27 @@ void mcu_config_clear()
 }
 
 // -----------------------------------------------------------------------
-void mcu_pin_mask_clear(uint8_t cfgnum)
-{
-	for (uint8_t i=0 ; i<MCU_PORT_CNT ; i++) {
-		mcu_port[cfgnum][i].mask = 0;
-	}
-}
-
-// -----------------------------------------------------------------------
 void mcu_init()
 {
 	mcu_config_clear();
 }
 
 // -----------------------------------------------------------------------
-bool mcu_func(uint8_t cfgnum, uint8_t func, uint8_t port_pos, uint8_t port_bit)
+bool mcu_func(uint8_t func, uint8_t port_pos, uint8_t port_bit)
 {
 	switch (func) {
 		case ZIF_OUT:
-			mcu_port[cfgnum][port_pos].output |= _BV(port_bit);
-			break;
-		case ZIF_IN_HIZ:
-			mcu_port[cfgnum][port_pos].input |= _BV(port_bit);
+			mcu_config[port_pos].output |= _BV(port_bit);
 			break;
 		case ZIF_IN_PU_WEAK:
-			mcu_port[cfgnum][port_pos].input |= _BV(port_bit);
-			mcu_port[cfgnum][port_pos].pullup |= _BV(port_bit);
-			break;
+			mcu_config[port_pos].pullup |= _BV(port_bit);
+			[[ fallthrough ]];
+		case ZIF_IN_HIZ:
 		case ZIF_IN_PU_STRONG:
-			mcu_port[cfgnum][port_pos].input |= _BV(port_bit);
+			mcu_config[port_pos].input |= _BV(port_bit);
 			break;
 		default:
+			// unknown pin function (should be already handled in zif.c)
 			return false;
 	}
 
@@ -84,16 +78,9 @@ bool mcu_func(uint8_t cfgnum, uint8_t func, uint8_t port_pos, uint8_t port_bit)
 }
 
 // -----------------------------------------------------------------------
-void mcu_pin_unmasked(uint8_t cfgnum, uint8_t port_pos, uint8_t port_bit)
-{
-	mcu_port[cfgnum][port_pos].mask |= mcu_port[cfgnum][port_pos].input & _BV(port_bit);
-}
-
-// -----------------------------------------------------------------------
 struct mcu_port_config * mcu_get_port_config()
 {
-	if (current_config == NO_CONFIG) return NULL;
-	return mcu_port[current_config];
+	return mcu_config;
 }
 
 // vim: tabstop=4 shiftwidth=4 autoindent

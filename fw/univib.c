@@ -27,6 +27,9 @@ enum test_types {
 	TEST_CLEARTRIG = 5,
 };
 
+uint8_t univib_device;
+uint8_t univib_test_type;
+
 // 74121
 
 #define VAL_121_A1 _BV(2)
@@ -214,6 +217,15 @@ static const __flash struct univib_test {
 //       This makes the whole device/test selection logic dirty with all
 //       the (duplicated) switch/case statements and inlined test functions,
 //       but I'm afraid it's the only sensible way.
+
+// -----------------------------------------------------------------------
+uint8_t univib_test_setup(struct univib_params *params)
+{
+	univib_device = params->device;
+	univib_test_type = params->test_type;
+	// TODO: check device and test type
+	return RESP_OK;
+}
 
 // -----------------------------------------------------------------------
 static inline void input_set(const __flash struct univib_test *uvt, uint8_t val)
@@ -410,23 +422,23 @@ static uint8_t test_123_2(uint8_t test)
 }
 
 // -----------------------------------------------------------------------
-uint8_t run_univib(uint16_t loops, uint8_t *params)
+uint8_t run_univib(uint16_t loops)
 {
 	uint8_t res;
 
 	for (uint16_t rep=0 ; rep<loops ; rep++) {
-		switch (params[PARAM_DEV]) {
+		switch (univib_device) {
 			case UNIVIB_121:
-				if ((res = test_121(params[PARAM_TEST])) != RESP_PASS) return res;
+				if ((res = test_121(univib_test_type)) != RESP_PASS) return res;
 				break;
 			case UNIVIB_122:
-				if ((res = test_122(params[PARAM_TEST])) != RESP_PASS) return res;
+				if ((res = test_122(univib_test_type)) != RESP_PASS) return res;
 				break;
 			case UNIVIB_123_1:
-				if ((res = test_123_1(params[PARAM_TEST])) != RESP_PASS) return res;
+				if ((res = test_123_1(univib_test_type)) != RESP_PASS) return res;
 				break;
 			case UNIVIB_123_2:
-				if ((res = test_123_2(params[PARAM_TEST])) != RESP_PASS) return res;
+				if ((res = test_123_2(univib_test_type)) != RESP_PASS) return res;
 				break;
 			default:
 				// unknown device type

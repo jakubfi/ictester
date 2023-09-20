@@ -64,6 +64,53 @@ enum zif_pin_function {
 	ZIF_GND				= 129,
 };
 
+struct cmd {
+	uint8_t cmd;
+	uint8_t data[];
+};
+
+struct cmd_dut_setup {
+	uint8_t package;
+	uint8_t pin_count;
+	uint8_t cfg_count;
+	uint8_t configs[];
+};
+
+struct cmd_test_setup {
+	uint8_t cfg_num;
+	uint8_t test_type;
+	uint8_t params[];
+};
+
+struct cmd_dut_connect {
+	uint8_t cfg_num;
+};
+
+struct cmd_run {
+	uint16_t loops;
+};
+
+struct logic_params {
+	uint16_t delay;
+	uint8_t pin_usage[];
+};
+
+struct mem_params {
+	uint8_t device;
+	uint8_t test_type;
+};
+
+struct univib_params {
+	uint8_t device;
+	uint8_t test_type;
+};
+
+struct vectors {
+	uint16_t vector_cnt;
+	uint8_t vectors[];
+};
+
+bool receive_cmd(uint8_t *buf, uint16_t buf_size);
 void reply(uint8_t res);
 
 #endif

@@ -21,44 +21,77 @@ static struct vector {
 	} port[MCU_PORT_CNT];
 } vectors[MAX_VECTORS];
 
-uint8_t failed_vector[MCU_PORT_CNT];
-uint16_t failed_vector_pos;
+static uint16_t delay;
+
+static uint8_t failed_vector[MCU_PORT_CNT];
+static uint16_t failed_vector_pos;
 
 // -----------------------------------------------------------------------
-uint8_t handle_vectors_load(uint8_t dut_pin_count, uint8_t zif_vcc_pin)
+uint8_t logic_test_setup(uint8_t dut_pin_count, struct logic_params *params)
 {
-	vectors_count = serial_rx_16le();
+	delay = params->delay;
+	vectors_count = 0;
 
-	// receive all vectors (bits in DUT pin order))
-	for (uint16_t pos=0 ; pos<vectors_count ; pos++) {
-		for (uint8_t i=0 ; i<dut_pin_count ; i+=8) {
-			vectors[pos].port[i/8].out= serial_rx_char();
+	struct mcu_port_config *mcu_port = mcu_get_port_config();
+	if (!mcu_port) {
+		// no configuration selected
+		return RESP_ERR;
+	}
+
+	for (uint8_t i=0 ; i<MCU_PORT_CNT ; i++) {
+		mcu_port[i].mask = 0;
+	}
+
+	// fill in port masks
+	for (uint8_t i=0 ; i<dut_pin_count ; i++) {
+		uint8_t pin_used = (params->pin_usage[i/8] >> (i%8)) & 1;
+		if (pin_used) {
+			uint8_t zif_pin = zif_pos(dut_pin_count, i);
+			int8_t port_pos = zif_mcu_port(zif_pin);
+			mcu_port[port_pos].mask |= _BV(zif_mcu_port_bit(zif_pin));
 		}
 	}
 
+	return RESP_OK;
+}
+
+// -----------------------------------------------------------------------
+uint8_t handle_vectors_load(struct vectors *data, uint8_t dut_pin_count, uint8_t zif_vcc_pin)
+{
+	uint16_t chunk_vectors_count = data->vector_cnt;
+	uint8_t *vector_slice = data->vectors;
+	struct vector *v = vectors + vectors_count;
+	vectors_count += chunk_vectors_count;
+
+	if (vectors_count > MAX_VECTORS) {
+		// too many vectors
+		return RESP_ERR;
+	}
+
 	// reorder bits in each vector into MCU port pin order
-	for (uint16_t pos=0 ; pos<vectors_count ; pos++) {
-		// convert received bytes into temporary 32-bit number
+	while (chunk_vectors_count--) {
+		// convert received vector bytes into a temporary 32-bit number
 		uint32_t bitvector = 0;
-		for (uint8_t i=0 ; i<dut_pin_count ; i+=8) {
-			bitvector |= (uint32_t) vectors[pos].port[i/8].out << i;
+		for (uint8_t i=0 ; i<dut_pin_count ; i+=8, vector_slice++) {
+			bitvector |= (uint32_t) *vector_slice << i;
 		}
-		// clear received vector data
-		for (uint8_t i=0 ; i<MCU_PORT_CNT ; i++) {
-			vectors[pos].port[i].out = 0;
-			vectors[pos].check = 1;
-		}
+
+		// clear current vector data
+		for (uint8_t i=0 ; i<MCU_PORT_CNT ; i++) v->port[i].out = 0;
+		v->check = 1;
+
 		// fill in bits in MCU port pin order
 		for (uint8_t dut_pin=0 ; dut_pin<dut_pin_count ; dut_pin++) {
 			uint8_t zif_pin = zif_pos(dut_pin_count, dut_pin);
 			int8_t port_pos = zif_mcu_port(zif_pin);
 			uint8_t bit_val = (bitvector >> dut_pin) & 1;
 			if ((zif_pin == zif_vcc_pin) && bit_val) {
-				vectors[pos].check = 0;
-				bit_val = 0;
+				v->check = 0;
+			} else {
+				v->port[port_pos].out |= bit_val << zif_mcu_port_bit(zif_pin);
 			}
-			vectors[pos].port[port_pos].out |= bit_val << zif_mcu_port_bit(zif_pin);
 		}
+		v++;
 	}
 
 	return RESP_OK;
@@ -85,15 +118,15 @@ static uint8_t handle_failure(uint16_t pos, struct mcu_port_config *mcu_port)
 }
 
 // -----------------------------------------------------------------------
-static inline uint8_t run_logic2(uint16_t delay, struct mcu_port_config *mcu_port)
+static inline uint8_t run_logic2(struct mcu_port_config *mcu_port)
 {
-	uint16_t pos;
-	for (pos=0 ; pos<vectors_count ; pos++) {
+	uint16_t local_delay = delay; // need to trick the optimizer :-(
+	for (uint16_t pos=0 ; pos<vectors_count ; pos++) {
 		PORTB = vectors[pos].port[PB].in;
 		PORTC = vectors[pos].port[PC].in;
 
 		if (!vectors[pos].check) continue;
-		if (delay) _delay_loop_2(delay);
+		if (local_delay) _delay_loop_2(local_delay);
 
 		if ((PINB & mcu_port[PB].mask) != vectors[pos].port[PB].out) return handle_failure(pos, mcu_port);
 		if ((PINC & mcu_port[PC].mask) != vectors[pos].port[PC].out) return handle_failure(pos, mcu_port);
@@ -103,15 +136,16 @@ static inline uint8_t run_logic2(uint16_t delay, struct mcu_port_config *mcu_por
 }
 
 // -----------------------------------------------------------------------
-static inline uint8_t run_logic3(uint16_t delay, struct mcu_port_config *mcu_port)
+static inline uint8_t run_logic3(struct mcu_port_config *mcu_port)
 {
+	uint16_t local_delay = delay; // need to trick the optimizer :-(
 	for (uint16_t pos=0 ; pos<vectors_count ; pos++) {
 		PORTA = vectors[pos].port[PA].in;
 		PORTB = vectors[pos].port[PB].in;
 		PORTC = vectors[pos].port[PC].in;
 
 		if (!vectors[pos].check) continue;
-		if (delay) _delay_loop_2(delay);
+		if (local_delay) _delay_loop_2(local_delay);
 
 		if ((PINA & mcu_port[PA].mask) != vectors[pos].port[PA].out) return handle_failure(pos, mcu_port);
 		if ((PINB & mcu_port[PB].mask) != vectors[pos].port[PB].out) return handle_failure(pos, mcu_port);
@@ -122,15 +156,17 @@ static inline uint8_t run_logic3(uint16_t delay, struct mcu_port_config *mcu_por
 }
 
 // -----------------------------------------------------------------------
-uint8_t run_logic(uint8_t dut_pin_count, uint16_t loops, uint8_t *params)
+uint8_t run_logic(uint8_t dut_pin_count, uint16_t loops)
 {
 	uint8_t res;
-	volatile uint16_t delay = (params[1] << 8) + params[0];
 
 	// local copy for speed (pointer known at compile time)
 	struct mcu_port_config mcu_port_copy[MCU_PORT_CNT];
 	struct mcu_port_config *mcu_port = mcu_get_port_config();
-	if (!mcu_port) return RESP_ERR;
+	if (!mcu_port) {
+		// no config selected
+		return RESP_ERR;
+	}
 	for (uint8_t i=0 ; i<MCU_PORT_CNT ; i++) mcu_port_copy[i] = mcu_port[i];
 
 	// precompute input/output vectors with port masks
@@ -143,11 +179,11 @@ uint8_t run_logic(uint8_t dut_pin_count, uint16_t loops, uint8_t *params)
 
 	if (dut_pin_count <= 16) {
 		for (uint16_t rep=0 ; rep<loops ; rep++) {
-			if ((res = run_logic2(delay, mcu_port_copy)) != RESP_PASS) return res;
+			if ((res = run_logic2(mcu_port_copy)) != RESP_PASS) return res;
 		}
 	} else {
 		for (uint16_t rep=0 ; rep<loops ; rep++) {
-			if ((res = run_logic3(delay, mcu_port_copy)) != RESP_PASS) return res;
+			if ((res = run_logic3(mcu_port_copy)) != RESP_PASS) return res;
 		}
 	}
 

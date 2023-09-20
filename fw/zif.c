@@ -57,9 +57,16 @@ void zif_config_clear()
 }
 
 // -----------------------------------------------------------------------
+void zif_config_select(uint8_t cfgnum)
+{
+	mcu_config_select(cfgnum);
+	sw_config_select(cfgnum);
+}
+
+// -----------------------------------------------------------------------
 uint8_t zif_pos(uint8_t dut_pin_count, uint8_t dut_pin)
 {
-    return dut_pin < (dut_pin_count/2) ? dut_pin : ZIF_PIN_CNT-dut_pin_count + dut_pin;
+	return dut_pin < (dut_pin_count/2) ? dut_pin : ZIF_PIN_CNT-dut_pin_count + dut_pin;
 }
 
 // -----------------------------------------------------------------------
@@ -75,7 +82,7 @@ uint8_t zif_mcu_port_bit(uint8_t zif_pin)
 }
 
 // -----------------------------------------------------------------------
-bool zif_func(uint8_t cfgnum, uint8_t func, uint8_t zif_pin)
+bool zif_func(uint8_t func, uint8_t zif_pin)
 {
 	uint8_t port_pos, port_bit;
 	const __flash struct coord *coord = NULL;
@@ -89,7 +96,7 @@ bool zif_func(uint8_t cfgnum, uint8_t func, uint8_t zif_pin)
 		case ZIF_IN_HIZ:
 			port_pos = zif_mcu_port(zif_pin);
 			port_bit = zif_mcu_port_bit(zif_pin);
-			mcu_func(cfgnum, func, port_pos, port_bit);
+			mcu_func(func, port_pos, port_bit);
 			break;
 		case ZIF_VCC:
 			zif_vcc_pin = zif_pin;
@@ -102,29 +109,36 @@ bool zif_func(uint8_t cfgnum, uint8_t func, uint8_t zif_pin)
 			coord = zif_c_coord + zif_pin;
 			break;
 		default:
+			// unknown function
 			return false;
 	}
 
 	if (coord) { // SW function
-		if (coord->port == NA) return false;
-		sw_on(cfgnum, coord->port, coord->bit);
+		if (coord->port == NA) {
+			// function not available for this pin
+			return false;
+		}
+		sw_on(coord->port, coord->bit);
 	}
 
 	return true;
 }
 
 // -----------------------------------------------------------------------
-static bool zif_config_sane(uint8_t cfgnum)
+static bool zif_config_sane()
 {
-	return sw_config_sane(cfgnum);
+	return sw_config_sane();
 }
 
 // -----------------------------------------------------------------------
-bool zif_connect(uint8_t cfgnum)
+bool zif_connect()
 {
-	if (!zif_config_sane(cfgnum)) return false;
-	sw_connect(cfgnum);
-	mcu_connect(cfgnum);
+	if (!zif_config_sane()) {
+		// configuration is not safe
+		return false;
+	}
+	sw_connect();
+	mcu_connect();
 	return true;
 }
 
@@ -133,20 +147,6 @@ void zif_disconnect()
 {
 	mcu_disconnect();
 	sw_disconnect();
-}
-
-// -----------------------------------------------------------------------
-void zif_pin_mask_clear(uint8_t cfgnum)
-{
-	mcu_pin_mask_clear(cfgnum);
-}
-
-// -----------------------------------------------------------------------
-void zif_pin_unmasked(uint8_t cfgnum, uint8_t zif_pin)
-{
-	uint8_t port_pos = zif_mcu_port(zif_pin);
-	uint8_t port_bit = zif_mcu_port_bit(zif_pin);
-	mcu_pin_unmasked(cfgnum, port_pos, port_bit);
 }
 
 // -----------------------------------------------------------------------

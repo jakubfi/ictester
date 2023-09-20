@@ -62,6 +62,16 @@ void serial_tx_16le(uint16_t v)
 }
 
 // -----------------------------------------------------------------------
+void serial_rx_bytes(uint8_t *data, uint16_t count)
+{
+	while (count) {
+		*data = serial_rx_char();
+		data++;
+		count--;
+	}
+}
+
+// -----------------------------------------------------------------------
 void serial_tx_bytes(uint8_t *data, uint8_t count)
 {
 	while (count--) {

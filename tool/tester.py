@@ -1,8 +1,10 @@
 import time
+import math
 import logging
 from enum import Enum
 from prototypes import (Test, TestType)
 from binvec import BV
+from struct import (pack, unpack)
 
 logger = logging.getLogger('ictester')
 
@@ -59,30 +61,36 @@ class Tester:
         self.warning = 0
         self.failed = 0
 
+    def get_response(self):
+        resp = Resp(self.tr.recv())
+        return resp
+
     def dut_setup(self):
         logger.info("---- DUT SETUP ------------------------------------")
-        self.tr.send([Cmd.DUT_SETUP.value])
-        self.tr.send(self.part)
-        if self.tr.recv() != Resp.OK.value:
+        data = bytes([Cmd.DUT_SETUP.value]) + bytes(self.part)
+        self.tr.send(data)
+        if self.get_response() != Resp.OK:
             raise RuntimeError("DUT setup failed")
 
     def dut_connect(self, cfgnum):
         logger.info("---- DUT CONNECT ----------------------------------")
-        self.tr.send([Cmd.DUT_CONNECT.value, cfgnum])
-        if self.tr.recv() != Resp.OK.value:
+        data = bytes([Cmd.DUT_CONNECT.value, cfgnum])
+        self.tr.send(data)
+        if self.get_response() != Resp.OK:
             raise RuntimeError("DUT connect failed")
 
     def dut_disconnect(self):
         logger.info("---- DUT DISCONNECT -------------------------------")
-        self.tr.send([Cmd.DUT_DISCONNECT.value])
-        if self.tr.recv() != Resp.OK.value:
+        data = bytes([Cmd.DUT_DISCONNECT.value])
+        self.tr.send(data)
+        if self.get_response() != Resp.OK:
             raise RuntimeError("DUT disconnect failed")
 
     def test_setup(self, test):
         logger.info("\n---- TEST SETUP -----------------------------------")
-        self.tr.send([Cmd.TEST_SETUP.value])
-        self.tr.send(test)
-        if self.tr.recv() != Resp.OK.value:
+        data = bytes([Cmd.TEST_SETUP.value]) + bytes(test)
+        self.tr.send(data)
+        if self.get_response() != Resp.OK:
             raise RuntimeError("Test setup failed")
 
     def vectors_load(self, test):
@@ -94,26 +102,31 @@ class Tester:
 
         assert len(test.vectors) <= Tester.MAX_VECTORS
 
-        self.tr.send([Cmd.VECTORS_LOAD.value])
-        self.tr.send_16le(len(test.vectors))
+        # split vectors into chunks that fit in tester's buffer
+        buf_size = 2048
+        v_per_chunk = buf_size // math.ceil(self.part.pincount/8) - 2
+        vector_chunks = [test.vectors[i:i+v_per_chunk] for i in range(0, len(test.vectors), v_per_chunk)]
 
-        logger.info("Binary vectors:")
+        for vc in vector_chunks:
+            logger.info("Binary vectors chunk sent (%s):", len(vc))
+            data = bytes([Cmd.VECTORS_LOAD.value]) + pack("<H", len(vc))
+            for v in vc:
+                data += bytes(v)
 
-        for v in test.vectors:
-            self.tr.send(v)
+            self.tr.send(data)
 
-        if self.tr.recv() != Resp.OK.value:
-            raise RuntimeError("Vectors load failed")
+            if self.get_response() != Resp.OK:
+                raise RuntimeError("Vectors load failed")
 
     def run(self, loops, test):
         logger.info("---- RUN ------------------------------------------")
         assert 1 <= loops <= 0xffff
 
-        self.tr.send([Cmd.RUN.value])
-        self.tr.send_16le(loops)
+        data = bytes([Cmd.RUN.value]) + pack("<H", loops)
+        self.tr.send(data)
 
         start = time.time()
-        resp = Resp(self.tr.recv())
+        resp = self.get_response()
         elapsed = time.time() - start
 
         if resp == Resp.PASS:
@@ -125,9 +138,9 @@ class Tester:
 
         # Read failed vector data for LOGIC tests (natural DUT pin order)
         if test.type == TestType.LOGIC and resp == Resp.FAIL:
-            self.failed_vector_num = self.tr.recv_16le()
+            self.failed_vector_num = unpack("<H", self.tr.recv(2))[0]
             self.failed_pin_vector = [*BV.int(self.tr.recv(), 8).reversed()]
-            self. failed_pin_vector.extend([*BV.int(self.tr.recv(), 8).reversed()])
+            self.failed_pin_vector.extend([*BV.int(self.tr.recv(), 8).reversed()])
             if self.part.pincount > 16:
                 self.failed_pin_vector.extend([*BV.int(self.tr.recv(), 8).reversed()])
 

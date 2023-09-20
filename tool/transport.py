@@ -1,6 +1,7 @@
 import logging
 import serial
 from binvec import BV
+from struct import pack
 
 logger = logging.getLogger('ictester')
 
@@ -26,18 +27,15 @@ class Transport:
 
     def send(self, b):
         b = bytes(b)
-        logger.debug("<- %s", [x for x in b])
+        self.s.write(pack("<H", len(b)))
+        logger.debug("<- (%s bytes) %s", len(b), bytes(b).hex(" "))
         self.s.write(b)
         self.bytes_sent += len(b)
 
-    def send_16le(self, val):
-        self.send(val.to_bytes(2, 'little'))
-
-    def recv(self):
-        b = ord(self.s.read(1))
-        self.bytes_received += 1
-        logger.debug("-> %s", b)
+    def recv(self, count=1):
+        b = self.s.read(count)
+        logger.debug("-> %s", b.hex(" "))
+        if count == 1:
+            b = ord(b)  # temporary backwards compatibility
+        self.bytes_received += count
         return b
-
-    def recv_16le(self):
-        return self.recv() + (self.recv() << 8)

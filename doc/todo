@@ -26,9 +26,11 @@ review all sequential ICs (command changes vs clock, clock polarity, test suitab
 657 - octal transceiver with parity generator/checker and 3-state outputs
 
 --- FW/protocol ----------------------------------------------------------
+should cfgnum be moved to zif.c?
+mem_setup(); is a part of mem test?
 full error handling (protocol)
-  * check everything early (protocol level if possible => no checks during testing)
-  * allow only meaningfull setups (anything out of ordinary => error)
+  * check everything everywhere, send meaningfull error codes
+  * disallow only setups harmful to the device?
 cmd_hello
 protocol and fw versioning?
 'IC state reset' non-test something? is it required?
@@ -36,6 +38,8 @@ protocol frames
 PROM/EPROM reading?
 
 --- SW -------------------------------------------------------------------
+wrong Bytes sent count?
+mode debug levels (commands, vectors, serial)
 bash completion?
 names: LS/S when no regular family? common names? alternatives?
 chip autodetection
