@@ -26,19 +26,26 @@ enum responses {
 };
 
 enum error_types {
-	ERR_UNKNOWN		= 0,
-	ERR_CMD			= 1,
-	ERR_NO_SETUP	= 2,
-	ERR_NO_TEST		= 3,
-	ERR_NO_VECT		= 4,
-	ERR_PACKAGE		= 5,
-	ERR_PIN_CNT		= 6,
-	ERR_PIN_FUNC	= 7,
-	ERR_PIN_COMB	= 8,
-	ERR_PIN_SETUP	= 9,
-	ERR_TEST_TYPE	= 10,
-	ERR_PARAMS		= 11,
-	ERR_VECT_NUM	= 12,
+	ERR_UNKNOWN		= 0,	// unknown error (not set by the FW, likely a bug)
+	ERR_CMD_UNKNOWN	= 1,	// unknown command
+	ERR_CMD_TOOBIG	= 2,	// command didn't fit in the buffer
+	ERR_CRC			= 3,	// CRC transmission error detected
+	ERR_4			= 4,
+	ERR_PACKAGE		= 5,	// unknown DUT package
+	ERR_PIN_CNT		= 6,	// wrong DUT pin count
+	ERR_PIN_FUNC	= 7,	// unknown DUT pin function
+	ERR_PIN_COMB	= 8,	// wrong (unsafe) pin function combination
+	ERR_9			= 9,
+	ERR_TEST_TYPE	= 10,	// unknown test type
+	ERR_11			= 11,
+	ERR_VECT_NUM	= 12,	// too many vectors or no vectors at all
+	ERR_PINCFG_CNT	= 13,	// wrong pin configuration count
+	ERR_PINCFG_NUM	= 14,	// wrong pin configuration number (pin configuration not set)
+	ERR_15			= 15,
+	ERR_PIN_FUNC_UNAVAILABLE = 16,	// function not available for a pin
+	ERR_NO_PINCFG	= 17,	// no pin configuration active
+	ERR_UNKNOWN_CHIP	= 18,	// selected chip type is unknown
+	ERR_UNKNOWN_TEST	= 19,	// no such test for selected chip
 };
 
 enum test_type {
@@ -122,8 +129,9 @@ struct resp_dram_fail {
 };
 
 bool receive_cmd(uint8_t *buf, uint16_t buf_size);
-void reply(uint8_t res);
 void send_response(uint8_t *buf, uint16_t len);
+uint8_t error(uint8_t reason);
+uint8_t get_error();
 
 #endif
 

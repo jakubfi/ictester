@@ -34,8 +34,7 @@ uint8_t logic_test_setup(uint8_t dut_pin_count, struct logic_params *params)
 
 	struct mcu_port_config *mcu_port = mcu_get_port_config();
 	if (!mcu_port) {
-		// no configuration selected
-		return RESP_ERR;
+		return error(ERR_NO_PINCFG);
 	}
 
 	for (uint8_t i=0 ; i<MCU_PORT_CNT ; i++) {
@@ -64,8 +63,7 @@ uint8_t handle_vectors_load(struct vectors *data, uint8_t dut_pin_count, uint8_t
 	vectors_count += chunk_vectors_count;
 
 	if (vectors_count > MAX_VECTORS) {
-		// too many vectors
-		return RESP_ERR;
+		return error(ERR_VECT_NUM);
 	}
 
 	// reorder bits in each vector into MCU port pin order
@@ -164,10 +162,13 @@ uint8_t run_logic(uint8_t dut_pin_count, uint16_t loops)
 	struct mcu_port_config mcu_port_copy[MCU_PORT_CNT];
 	struct mcu_port_config *mcu_port = mcu_get_port_config();
 	if (!mcu_port) {
-		// no config selected
-		return RESP_ERR;
+		return error(ERR_NO_PINCFG);
 	}
 	for (uint8_t i=0 ; i<MCU_PORT_CNT ; i++) mcu_port_copy[i] = mcu_port[i];
+
+	if (!vectors_count) {
+		return error(ERR_VECT_NUM);
+	}
 
 	// precompute input/output vectors with port masks
 	for (uint16_t pos=0 ; pos<vectors_count ; pos++) {

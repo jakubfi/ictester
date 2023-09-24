@@ -288,21 +288,29 @@ This response is sent when a command cannot be executed or the execution failed.
 * 1 BYTE: response: `RESP_ERR`
 * 1 BYTE: error code from the table below
 
-| Command         | Value | Description                                       |
-|-----------------|-------|---------------------------------------------------|
-| `ERR_UNKNOWN`   | 0     | Error code was not set (likely a software bug)    |
-| `ERR_CMD`       | 1     | Unknown command                                   |
-| `ERR_NO_SETUP`  | 2     | Missing DUT setup                                 |
-| `ERR_NO_TEST`   | 3     | No test set                                       |
-| `ERR_NO_VECT`   | 4     | No vectors loaded                                 |
-| `ERR_PACKAGE`   | 5     | Unsupported package type                          |
-| `ERR_PIN_CNT`   | 6     | Unsupported pin count                             |
-| `ERR_PIN_FUNC`  | 7     | Unknown pin function                              |
-| `ERR_PIN_COMB`  | 8     | Bad pin function combination (eg. VCC+GND)        |
-| `ERR_PIN_SETUP` | 9     | Unsupported pin setup                             |
-| `ERR_TEST_TYPE` | 10    | Unsupported test type                             |
-| `ERR_PARAMS`    | 11    | Bad test parameters                               |
-| `ERR_VECT_NUM`  | 12    | Wrong number of test vectors (<1 or too many)     |
+| Command                    | Value | Description                                       |
+|----------------------------|-------|---------------------------------------------------|
+| `ERR_UNKNOWN`              | 0     | Error code was not set (likely a software bug)    |
+| `ERR_CMD_UNKNOWN`          | 1     | Unknown command                                   |
+| `ERR_CMD_TOOBIG`           | 2     | Command didn't fit in the receive buffer          |
+| `ERR_CRC`                  | 3     | CRC transmission error detected                   |
+|                            | 4     | (unused)                                          |
+| `ERR_PACKAGE`              | 5     | Unsupported package type                          |
+| `ERR_PIN_CNT`              | 6     | Unsupported pin count                             |
+| `ERR_PIN_FUNC`             | 7     | Unknown pin function                              |
+| `ERR_PIN_COMB`             | 8     | Bad pin function combination (eg. VCC+GND)        |
+|                            | 9     | (unused)                                          |
+| `ERR_TEST_TYPE`            | 10    | Unsupported test type                             |
+|                            | 11    | (unused)                                          |
+| `ERR_VECT_NUM`             | 12    | Wrong number of test vectors (<1 or too many)     |
+| `ERR_PINCFG_CNT`           | 13    | Wrong pin configuration count                     |
+| `ERR_PINCFG_NUM`           | 14    | Wrong pin configuration number (config not set)   |
+|                            | 15    | (unused)                                          |
+| `ERR_PIN_FUNC_UNAVAILABLE` | 16    | Function not available for a pin                  |
+| `ERR_NO_PINCFG`            | 17    | No pin configuration active                       |
+| `ERR_UNKNOWN_CHIP`         | 18    | Selected chip type is unknown                     |
+| `ERR_UNKNOWN_TEST`         | 19    | No such test for selected chip                    |
+
 
 ## Test PASS
 

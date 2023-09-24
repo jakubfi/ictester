@@ -19,7 +19,7 @@ struct mcu_port_config {
 void mcu_init();
 void mcu_config_select(uint8_t cfgnum);
 void mcu_disconnect();
-void mcu_connect();
+bool mcu_connect();
 void mcu_config_clear();
 bool mcu_func(uint8_t func, uint8_t port_pos, uint8_t port_bit);
 struct mcu_port_config * mcu_get_port_config();

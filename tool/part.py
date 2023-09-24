@@ -143,24 +143,18 @@ class Part:
         data = bytes([CmdType.DUT_SETUP.value]) + bytes(self)
         tr.send(data)
         resp = Response(tr)
-        if resp.response != RespType.OK:
-            raise RuntimeError("DUT setup failed")
 
     def connect(self, tr, cfgnum):
         logger.log(20, "---- DUT CONNECT ----------------------------------")
         data = bytes([CmdType.DUT_CONNECT.value, cfgnum])
         r.send(data)
         resp = Response(tr)
-        if resp.response != RespType.OK:
-            raise RuntimeError("DUT connect failed")
 
     def disconnect(self, tr):
         logger.log(20, "---- DUT DISCONNECT -------------------------------")
         data = bytes([CmdType.DUT_DISCONNECT.value])
         tr.send(data)
         resp = Response(tr)
-        if resp.response != RespType.OK:
-            raise RuntimeError("DUT disconnect failed")
 
 
 # ------------------------------------------------------------------------

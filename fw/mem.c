@@ -48,8 +48,9 @@
 #define DIR_DOWN 1
 
 enum mem_chip_type {
-	MEM_4164	= 1,
-	MEM_41256	= 2,
+	MEM_4164		= 1,
+	MEM_41256		= 2,
+	MEM_DEVICE_MAX = MEM_41256
 };
 
 enum mem_test_type {
@@ -87,9 +88,16 @@ uint8_t failing_step;
 // -----------------------------------------------------------------------
 uint8_t mem_test_setup(struct mem_params *params)
 {
+	if (params->device > MEM_DEVICE_MAX) {
+		return error(ERR_UNKNOWN_CHIP);
+	}
+	if (params->test_type > MEM_TEST_MAX) {
+		return error(ERR_UNKNOWN_TEST);
+	}
+
 	mem_device = params->device;
 	mem_test_type = params->test_type;
-	// TODO: check device and test type
+
 	return RESP_OK;
 }
 
@@ -303,8 +311,7 @@ uint8_t run_mem(uint16_t loops)
 			address_space = 0x200;
 			break;
 		default:
-			// unknown chip type
-			return RESP_ERR;
+			return error(ERR_UNKNOWN_CHIP);
 	}
 
 	if (mem_test_type == MEM_TEST_SPEED) {
@@ -313,8 +320,7 @@ uint8_t run_mem(uint16_t loops)
 	}
 
 	if (mem_test_type > MEM_TEST_MAX) {
-		// unknown test type
-		return RESP_ERR;
+		return error(ERR_UNKNOWN_TEST);
 	}
 
 	march_fun m_fun = m_funcs[mem_test_type];

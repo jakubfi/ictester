@@ -59,6 +59,7 @@ void zif_config_clear()
 // -----------------------------------------------------------------------
 void zif_config_select(uint8_t cfgnum)
 {
+	// check if cfgnum is actually present
 	mcu_config_select(cfgnum);
 	sw_config_select(cfgnum);
 }
@@ -96,7 +97,9 @@ bool zif_func(uint8_t func, uint8_t zif_pin)
 		case ZIF_IN_HIZ:
 			port_pos = zif_mcu_port(zif_pin);
 			port_bit = zif_mcu_port_bit(zif_pin);
-			mcu_func(func, port_pos, port_bit);
+			if (!mcu_func(func, port_pos, port_bit)) {
+				return false; // cause set downstream
+			}
 			break;
 		case ZIF_VCC:
 			zif_vcc_pin = zif_pin;
@@ -109,13 +112,13 @@ bool zif_func(uint8_t func, uint8_t zif_pin)
 			coord = zif_c_coord + zif_pin;
 			break;
 		default:
-			// unknown function
+			error(ERR_PIN_FUNC);
 			return false;
 	}
 
 	if (coord) { // SW function
 		if (coord->port == NA) {
-			// function not available for this pin
+			error(ERR_PIN_FUNC_UNAVAILABLE);
 			return false;
 		}
 		sw_on(coord->port, coord->bit);
@@ -125,20 +128,14 @@ bool zif_func(uint8_t func, uint8_t zif_pin)
 }
 
 // -----------------------------------------------------------------------
-static bool zif_config_sane()
-{
-	return sw_config_sane();
-}
-
-// -----------------------------------------------------------------------
 bool zif_connect()
 {
-	if (!zif_config_sane()) {
-		// configuration is not safe
-		return false;
+	if (!sw_connect()) {
+		return false; // error set downstream
 	}
-	sw_connect();
-	mcu_connect();
+	if (!mcu_connect()) {
+		return false; // error set downstream
+	}
 	return true;
 }
 

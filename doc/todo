@@ -27,12 +27,10 @@ review all sequential ICs (command changes vs clock, clock polarity, test suitab
 
 --- FW/protocol ----------------------------------------------------------
 should cfgnum be moved to zif.c?
+better cfgnum selection/activation logic
 mem_setup(); is a part of mem test?
 generic "drivers" for tests
 cleanup mem/dram naming
-full error handling (protocol)
-  * check everything everywhere, send meaningfull error codes
-  * disallow only setups harmful to the device?
 cmd_hello
 protocol and fw versioning?
 'IC state reset' non-test something? is it required?
@@ -40,7 +38,7 @@ PROM/EPROM reading?
 framing CRC?
 
 --- SW -------------------------------------------------------------------
-tester protocol exceptions
+more ictester.py cleanups
 bash completion?
 names: LS/S when no regular family? common names? alternatives?
 chip autodetection

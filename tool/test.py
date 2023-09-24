@@ -109,8 +109,6 @@ class Test:
         data = bytes([CmdType.TEST_SETUP.value]) + bytes(self)
         tr.send(data)
         resp = Response(tr)
-        if resp.response != RespType.OK:
-            raise RuntimeError("Test setup failed")
 
     def run(self, tr, loops):
         logger.log(20, "---- RUN ------------------------------------------")
@@ -261,8 +259,6 @@ class TestLogic(Test):
             tr.send(data)
 
             resp = Response(tr)
-            if resp.response != RespType.OK:
-                raise RuntimeError("Vectors load failed")
 
     def run(self, tr, loops):
         resp = super().run(tr, loops)

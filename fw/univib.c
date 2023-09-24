@@ -6,25 +6,22 @@
 
 #include "protocol.h"
 
-enum test_parameters {
-	PARAM_DEV = 0,
-	PARAM_TEST = 1,
-};
-
 enum univib_devices {
-	UNIVIB_121 = 0,
-	UNIVIB_122 = 1,
-	UNIVIB_123_1 = 2,
-	UNIVIB_123_2 = 3,
+	UNIVIB_121			= 0,
+	UNIVIB_122			= 1,
+	UNIVIB_123_1		= 2,
+	UNIVIB_123_2		= 3,
+	UNIVIB_DEVICE_MAX	= UNIVIB_123_2
 };
 
 enum test_types {
-	TEST_NOTRIG = 0,
-	TEST_TRIG = 1,
-	TEST_RETRIG = 2,
-	TEST_CLEAR = 3,
-	TEST_CROSSTRIG = 4,
-	TEST_CLEARTRIG = 5,
+	TEST_NOTRIG		= 0,
+	TEST_TRIG		= 1,
+	TEST_RETRIG		= 2,
+	TEST_CLEAR		= 3,
+	TEST_CROSSTRIG	= 4,
+	TEST_CLEARTRIG	= 5,
+	UNIVIB_TEST_MAX	= TEST_CLEARTRIG
 };
 
 uint8_t univib_device;
@@ -221,9 +218,16 @@ static const __flash struct univib_test {
 // -----------------------------------------------------------------------
 uint8_t univib_test_setup(struct univib_params *params)
 {
+	if (params->device > UNIVIB_DEVICE_MAX) {
+		return error(ERR_UNKNOWN_CHIP);
+	}
+	if (params->test_type > UNIVIB_TEST_MAX) {
+		return error(ERR_UNKNOWN_TEST);
+	}
+
 	univib_device = params->device;
 	univib_test_type = params->test_type;
-	// TODO: check device and test type
+
 	return RESP_OK;
 }
 
@@ -369,8 +373,7 @@ static uint8_t test_121(uint8_t test)
 		case TEST_NOTRIG: return test_no_trig(univib_test + UNIVIB_121);
 		case TEST_TRIG: return test_trig(univib_test + UNIVIB_121);
 		default:
-			// unknown test type
-			return RESP_ERR;
+			return error(ERR_UNKNOWN_TEST);
 	}
 }
 
@@ -384,8 +387,7 @@ static uint8_t test_122(uint8_t test)
 		case TEST_CLEAR: return test_clear(univib_test + UNIVIB_122);
 		case TEST_CLEARTRIG: return test_cleartrig(univib_test + UNIVIB_122);
 		default:
-			// unknown test type
-			return RESP_ERR;
+			return error(ERR_UNKNOWN_TEST);
 	}
 }
 
@@ -400,8 +402,7 @@ static uint8_t test_123_1(uint8_t test)
 		case TEST_CROSSTRIG: return test_crosstrig(univib_test + UNIVIB_123_1);
 		case TEST_CLEARTRIG: return test_cleartrig(univib_test + UNIVIB_123_1);
 		default:
-			// unknown test type
-			return RESP_ERR;
+			return error(ERR_UNKNOWN_TEST);
 	}
 }
 
@@ -416,8 +417,7 @@ static uint8_t test_123_2(uint8_t test)
 		case TEST_CROSSTRIG: return test_crosstrig(univib_test + UNIVIB_123_2);
 		case TEST_CLEARTRIG: return test_cleartrig(univib_test + UNIVIB_123_2);
 		default:
-			// unknown test type
-			return RESP_ERR;
+			return error(ERR_UNKNOWN_TEST);
 	}
 }
 
@@ -441,8 +441,7 @@ uint8_t run_univib(uint16_t loops)
 				if ((res = test_123_2(univib_test_type)) != RESP_PASS) return res;
 				break;
 			default:
-				// unknown device type
-				return RESP_ERR;
+				return error(ERR_UNKNOWN_CHIP);
 		}
 	}
 

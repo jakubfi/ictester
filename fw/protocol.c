@@ -1,7 +1,10 @@
 #include <inttypes.h>
 #include <stdbool.h>
 
+#include "protocol.h"
 #include "serial.h"
+
+static uint8_t error_reason = ERR_UNKNOWN;
 
 // -----------------------------------------------------------------------
 bool receive_cmd(uint8_t *buf, uint16_t buf_size)
@@ -26,10 +29,16 @@ void send_response(uint8_t *buf, uint16_t len)
 }
 
 // -----------------------------------------------------------------------
-void reply(uint8_t resp) 
+uint8_t error(uint8_t reason)
 {
-	serial_tx_char(resp);
-	// TODO: error codes
+	error_reason = reason;
+	return RESP_ERR;
+}
+
+// -----------------------------------------------------------------------
+uint8_t get_error()
+{
+	return error_reason;
 }
 
 // vim: tabstop=4 shiftwidth=4 autoindent

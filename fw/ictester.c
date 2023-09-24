@@ -30,16 +30,13 @@ static uint8_t handle_dut_setup(struct cmd_dut_setup *data)
 	dut_pin_count = data->pin_count;
 
 	if ((dut_pin_count != 14) && (dut_pin_count != 16) && (dut_pin_count != 20) && (dut_pin_count != 24)) {
-		// invalid number of DUT pins
-		return RESP_ERR;
+		return error(ERR_PIN_CNT);
 	}
 	if (dut_package_type != PACKAGE_DIP) {
-		// unknown package type
-		return RESP_ERR;
+		return error(ERR_PACKAGE);
 	}
 	if ((data->cfg_count < 1) || (data->cfg_count > MAX_CONFIGS)) {
-		// invalid number of pin configurations
-		return RESP_ERR;
+		return error(ERR_PINCFG_CNT);
 	}
 
 	zif_config_clear();
@@ -51,8 +48,7 @@ static uint8_t handle_dut_setup(struct cmd_dut_setup *data)
 			uint8_t pin_func = data->configs[cfgnum * dut_pin_count + dut_pin];
 			uint8_t zif_pin = zif_pos(dut_pin_count, dut_pin);
 			if (!zif_func(pin_func, zif_pin)) {
-				// cannot set pin function, cause set downstream(?)
-				return RESP_ERR;
+				return RESP_ERR; // cause set downstream
 			}
 		}
 	}
@@ -64,31 +60,31 @@ static uint8_t handle_dut_setup(struct cmd_dut_setup *data)
 static uint8_t handle_test_setup(struct cmd_test_setup *data)
 {
 	if (data->cfg_num >= MAX_CONFIGS) {
-		// wrong configuration number
 		// TODO: really check if configuration exists (has been set for the DUT)
-		return RESP_ERR;
+		return error(ERR_PINCFG_NUM);
 	}
 
 	cfgnum = data->cfg_num;
 	zif_config_select(cfgnum);
 	test_type = data->test_type;
 
+	uint8_t resp = RESP_OK;
+
 	switch (test_type) {
 		case TEST_LOGIC:
-			logic_test_setup(dut_pin_count, (struct logic_params*) data->params);
+			resp = logic_test_setup(dut_pin_count, (struct logic_params*) data->params);
 			break;
 		case TEST_DRAM:
-			mem_test_setup((struct mem_params*) data->params);
+			resp = mem_test_setup((struct mem_params*) data->params);
 			break;
 		case TEST_UNIVIB:
-			univib_test_setup((struct univib_params*) data->params);
+			resp = univib_test_setup((struct univib_params*) data->params);
 			break;
 		default:
-			// unknown test type
-			return RESP_ERR;
+			resp = error(ERR_TEST_TYPE);
 	}
 
-	return RESP_OK;
+	return resp;
 }
 
 // -----------------------------------------------------------------------
@@ -97,8 +93,7 @@ static uint8_t do_connect()
 	led(LED_ACTIVE);
 
 	if (!zif_connect()) {
-		// cannot connect the DUT, cause set downstream.
-		return RESP_ERR;
+		return RESP_ERR; // cause set downstream.
 	}
 
 	if (test_type == TEST_DRAM) {
@@ -155,8 +150,7 @@ static uint8_t handle_run(struct cmd_run *data)
 			res = run_univib(data->loops);
 			break;
 		default:
-			// unknown test type
-			res = RESP_ERR;
+			res = error(ERR_TEST_TYPE);
 			break;
 	}
 
@@ -181,8 +175,7 @@ int main()
 
 	while (true) {
 		if (!receive_cmd(buf, BUF_SIZE)) {
-			// command didn't fit in the buffer
-			resp = RESP_ERR;
+			resp = error(ERR_CMD_TOOBIG);
 		} else {
 			cmd = buf[0];
 			switch (cmd) {
@@ -205,20 +198,18 @@ int main()
 					resp = handle_dut_disconnect(resp);
 					break;
 				default:
-					// unknown command
-					resp = RESP_ERR;
+					resp = error(ERR_CMD_UNKNOWN);
 			}
-		}
-
-		if (resp == RESP_ERR) {
-			led(LED_ERR);
 		}
 
 		buf[0] = resp;
 		uint16_t count = 1;
 
-		// handle response data for failed tests
-		if ((resp == RESP_FAIL) && (cmd == CMD_TEST_RUN)) {
+		if (resp == RESP_ERR) {
+			led(LED_ERR);
+			count += 1;
+			buf[1] = get_error();
+		} else if (resp == RESP_FAIL) {
 			switch (test_type) {
 				case TEST_LOGIC:
 					count += logic_store_result(buf+1, dut_pin_count);
@@ -227,6 +218,7 @@ int main()
 					count += mem_store_result(buf+1, dut_pin_count);
 					break;
 				default:
+					// test does not store result data
 					break;
 			}
 		}

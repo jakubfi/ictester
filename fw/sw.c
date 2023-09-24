@@ -1,4 +1,5 @@
 #include <inttypes.h>
+#include <stdlib.h>
 #include <stdbool.h>
 #include <util/delay.h>
 
@@ -28,7 +29,7 @@ const __flash struct switch_drv {
 };
 
 uint8_t switch_config[MAX_CONFIGS][SWITCH_CNT];
-uint8_t *switch_config_active;
+uint8_t *switch_config_active = NULL;
 
 // -----------------------------------------------------------------------
 void sw_init()
@@ -55,11 +56,6 @@ bool sw_config_sane()
 {
 	if ((switch_config_active[A1] & 0b00001100) == 0b00001100) return false; // pin 8 VCC+GND
 	if ((switch_config_active[B0] & 0b00000110) == 0b00000110) return false; // pin 24 VCC+GND
-	// TODO: GND + pullup?
-	// TODO: C + no pullup
-	// TODO: VCC + pullup?
-	// TODO: or just any two functions?
-	// TODO: more than one GND/VCC/C?
 	// check for disallowed inter-config changes
 	return true;
 }
@@ -78,12 +74,24 @@ void sw_push_config(uint8_t cfg)
 }
 
 // -----------------------------------------------------------------------
-void sw_connect()
+bool sw_connect()
 {
+	if (!switch_config_active) {
+		error(ERR_NO_PINCFG);
+		return false;
+	}
+
+	if (!sw_config_sane()) {
+		error(ERR_PIN_COMB);
+		return false;
+	}
+
 	// connect grounds first
 	sw_push_config(SW_CFG_GND_ONLY);
 	sw_push_config(SW_CFG_ALL);
 	_delay_us(SWITCH_ON_DELAY_US);
+
+	return true;
 }
 
 // -----------------------------------------------------------------------
@@ -94,6 +102,7 @@ void sw_config_clear()
 			switch_config[cfgnum][i] = 0;
 		}
 	}
+	switch_config_active = NULL;
 }
 
 // -----------------------------------------------------------------------
@@ -104,6 +113,7 @@ void sw_disconnect()
 	sw_config_clear();
 	sw_push_config(SW_CFG_ALL);
 	_delay_us(SWITCH_ON_DELAY_US);
+	switch_config_active = NULL;
 }
 
 // vim: tabstop=4 shiftwidth=4 autoindent
