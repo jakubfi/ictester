@@ -422,7 +422,7 @@ static uint8_t test_123_2(uint8_t test)
 }
 
 // -----------------------------------------------------------------------
-uint8_t run_univib(uint16_t loops)
+uint8_t univib_run(uint16_t loops)
 {
 	uint8_t res;
 

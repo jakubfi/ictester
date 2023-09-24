@@ -47,18 +47,18 @@
 #define DIR_UP 0
 #define DIR_DOWN 1
 
-enum mem_chip_type {
-	MEM_4164		= 1,
-	MEM_41256		= 2,
-	MEM_DEVICE_MAX = MEM_41256
+enum dram_chip_type {
+	DRAM_4164		= 1,
+	DRAM_41256		= 2,
+	DRAM_DEVICE_MAX = DRAM_41256
 };
 
-enum mem_test_type {
-	MEM_TEST_SPEED			= 0,
-	MEM_TEST_MARCH_RMW		= 1,
-	MEM_TEST_MARCH_RW		= 2,
-	MEM_TEST_MARCH_PAGE		= 3,
-	MEM_TEST_MAX			= MEM_TEST_MARCH_PAGE
+enum dram_test_type {
+	DRAM_TEST_SPEED			= 0,
+	DRAM_TEST_MARCH_RMW		= 1,
+	DRAM_TEST_MARCH_RW		= 2,
+	DRAM_TEST_MARCH_PAGE	= 3,
+	DRAM_TEST_MAX			= DRAM_TEST_MARCH_PAGE
 };
 
 struct march {
@@ -79,30 +79,30 @@ static const struct march march_cm[MARCH_STEPS] = {
 
 typedef uint8_t (*march_fun)(uint8_t dir, uint8_t r, uint8_t w, uint16_t addr_space);
 
-uint8_t mem_device;
-uint8_t mem_test_type;
+uint8_t dram_device;
+uint8_t dram_test_type;
 
 uint16_t failing_row, failing_col;
 uint8_t failing_step;
 
 // -----------------------------------------------------------------------
-uint8_t mem_test_setup(struct mem_params *params)
+uint8_t dram_test_setup(struct dram_params *params)
 {
-	if (params->device > MEM_DEVICE_MAX) {
+	if (params->device > DRAM_DEVICE_MAX) {
 		return error(ERR_UNKNOWN_CHIP);
 	}
-	if (params->test_type > MEM_TEST_MAX) {
+	if (params->test_type > DRAM_TEST_MAX) {
 		return error(ERR_UNKNOWN_TEST);
 	}
 
-	mem_device = params->device;
-	mem_test_type = params->test_type;
+	dram_device = params->device;
+	dram_test_type = params->test_type;
 
 	return RESP_OK;
 }
 
 // -----------------------------------------------------------------------
-void mem_init()
+void dram_connect()
 {
 	CAS_OFF;
 	RAS_OFF;
@@ -293,37 +293,37 @@ void test_speed(uint16_t loops)
 }
 
 // -----------------------------------------------------------------------
-uint8_t run_mem(uint16_t loops)
+uint8_t dram_run(uint16_t loops)
 {
 	march_fun m_funcs[4] = {
-		[MEM_TEST_SPEED] = NULL,
-		[MEM_TEST_MARCH_RMW] = march_step_rmw,
-		[MEM_TEST_MARCH_RW] = march_step_rw,
-		[MEM_TEST_MARCH_PAGE] = march_step_page,
+		[DRAM_TEST_SPEED] = NULL,
+		[DRAM_TEST_MARCH_RMW] = march_step_rmw,
+		[DRAM_TEST_MARCH_RW] = march_step_rw,
+		[DRAM_TEST_MARCH_PAGE] = march_step_page,
 	};
 
 	uint16_t address_space;
-	switch (mem_device) {
-		case MEM_4164:
+	switch (dram_device) {
+		case DRAM_4164:
 			address_space = 0x100;
 			break;
-		case MEM_41256:
+		case DRAM_41256:
 			address_space = 0x200;
 			break;
 		default:
 			return error(ERR_UNKNOWN_CHIP);
 	}
 
-	if (mem_test_type == MEM_TEST_SPEED) {
+	if (dram_test_type == DRAM_TEST_SPEED) {
 		test_speed(loops);
 		return RESP_PASS;
 	}
 
-	if (mem_test_type > MEM_TEST_MAX) {
+	if (dram_test_type > DRAM_TEST_MAX) {
 		return error(ERR_UNKNOWN_TEST);
 	}
 
-	march_fun m_fun = m_funcs[mem_test_type];
+	march_fun m_fun = m_funcs[dram_test_type];
 
 	for (uint16_t rep=0 ; rep<loops ; rep++) {
 		for (uint8_t i=0 ; i<MARCH_STEPS ; i++) {
@@ -340,7 +340,7 @@ uint8_t run_mem(uint16_t loops)
 }
 
 // -----------------------------------------------------------------------
-uint16_t mem_store_result(uint8_t *buf, uint8_t dut_pin_count)
+uint16_t dram_store_result(uint8_t *buf, uint8_t dut_pin_count)
 {
 	struct resp_dram_fail *resp = (struct resp_dram_fail*) buf;
 	resp->row_address = failing_row;

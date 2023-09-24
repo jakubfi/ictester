@@ -55,7 +55,7 @@ uint8_t logic_test_setup(uint8_t dut_pin_count, struct logic_params *params)
 }
 
 // -----------------------------------------------------------------------
-uint8_t handle_vectors_load(struct vectors *data, uint8_t dut_pin_count, uint8_t zif_vcc_pin)
+uint8_t logic_vectors_load(struct vectors *data, uint8_t dut_pin_count, uint8_t zif_vcc_pin)
 {
 	uint16_t chunk_vectors_count = data->vector_cnt;
 	uint8_t *vector_slice = data->vectors;
@@ -116,7 +116,7 @@ static uint8_t handle_failure(uint16_t pos, struct mcu_port_config *mcu_port)
 }
 
 // -----------------------------------------------------------------------
-static inline uint8_t run_logic2(struct mcu_port_config *mcu_port)
+static inline uint8_t logic_run_2port(struct mcu_port_config *mcu_port)
 {
 	uint16_t local_delay = delay; // need to trick the optimizer :-(
 	for (uint16_t pos=0 ; pos<vectors_count ; pos++) {
@@ -134,7 +134,7 @@ static inline uint8_t run_logic2(struct mcu_port_config *mcu_port)
 }
 
 // -----------------------------------------------------------------------
-static inline uint8_t run_logic3(struct mcu_port_config *mcu_port)
+static inline uint8_t logic_run_3port(struct mcu_port_config *mcu_port)
 {
 	uint16_t local_delay = delay; // need to trick the optimizer :-(
 	for (uint16_t pos=0 ; pos<vectors_count ; pos++) {
@@ -154,7 +154,7 @@ static inline uint8_t run_logic3(struct mcu_port_config *mcu_port)
 }
 
 // -----------------------------------------------------------------------
-uint8_t run_logic(uint8_t dut_pin_count, uint16_t loops)
+uint8_t logic_run(uint8_t dut_pin_count, uint16_t loops)
 {
 	uint8_t res;
 
@@ -180,11 +180,11 @@ uint8_t run_logic(uint8_t dut_pin_count, uint16_t loops)
 
 	if (dut_pin_count <= 16) {
 		for (uint16_t rep=0 ; rep<loops ; rep++) {
-			if ((res = run_logic2(mcu_port_copy)) != RESP_PASS) return res;
+			if ((res = logic_run_2port(mcu_port_copy)) != RESP_PASS) return res;
 		}
 	} else {
 		for (uint16_t rep=0 ; rep<loops ; rep++) {
-			if ((res = run_logic3(mcu_port_copy)) != RESP_PASS) return res;
+			if ((res = logic_run_3port(mcu_port_copy)) != RESP_PASS) return res;
 		}
 	}
 

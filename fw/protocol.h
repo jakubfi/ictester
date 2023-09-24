@@ -102,7 +102,7 @@ struct logic_params {
 	uint8_t pin_usage[];
 };
 
-struct mem_params {
+struct dram_params {
 	uint8_t device;
 	uint8_t test_type;
 };

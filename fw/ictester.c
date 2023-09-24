@@ -8,7 +8,7 @@
 #include "zif.h"
 
 #include "logic.h"
-#include "mem.h"
+#include "dram.h"
 #include "univib.h"
 
 #define LINK_SPEED 500000
@@ -75,7 +75,7 @@ static uint8_t handle_test_setup(struct cmd_test_setup *data)
 			resp = logic_test_setup(dut_pin_count, (struct logic_params*) data->params);
 			break;
 		case TEST_DRAM:
-			resp = mem_test_setup((struct mem_params*) data->params);
+			resp = dram_test_setup((struct dram_params*) data->params);
 			break;
 		case TEST_UNIVIB:
 			resp = univib_test_setup((struct univib_params*) data->params);
@@ -96,11 +96,12 @@ static uint8_t do_connect()
 		return RESP_ERR; // cause set downstream.
 	}
 
-	if (test_type == TEST_DRAM) {
-		mem_init();
-	}
-
 	cfgnum_active = cfgnum;
+
+	// device specific "connects"
+	if (test_type == TEST_DRAM) {
+		dram_connect();
+	}
 
 	return RESP_OK;
 }
@@ -141,13 +142,13 @@ static uint8_t handle_run(struct cmd_run *data)
 
 	switch (test_type) {
 		case TEST_LOGIC:
-			res = run_logic(dut_pin_count, data->loops);
+			res = logic_run(dut_pin_count, data->loops);
 			break;
 		case TEST_DRAM:
-			res = run_mem(data->loops);
+			res = dram_run(data->loops);
 			break;
 		case TEST_UNIVIB:
-			res = run_univib(data->loops);
+			res = univib_run(data->loops);
 			break;
 		default:
 			res = error(ERR_TEST_TYPE);
@@ -189,7 +190,7 @@ int main()
 					resp = handle_test_setup((struct cmd_test_setup*) data);
 					break;
 				case CMD_VECTORS_LOAD:
-					resp = handle_vectors_load((struct vectors*) data, dut_pin_count, zif_get_vcc_pin());
+					resp = logic_vectors_load((struct vectors*) data, dut_pin_count, zif_get_vcc_pin());
 					break;
 				case CMD_TEST_RUN:
 					resp = handle_run((struct cmd_run*) data);
@@ -215,7 +216,7 @@ int main()
 					count += logic_store_result(buf+1, dut_pin_count);
 					break;
 				case TEST_DRAM:
-					count += mem_store_result(buf+1, dut_pin_count);
+					count += dram_store_result(buf+1, dut_pin_count);
 					break;
 				default:
 					// test does not store result data

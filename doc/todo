@@ -15,8 +15,8 @@ review all sequential ICs (command changes vs clock, clock polarity, test suitab
 367 - 3-STATE HEX BUFFER
 373 - OCTAL D-TYPE TRANSPARENT LATCHES AND EDGE-TRIGGERED FLIP-FLOPS
 374 - OCTAL D-TYPE TRANSPARENT LATCHES AND EDGE-TRIGGERED FLIP-FLOPS
-414 - (UCY) 8-poziomowy kontroler priorytetu przerwań
-416 - (UCY) 4-bitowy nadajnik szyny danych
+414 - 8214 (UCY) 8-poziomowy kontroler priorytetu przerwań
+416 - 8216 (UCY) 4-bitowy nadajnik szyny danych
 540 - octal buffers and line drivers with 3-state outputs
 541 - octal buffers and line drivers with 3-state outputs
 547 - 8-bit bus register transceivers and latch transceivers
@@ -28,9 +28,7 @@ review all sequential ICs (command changes vs clock, clock polarity, test suitab
 --- FW/protocol ----------------------------------------------------------
 should cfgnum be moved to zif.c?
 better cfgnum selection/activation logic
-mem_setup(); is a part of mem test?
 generic "drivers" for tests
-cleanup mem/dram naming
 cmd_hello
 protocol and fw versioning?
 'IC state reset' non-test something? is it required?

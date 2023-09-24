@@ -2,7 +2,7 @@ MCU=atmega1284p
 DEFINES=-DF_CPU=20000000UL
 PROGRAMMER_MCU=m1284p
 PROJECTNAME=ictester
-PRJSRC=ictester.c serial.c zif.c sw.c mcu.c led.c protocol.c logic.c mem.c univib.c \
+PRJSRC=ictester.c serial.c zif.c sw.c mcu.c led.c protocol.c logic.c dram.c univib.c \
        external/pololu-led-strip-avr/led_strip.c \
        external/fleury-i2cmaster/i2cmaster_a.S external/fleury-i2cmaster/i2cmaster_b.S
 INC=
