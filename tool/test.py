@@ -74,7 +74,7 @@ class TestVector():
 
         pin_data = list(reversed(pin_data))
 
-        logger.info("%s%s", list(map(int, pin_data)), ' NC' if not self.output else '')
+        logger.log(19, "%s%s", list(map(int, pin_data)), ' NC' if not self.output else '')
 
         return bytes(BV(pin_data))
 
@@ -99,13 +99,13 @@ class Test:
     def __bytes__(self):
         data = bytes([self.cfgnum, self.type.value])
 
-        logger.info("Test type: %s", self.type.name)
-        logger.info("Configuration used: %s", self.cfgnum)
+        logger.log(20, "Test type: %s", self.type.name)
+        logger.log(20, "Configuration used: %s", self.cfgnum)
 
         return data
 
     def setup(self, tr):
-        logger.info("---- TEST SETUP -----------------------------------")
+        logger.log(20, "---- TEST SETUP -----------------------------------")
         data = bytes([CmdType.TEST_SETUP.value]) + bytes(self)
         tr.send(data)
         resp = Response(tr)
@@ -113,7 +113,7 @@ class Test:
             raise RuntimeError("Test setup failed")
 
     def run(self, tr, loops):
-        logger.info("---- RUN ------------------------------------------")
+        logger.log(20, "---- RUN ------------------------------------------")
         assert 1 <= loops <= 0xffff
 
         data = bytes([CmdType.RUN.value]) + pack("<H", loops)
@@ -141,7 +141,7 @@ class TestDRAM(Test):
         data = super().__bytes__()
         data += bytes([self.chip_type.value, self.chip_test_type.value])
 
-        logger.info("DRAM chip: %s, test: %s", self.chip_type.name, self.chip_test_type.name)
+        logger.log(20, "DRAM chip: %s, test: %s", self.chip_type.name, self.chip_test_type.name)
 
         return data
 
@@ -169,7 +169,7 @@ class TestUnivib(Test):
         data = super().__bytes__()
         data += bytes([self.chip_type.value, self.chip_test_type.value])
 
-        logger.info("Univibrator: %s, test: %s", self.chip_type.name, self.chip_test_type.name)
+        logger.log(20, "Univibrator: %s, test: %s", self.chip_type.name, self.chip_test_type.name)
 
         return data
 
@@ -228,9 +228,9 @@ class TestLogic(Test):
             1 if i in self.pins else 0
             for i in reversed(sorted(self.part.pins))
         ]
-        logger.info("Additional read delay: %s μs", self.read_delay_us)
-        logger.info("DUT inputs: %s", self.inputs)
-        logger.info("DUT outputs: %s", self.outputs)
+        logger.log(20, "Additional read delay: %s μs", self.read_delay_us)
+        logger.log(20, "DUT inputs: %s", self.inputs)
+        logger.log(20, "DUT outputs: %s", self.outputs)
 
         data += bytes(BV(pin_data))
 
@@ -239,11 +239,11 @@ class TestLogic(Test):
     def setup(self, tr):
         super().setup(tr)
 
-        if logger.isEnabledFor(logging.INFO):
-            logger.info("---- VECTORS LOAD ---------------------------------")
-            logger.info("Test vectors (%s)", len(self.vectors))
+        if logger.isEnabledFor(20):
+            logger.log(20, "---- VECTORS LOAD ---------------------------------")
+            logger.log(20, "Test vectors (%s)", len(self.vectors))
             for v in self.vectors:
-                logger.info(v)
+                logger.log(19, v)
 
         assert len(self.vectors) <= TestLogic.MAX_VECTORS
 
@@ -253,7 +253,7 @@ class TestLogic(Test):
         vector_chunks = [self.vectors[i:i+v_per_chunk] for i in range(0, len(self.vectors), v_per_chunk)]
 
         for vc in vector_chunks:
-            logger.info("Binary vectors chunk sent (%s):", len(vc))
+            logger.log(20, "Binary vectors chunk sent (%s)", len(vc))
             data = bytes([CmdType.VECTORS_LOAD.value]) + pack("<H", len(vc))
             for v in vc:
                 data += bytes(v)

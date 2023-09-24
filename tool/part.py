@@ -124,22 +124,22 @@ class Part:
         assert 5 > cfg_count > 0
         data.extend([self.package_type.value, self.pincount, cfg_count])
 
-        logger.info("DUT pin definitions, %s configuration(-s) available:", cfg_count)
+        logger.log(20, "DUT pin definitions, %s configuration(-s) available:", cfg_count)
 
         for cfgnum in range(0, cfg_count):
-            logger.info("Configuration %s:", cfgnum)
+            logger.log(20, "Configuration %s:", cfgnum)
             for num, pin in sorted(self.pins.items()):
                 try:
                     pin_func = pin.zif_func[cfgnum]
                 except IndexError:
                     pin_func = pin.zif_func[0]
-                logger.info('%3s %6s %5s ZIF %s', num, pin.name, pin.role.name, pin_func.name)
+                logger.log(20, '%3s %6s %5s ZIF %s', num, pin.name, pin.role.name, pin_func.name)
                 data.append(pin_func.value)
 
         return bytes(data)
 
     def setup(self, tr):
-        logger.info("---- DUT SETUP ------------------------------------")
+        logger.log(20, "---- DUT SETUP ------------------------------------")
         data = bytes([CmdType.DUT_SETUP.value]) + bytes(self)
         tr.send(data)
         resp = Response(tr)
@@ -147,7 +147,7 @@ class Part:
             raise RuntimeError("DUT setup failed")
 
     def connect(self, tr, cfgnum):
-        logger.info("---- DUT CONNECT ----------------------------------")
+        logger.log(20, "---- DUT CONNECT ----------------------------------")
         data = bytes([CmdType.DUT_CONNECT.value, cfgnum])
         r.send(data)
         resp = Response(tr)
@@ -155,7 +155,7 @@ class Part:
             raise RuntimeError("DUT connect failed")
 
     def disconnect(self, tr):
-        logger.info("---- DUT DISCONNECT -------------------------------")
+        logger.log(20, "---- DUT DISCONNECT -------------------------------")
         data = bytes([CmdType.DUT_DISCONNECT.value])
         tr.send(data)
         resp = Response(tr)

@@ -41,8 +41,6 @@ framing CRC?
 
 --- SW -------------------------------------------------------------------
 tester protocol exceptions
-split prototypes.py
-mode debug levels (commands, vectors, serial)
 bash completion?
 names: LS/S when no regular family? common names? alternatives?
 chip autodetection

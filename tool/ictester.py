@@ -33,6 +33,13 @@ result_color = {
 logging.basicConfig(format='%(message)s', level=logging.CRITICAL)
 logger = logging.getLogger('ictester')
 
+'''
+Log levels:
+    20 - regular debug
+    19 - vector dump
+    18 - protocol data
+'''
+
 # ------------------------------------------------------------------------
 def print_parts(list_tests=False):
     families = {}
@@ -105,14 +112,11 @@ def parse_cmd():
     parser.add_argument('-D', '--delay', type=float, default=None, help='additional DUT output read delay in μs (for logic tests only, 13107 μs max, rounded to nearest 0.2 μs)')
     parser.add_argument('-L', '--list', action="store_true", help='List all supported parts')
     parser.add_argument('-A', '--list-all', action="store_true", help='List all supported parts and all tests for each part')
-    parser.add_argument('-v', '--verbose', action="count", default=0, help='Verbose output. Twice for even more verbosity')
+    parser.add_argument('-v', '--verbose', action="count", default=0, help='Verbose output. Repeat for even more verbosity')
     parser.add_argument('part', help='Part symbol')
     args = parser.parse_args()
 
-    if args.verbose > 1:
-        logger.setLevel(logging.DEBUG)
-    elif args.verbose > 0:
-        logger.setLevel(logging.INFO)
+    logger.setLevel(21 - args.verbose)
 
     if args.test is not None and args.test <= 0:
         parser.error("Test numbers start from 1")
@@ -195,7 +199,7 @@ for test in run_tests:
     loops = args.loops if args.loops is not None else test.loops
     plural = "s" if loops != 1 else ""
     stats = f"({len(test.vectors)} vectors, {loops} loop{plural})"
-    endc = "\n" if logger.isEnabledFor(logging.INFO) else ""
+    endc = "\n" if logger.isEnabledFor(20) else ""
     print(f" * Testing: {test.name:{longest_desc}s}   {stats:25}  ... ", end=endc, flush=True)
 
     if tests_failed:
@@ -233,7 +237,7 @@ part.disconnect(transport)
 if resp.response != RespType.FAIL:
     print()
 
-logger.info("Bytes sent: %s, received: %s", transport.bytes_sent, transport.bytes_received)
+logger.log(20, "Bytes sent: %s, received: %s", transport.bytes_sent, transport.bytes_received)
 
 tests_skipped = len(part.tests) - (tests_failed + tests_warning + tests_passed)
 
