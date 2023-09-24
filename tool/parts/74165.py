@@ -1,4 +1,5 @@
-#from prototypes import (PackageDIP16, Pin, PinType, TestLogic)
+#from part import (PackageDIP16, Pin, PinType)
+#from test import TestLogic
 #
 #class Part74165(PackageDIP16):
 #    name = "74165"

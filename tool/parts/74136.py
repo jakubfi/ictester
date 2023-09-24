@@ -1,4 +1,4 @@
-from prototypes import (Pin, PinType, partimport)
+from part import (Pin, PinType, partimport)
 
 class Part74136(partimport("7486")):
     name = "74136"

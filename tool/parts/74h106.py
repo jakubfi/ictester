@@ -1,4 +1,5 @@
-from prototypes import (PackageDIP16_vcc5_gnd13, Pin, PinType, TestLogic)
+from part import (PackageDIP16_vcc5_gnd13, Pin, PinType)
+from test import TestLogic
 
 class Part74H106(PackageDIP16_vcc5_gnd13):
     name = "74H106"

@@ -1,4 +1,4 @@
-from prototypes import partimport
+from part import partimport
 
 class Part7440(partimport("7413")):
     name = "7440"

@@ -1,5 +1,6 @@
 from binvec import BV
-from prototypes import (PackageDIP20, Pin, PinType, ZIFFunc, TestLogic)
+from part import (PackageDIP20, Pin, PinType, ZIFFunc)
+from test import TestLogic
 
 in_out_hiz = [ZIFFunc.OUT, ZIFFunc.IN_PU_WEAK, ZIFFunc.IN_PU_STRONG]
 out_in_hiz = [ZIFFunc.IN_PU_WEAK, ZIFFunc.OUT, ZIFFunc.IN_PU_STRONG]

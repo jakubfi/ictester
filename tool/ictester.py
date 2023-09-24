@@ -9,7 +9,7 @@ import logging
 import serial.tools.list_ports as listports
 from serial.serialutil import SerialException
 
-from prototypes import TestType
+from test import TestType
 from transport import Transport
 from response import RespType
 from parts import catalog

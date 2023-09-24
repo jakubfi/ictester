@@ -1,4 +1,5 @@
-from prototypes import (PackageDIP16_rotated, Pin, PinType, TestDRAM, DRAMType, DRAMTestType)
+from part import (PackageDIP16_rotated, Pin, PinType)
+from test import (TestDRAM, DRAMType, DRAMTestType)
 
 class Part41256(PackageDIP16_rotated):
     name = "41256"

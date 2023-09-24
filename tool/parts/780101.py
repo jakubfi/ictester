@@ -1,5 +1,6 @@
 from binvec import BV
-from prototypes import ( TestLogic, partimport)
+from part import partimport
+from test import TestLogic
 
 class Part780101(partimport("7489")):
     name = "780101"

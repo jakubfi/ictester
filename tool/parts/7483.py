@@ -1,5 +1,6 @@
 from binvec import BV
-from prototypes import (PackageDIP16_vcc5, Pin, PinType, TestLogic)
+from part import (PackageDIP16_vcc5, Pin, PinType)
+from test import TestLogic
 
 class Part7483(PackageDIP16_vcc5):
     name = "7483"

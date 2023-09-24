@@ -1,5 +1,6 @@
 from binvec import BV
-from prototypes import (PackageDIP14, Pin, PinType, TestUnivib, UnivibType, UnivibTestType)
+from part import (PackageDIP14, Pin, PinType)
+from test import (TestUnivib, UnivibType, UnivibTestType)
 
 class Part74121(PackageDIP14):
     name = "74121"
