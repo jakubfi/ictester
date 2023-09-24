@@ -27,13 +27,14 @@ class Transport:
 
     def send(self, b):
         b = bytes(b)
+        self.bytes_sent += len(b)
         self.s.write(pack("<H", len(b)))
         logger.debug("<- (%s bytes) %s", len(b), bytes(b).hex(" "))
         self.s.write(b)
-        self.bytes_sent += len(b)
 
     def recv(self):
         size = unpack("<H", self.s.read(2))[0]
         payload = self.s.read(size)
         logger.debug("-> (%s bytes) %s", size, payload.hex(" "))
+        self.bytes_received += 2 + len(payload)
         return payload

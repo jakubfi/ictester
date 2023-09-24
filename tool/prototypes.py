@@ -1,7 +1,12 @@
+import time
+import math
 import inspect
 import logging
 from enum import Enum
+from struct import (pack, unpack)
 from binvec import BV
+from command import CmdType
+from response import (Response, RespType)
 
 logger = logging.getLogger('ictester')
 
@@ -133,6 +138,9 @@ class Part:
         self.pins.update(self.package_pins)
         self.pins.update(self.pin_cfg)
 
+        for t in self.tests:
+            t.attach_part(self)
+
     @property
     def package_name(self):
         return f"{self.package_type.name}{self.pincount}"
@@ -167,6 +175,30 @@ class Part:
                 data.append(pin_func.value)
 
         return bytes(data)
+
+    def setup(self, tr):
+        logger.info("---- DUT SETUP ------------------------------------")
+        data = bytes([CmdType.DUT_SETUP.value]) + bytes(self)
+        tr.send(data)
+        resp = Response(tr)
+        if resp.response != RespType.OK:
+            raise RuntimeError("DUT setup failed")
+
+    def connect(self, tr, cfgnum):
+        logger.info("---- DUT CONNECT ----------------------------------")
+        data = bytes([CmdType.DUT_CONNECT.value, cfgnum])
+        r.send(data)
+        resp = Response(tr)
+        if resp.response != RespType.OK:
+            raise RuntimeError("DUT connect failed")
+
+    def disconnect(self, tr):
+        logger.info("---- DUT DISCONNECT -------------------------------")
+        data = bytes([CmdType.DUT_DISCONNECT.value])
+        tr.send(data)
+        resp = Response(tr)
+        if resp.response != RespType.OK:
+            raise RuntimeError("DUT disconnect failed")
 
 
 # ------------------------------------------------------------------------
@@ -295,15 +327,20 @@ class TestVector():
 
 # ------------------------------------------------------------------------
 class Test:
-    def __init__(self, ttype, name, loops, cfgnum):
+    def __init__(self, ttype, name, loops=1024, cfgnum=0, read_delay_us=0):
         self.type = ttype
         self.name = name
         self.loops = loops
         self.cfgnum = cfgnum
         self.part = None
+        self.elapsed = None
+        self.read_delay_us = read_delay_us
 
     def attach_part(self, part):
         self.part = part
+
+    def set_delay(self, read_delay_us):
+        self.read_delay_us = read_delay_us
 
     def __bytes__(self):
         data = bytes([self.cfgnum, self.type.value])
@@ -312,6 +349,27 @@ class Test:
         logger.info("Configuration used: %s", self.cfgnum)
 
         return data
+
+    def setup(self, tr):
+        logger.info("---- TEST SETUP -----------------------------------")
+        data = bytes([CmdType.TEST_SETUP.value]) + bytes(self)
+        tr.send(data)
+        resp = Response(tr)
+        if resp.response != RespType.OK:
+            raise RuntimeError("Test setup failed")
+
+    def run(self, tr, loops):
+        logger.info("---- RUN ------------------------------------------")
+        assert 1 <= loops <= 0xffff
+
+        data = bytes([CmdType.RUN.value]) + pack("<H", loops)
+        tr.send(data)
+
+        start = time.time()
+        resp = Response(tr)
+        self.elapsed = time.time() - start
+
+        return resp
 
 # ------------------------------------------------------------------------
 class TestDRAM(Test):
@@ -333,6 +391,13 @@ class TestDRAM(Test):
 
         return data
 
+    def run(self, tr, loops):
+        resp = super().run(tr, loops)
+
+        if resp.response == RespType.FAIL:
+            self.failed_row, self.failed_column, self.failed_march_step = unpack("<HHB", resp.payload)
+
+        return resp
 
 # ------------------------------------------------------------------------
 class TestUnivib(Test):
@@ -359,18 +424,15 @@ class TestUnivib(Test):
 class TestLogic(Test):
 
     MAX_TEST_PARAMS = 2
+    MAX_VECTORS = 1024
 
     def __init__(self, name, inputs, outputs, params=[], body=[], loops=1024, cfgnum=0, read_delay_us=0):
-        super(TestLogic, self).__init__(TestType.LOGIC, name, loops, cfgnum)
+        super(TestLogic, self).__init__(TestType.LOGIC, name, loops, cfgnum, read_delay_us)
         self.params = params + [0] * (self.MAX_TEST_PARAMS - len(params))
         self.inputs = inputs
         self.outputs = outputs
         self._body = body
         self._vectors = None
-        self.read_delay_us = read_delay_us
-
-    def set_delay(self, read_delay_us):
-        self.read_delay_us = read_delay_us
 
     @property
     def pins(self):
@@ -419,4 +481,45 @@ class TestLogic(Test):
         data += bytes(BV(pin_data))
 
         return data
+
+    def setup(self, tr):
+        super().setup(tr)
+
+        if logger.isEnabledFor(logging.INFO):
+            logger.info("---- VECTORS LOAD ---------------------------------")
+            logger.info("Test vectors (%s)", len(self.vectors))
+            for v in self.vectors:
+                logger.info(v)
+
+        assert len(self.vectors) <= TestLogic.MAX_VECTORS
+
+        # split vectors into chunks that fit in tester's buffer
+        buf_size = 2048
+        v_per_chunk = buf_size // math.ceil(self.part.pincount/8) - 2
+        vector_chunks = [self.vectors[i:i+v_per_chunk] for i in range(0, len(self.vectors), v_per_chunk)]
+
+        for vc in vector_chunks:
+            logger.info("Binary vectors chunk sent (%s):", len(vc))
+            data = bytes([CmdType.VECTORS_LOAD.value]) + pack("<H", len(vc))
+            for v in vc:
+                data += bytes(v)
+
+            tr.send(data)
+
+            resp = Response(tr)
+            if resp.response != RespType.OK:
+                raise RuntimeError("Vectors load failed")
+
+    def run(self, tr, loops):
+        resp = super().run(tr, loops)
+
+        if resp.response == RespType.FAIL:
+            self.failed_vector_num = unpack("<H", resp.payload[0:2])[0]
+            self.failed_pin_vector = [*BV.int(resp.payload[2], 8).reversed()]
+            self.failed_pin_vector.extend([*BV.int(resp.payload[3], 8).reversed()])
+            if self.part.pincount > 16:
+                self.failed_pin_vector.extend([*BV.int(resp.payload[4], 8).reversed()])
+
+        return resp
+
 

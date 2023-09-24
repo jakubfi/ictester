@@ -36,14 +36,12 @@ full error handling (protocol)
 cmd_hello
 protocol and fw versioning?
 'IC state reset' non-test something? is it required?
-protocol frames
 PROM/EPROM reading?
-CRC?
+framing CRC?
 
 --- SW -------------------------------------------------------------------
-move test result decoding wherever it should live
-move DUT and test command execution to dut/test?
-wrong Bytes sent count?
+tester protocol exceptions
+split prototypes.py
 mode debug levels (commands, vectors, serial)
 bash completion?
 names: LS/S when no regular family? common names? alternatives?

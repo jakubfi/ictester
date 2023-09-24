@@ -9,9 +9,9 @@ import logging
 import serial.tools.list_ports as listports
 from serial.serialutil import SerialException
 
-from tester import (Resp, Tester)
 from prototypes import TestType
 from transport import Transport
+from response import RespType
 from parts import catalog
 
 FAIL = '\033[91m\033[1m'
@@ -22,13 +22,12 @@ HI = '\033[97m\033[1m'
 ENDC = '\033[0m'
 
 result_color = {
-    Resp.HELLO: OK,
-    Resp.OK: OK,
-    Resp.PASS: OK,
-    Resp.FAIL: FAIL,
-    Resp.ERR: FAIL,
-    Resp.TIMING_ERROR: WARN,
-    Resp.SKIP: SKIP,
+    RespType.HELLO: OK,
+    RespType.OK: OK,
+    RespType.PASS: OK,
+    RespType.FAIL: FAIL,
+    RespType.ERR: FAIL,
+    RespType.TIMING_ERROR: WARN,
 }
 
 logging.basicConfig(format='%(message)s', level=logging.CRITICAL)
@@ -103,7 +102,7 @@ def parse_cmd():
     parser.add_argument('-d', '--device', default=None, help='Serial port where the IC tester is connected')
     parser.add_argument('-l', '--loops', type=int, default=None, help='Loop count (1..65535)')
     parser.add_argument('-t', '--test', type=int, default=None, help='Test number to run')
-    parser.add_argument('-D', '--delay', type=float, default=None, help='additional DUT output read delay in μs for logic tests (13107 μs max, rounded to nearest 0.2 μs)')
+    parser.add_argument('-D', '--delay', type=float, default=None, help='additional DUT output read delay in μs (for logic tests only, 13107 μs max, rounded to nearest 0.2 μs)')
     parser.add_argument('-L', '--list', action="store_true", help='List all supported parts')
     parser.add_argument('-A', '--list-all', action="store_true", help='List all supported parts and all tests for each part')
     parser.add_argument('-v', '--verbose', action="count", default=0, help='Verbose output. Twice for even more verbosity')
@@ -169,8 +168,8 @@ try:
 except SerialException as e:
     print(f"Could not open connection to the tester: {e}")
     sys.exit(80)
-tester = Tester(part, transport)
-tester.dut_setup()
+
+part.setup(transport)
 
 if args.test:
     try:
@@ -188,56 +187,71 @@ total_time = 0
 print_part_info(part)
 print()
 
+tests_failed = 0
+tests_warning = 0
+tests_passed = 0
+
 for test in run_tests:
     loops = args.loops if args.loops is not None else test.loops
-
     plural = "s" if loops != 1 else ""
     stats = f"({len(test.vectors)} vectors, {loops} loop{plural})"
     endc = "\n" if logger.isEnabledFor(logging.INFO) else ""
     print(f" * Testing: {test.name:{longest_desc}s}   {stats:25}  ... ", end=endc, flush=True)
 
-    if not tester.failed:
-        resp, elapsed = tester.exec_test(test, loops, args.delay)
-    else:
-        resp = Resp.SKIP
+    if tests_failed:
+        print(f"\b\b\b\b{SKIP}SKIP{ENDC}")
+        resp.response = None
+        continue
 
-    print(f"\b\b\b\b{result_color[resp]}{resp.name}{ENDC}", end="")
-    if resp in (Resp.PASS, Resp.FAIL):
-        print(f"  ({elapsed:.2f} sec.)", end="")
+    if args.delay is not None:
+        test.set_delay(args.delay)
+    test.setup(transport)
+
+    resp = test.run(transport, loops)
+
+    print(f"\b\b\b\b{result_color[resp.response]}{resp.response.name}{ENDC}", end="")
+    if resp.response in (RespType.PASS, RespType.FAIL):
+        print(f"  ({test.elapsed:.2f} sec.)", end="")
     print()
 
-    if resp == Resp.FAIL:
+    if resp.response == RespType.FAIL:
+        tests_failed += 1
         if test.type == TestType.LOGIC:
-            failed_vector_num, failed_pin_vector = tester.get_failed_vector()
-            print_failed_vector(part, test, failed_vector_num, failed_pin_vector)
+            print_failed_vector(part, test, test.failed_vector_num, test.failed_pin_vector)
         if test.type == TestType.DRAM:
             print()
-            print(f" Failing address: row {HI}{tester.failed_row}{ENDC}, column {HI}{tester.failed_column}{ENDC} on MARCH C- step {HI}{tester.failed_march_step}{ENDC}")
+            print(f" Failing address: row {HI}{test.failed_row}{ENDC}, column {HI}{test.failed_column}{ENDC} on MARCH C- step {HI}{test.failed_march_step}{ENDC}")
             print()
+    elif resp.response == RespType.PASS:
+        tests_passed += 1
+    elif resp.response == TespType.TIMING_ERROR:
+        tests_warnint += 1
 
 # required only on success, but just in case do it always
-tester.dut_disconnect()
+part.disconnect(transport)
 
-if resp != Resp.FAIL:
+if resp.response != RespType.FAIL:
     print()
 
-tests_skipped = len(part.tests) - (tester.failed + tester.warning + tester.passed)
+logger.info("Bytes sent: %s, received: %s", transport.bytes_sent, transport.bytes_received)
+
+tests_skipped = len(part.tests) - (tests_failed + tests_warning + tests_passed)
 
 print(f"Total tests: {HI}{len(run_tests)}{ENDC}", end="")
-if tester.failed:
-    print(f", failed: {FAIL}{tester.failed}{ENDC}", end="")
-if tester.warning:
-    print(f", warning: {WARN}{tester.warning}{ENDC}", end="")
+if tests_failed:
+    print(f", failed: {FAIL}{tests_failed}{ENDC}", end="")
+if tests_warning:
+    print(f", warning: {WARN}{tests_warning}{ENDC}", end="")
 if tests_skipped:
     print(f", skipped: {SKIP}{tests_skipped}{ENDC}", end="")
-if tester.passed:
-    print(f", passed: {OK}{tester.passed}{ENDC}", end="")
+if tests_passed:
+    print(f", passed: {OK}{tests_passed}{ENDC}", end="")
 print()
 
-if tester.failed:
+if tests_failed:
     result = f"{FAIL}PART DEFECTIVE"
     ret = 1
-elif tester.warning:
+elif tests_warning:
     result = f"{WARN}OUTPUT READ TIMING ERROR"
     ret = 2
 else:
