@@ -19,6 +19,13 @@ bool receive_cmd(uint8_t *buf, uint16_t buf_size)
 }
 
 // -----------------------------------------------------------------------
+void send_response(uint8_t *buf, uint16_t len)
+{
+	serial_tx_16le(len);
+	serial_tx_bytes(buf, len);
+}
+
+// -----------------------------------------------------------------------
 void reply(uint8_t resp) 
 {
 	serial_tx_char(resp);

@@ -176,29 +176,30 @@ int main()
 	led_welcome();
 
 	uint8_t resp;
-	struct cmd *cmd;
+	uint8_t cmd;
+	uint8_t *data = buf+1;
 
 	while (true) {
 		if (!receive_cmd(buf, BUF_SIZE)) {
 			// command didn't fit in the buffer
 			resp = RESP_ERR;
 		} else {
-			cmd = (struct cmd*) buf;
-			switch (cmd->cmd) {
+			cmd = buf[0];
+			switch (cmd) {
 				case CMD_DUT_SETUP:
-					resp = handle_dut_setup((struct cmd_dut_setup*) cmd->data);
+					resp = handle_dut_setup((struct cmd_dut_setup*) data);
 					break;
 				case CMD_DUT_CONNECT:
-					resp = handle_dut_connect((struct cmd_dut_connect*) cmd->data);
+					resp = handle_dut_connect((struct cmd_dut_connect*) data);
 					break;
 				case CMD_TEST_SETUP:
-					resp = handle_test_setup((struct cmd_test_setup*) cmd->data);
+					resp = handle_test_setup((struct cmd_test_setup*) data);
 					break;
 				case CMD_VECTORS_LOAD:
-					resp = handle_vectors_load((struct vectors*) cmd->data, dut_pin_count, zif_get_vcc_pin());
+					resp = handle_vectors_load((struct vectors*) data, dut_pin_count, zif_get_vcc_pin());
 					break;
 				case CMD_TEST_RUN:
-					resp = handle_run((struct cmd_run*) cmd->data);
+					resp = handle_run((struct cmd_run*) data);
 					break;
 				case CMD_DUT_DISCONNECT:
 					resp = handle_dut_disconnect(resp);
@@ -213,25 +214,24 @@ int main()
 			led(LED_ERR);
 		}
 
-		reply(resp);
+		buf[0] = resp;
+		uint16_t count = 1;
 
-		// handle response data for failed LOGIC tests
-		if ((resp == RESP_FAIL) && (test_type == TEST_LOGIC) && (cmd->cmd == CMD_TEST_RUN)) {
-			uint8_t pin_data[3] = {0, 0, 0};
-			uint8_t *failed_vector = get_failed_vector();
-			// translate vector from MCU port order to natural DUT pin order
-			for (uint8_t pin=0 ; pin<dut_pin_count ; pin++) {
-				uint8_t zif_pin = zif_pos(dut_pin_count, pin);
-				uint8_t mcu_port = zif_mcu_port(zif_pin);
-				uint8_t mcu_port_bit = zif_mcu_port_bit(zif_pin);
-				bool bit = failed_vector[mcu_port] & _BV(mcu_port_bit);
-				pin_data[pin / 8] |= bit << (pin % 8);
+		// handle response data for failed tests
+		if ((resp == RESP_FAIL) && (cmd == CMD_TEST_RUN)) {
+			switch (test_type) {
+				case TEST_LOGIC:
+					count += logic_store_result(buf+1, dut_pin_count);
+					break;
+				case TEST_DRAM:
+					count += mem_store_result(buf+1, dut_pin_count);
+					break;
+				default:
+					break;
 			}
-			serial_tx_16le(get_failed_vector_pos());
-			serial_tx_bytes(pin_data, 2);
-			if (dut_pin_count > 16) serial_tx_char(pin_data[2]);
 		}
 
+		send_response(buf, count);
 	}
 
 	return 0;

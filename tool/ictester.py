@@ -210,6 +210,10 @@ for test in run_tests:
         if test.type == TestType.LOGIC:
             failed_vector_num, failed_pin_vector = tester.get_failed_vector()
             print_failed_vector(part, test, failed_vector_num, failed_pin_vector)
+        if test.type == TestType.DRAM:
+            print()
+            print(f" Failing address: row {HI}{tester.failed_row}{ENDC}, column {HI}{tester.failed_column}{ENDC} on MARCH C- step {HI}{tester.failed_march_step}{ENDC}")
+            print()
 
 # required only on success, but just in case do it always
 tester.dut_disconnect()

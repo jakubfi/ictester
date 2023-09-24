@@ -72,7 +72,7 @@ void serial_rx_bytes(uint8_t *data, uint16_t count)
 }
 
 // -----------------------------------------------------------------------
-void serial_tx_bytes(uint8_t *data, uint8_t count)
+void serial_tx_bytes(uint8_t *data, uint16_t count)
 {
 	while (count--) {
 		serial_tx_char(*(data++));

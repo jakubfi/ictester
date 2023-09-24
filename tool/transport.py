@@ -1,7 +1,7 @@
 import logging
 import serial
 from binvec import BV
-from struct import pack
+from struct import (pack, unpack)
 
 logger = logging.getLogger('ictester')
 
@@ -32,10 +32,8 @@ class Transport:
         self.s.write(b)
         self.bytes_sent += len(b)
 
-    def recv(self, count=1):
-        b = self.s.read(count)
-        logger.debug("-> %s", b.hex(" "))
-        if count == 1:
-            b = ord(b)  # temporary backwards compatibility
-        self.bytes_received += count
-        return b
+    def recv(self):
+        size = unpack("<H", self.s.read(2))[0]
+        payload = self.s.read(size)
+        logger.debug("-> (%s bytes) %s", size, payload.hex(" "))
+        return payload

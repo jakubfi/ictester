@@ -81,6 +81,9 @@ typedef uint8_t (*march_fun)(uint8_t dir, uint8_t r, uint8_t w, uint16_t addr_sp
 uint8_t mem_device;
 uint8_t mem_test_type;
 
+uint16_t failing_row, failing_col;
+uint8_t failing_step;
+
 // -----------------------------------------------------------------------
 uint8_t mem_test_setup(struct mem_params *params)
 {
@@ -163,7 +166,11 @@ static uint8_t march_step_rmw(uint8_t dir, uint8_t r, uint8_t w, uint16_t addr_s
 		for (uint16_t addr_row=0 ; addr_row < addr_space; addr_row++) {
 			set_row_addr(addr_row, dir);
 			set_col_addr(addr_col, dir);
-			if ((r != READ_NONE) && (read_data() != r)) return RESP_FAIL;
+			if ((r != READ_NONE) && (read_data() != r)) {
+				failing_row = addr_row;
+				failing_col = addr_col;
+				return RESP_FAIL;
+			}
 			if (w != WRITE_NONE) write_data(w);
 			CAS_OFF;
 			RAS_OFF;
@@ -181,7 +188,11 @@ static uint8_t march_step_rw(uint8_t dir, uint8_t r, uint8_t w, uint16_t addr_sp
 			if (r != READ_NONE) {
 				set_row_addr(addr_row, dir);
 				set_col_addr(addr_col, dir);
-				if (read_data() != r) return RESP_FAIL;
+				if (read_data() != r) {
+					failing_row = addr_row;
+					failing_col = addr_col;
+					return RESP_FAIL;
+				}
 				CAS_OFF;
 				RAS_OFF;
 			}
@@ -217,7 +228,11 @@ static uint8_t march_step_page(uint8_t dir, uint8_t r, uint8_t w, uint16_t addr_
 			set_row_addr(addr_row, dir);
 			for (uint16_t addr_col=0 ; addr_col < addr_space; addr_col++) {
 				set_col_addr(addr_col, dir);
-				if (read_data() != r) return RESP_FAIL;
+				if (read_data() != r) {
+					failing_row = addr_row;
+					failing_col = addr_col;
+					return RESP_FAIL;
+				}
 				CAS_OFF;
 			}
 			RAS_OFF;
@@ -307,6 +322,7 @@ uint8_t run_mem(uint16_t loops)
 	for (uint16_t rep=0 ; rep<loops ; rep++) {
 		for (uint8_t i=0 ; i<MARCH_STEPS ; i++) {
 			if (m_fun(march_cm[i].dir, march_cm[i].read, march_cm[i].write, address_space) != RESP_PASS) {
+				failing_step = i;
 				CAS_OFF;
 				RAS_OFF;
 				return RESP_FAIL;
@@ -315,6 +331,16 @@ uint8_t run_mem(uint16_t loops)
 	}
 
 	return RESP_PASS;
+}
+
+// -----------------------------------------------------------------------
+uint16_t mem_store_result(uint8_t *buf, uint8_t dut_pin_count)
+{
+	struct resp_dram_fail *resp = (struct resp_dram_fail*) buf;
+	resp->row_address = failing_row;
+	resp->column_address = failing_col;
+	resp->march_step = failing_step;
+	return 5;
 }
 
 // vim: tabstop=4 shiftwidth=4 autoindent

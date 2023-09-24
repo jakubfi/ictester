@@ -316,7 +316,22 @@ This response is sent only for `CMD_TEST_RUN` command, when the test fails.
 Note that when test fails, DUT is immediately disconnected by the tester.
 
 * 1 BYTE: response: `RESP_FAIL`
-* `x` BYTES: failure description. Depends on the test type, see below
+* FAILURE DESCRIPTION. Depends on the test type, see below.
+
+### `TEST_LOGIC` failure
+
+  * 1 WORD: vector number that test failed on
+  * `n` bytes of pin data - failing vector. 2 or 3 bytes, format as for the pin mask in the test configuration.
+
+### `TEST_DRAM` failure
+
+  * 1 WORD: failing row address
+  * 1 WORD: failing column address
+  * 1 BYTE: failing MARCH C- step
+
+### `TEST_UNIVIB` failure
+
+Test sends no additional description.
 
 ## Test timing error
 
@@ -326,16 +341,4 @@ passes, `RESP_TIMING_ERROR` is sent in response. Otherwise test fails with `RESP
 
 * 1 BYTE: response: `RESP_TIMING_ERROR`
 
-### `TEST_LOGIC` failure
 
-  * 1 WORD: vector number that test failed on
-  * `n` bytes of pin data - failing vector. Format as in the test configuration.
-
-### `TEST_DRAM` failure
-
-  * 1 WORD: failing address
-  * 1 BYTE: failing MARCH C- step
-
-### `TEST_UNIVIB` failure
-
-Test sends no additional description.

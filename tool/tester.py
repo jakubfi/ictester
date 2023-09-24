@@ -62,35 +62,37 @@ class Tester:
         self.failed = 0
 
     def get_response(self):
-        resp = Resp(self.tr.recv())
-        return resp
+        data = self.tr.recv()
+        resp = Resp(data[0])
+        payload = data[1:]
+        return resp, payload
 
     def dut_setup(self):
         logger.info("---- DUT SETUP ------------------------------------")
         data = bytes([Cmd.DUT_SETUP.value]) + bytes(self.part)
         self.tr.send(data)
-        if self.get_response() != Resp.OK:
+        if self.get_response()[0] != Resp.OK:
             raise RuntimeError("DUT setup failed")
 
     def dut_connect(self, cfgnum):
         logger.info("---- DUT CONNECT ----------------------------------")
         data = bytes([Cmd.DUT_CONNECT.value, cfgnum])
         self.tr.send(data)
-        if self.get_response() != Resp.OK:
+        if self.get_response()[0] != Resp.OK:
             raise RuntimeError("DUT connect failed")
 
     def dut_disconnect(self):
         logger.info("---- DUT DISCONNECT -------------------------------")
         data = bytes([Cmd.DUT_DISCONNECT.value])
         self.tr.send(data)
-        if self.get_response() != Resp.OK:
+        if self.get_response()[0] != Resp.OK:
             raise RuntimeError("DUT disconnect failed")
 
     def test_setup(self, test):
         logger.info("\n---- TEST SETUP -----------------------------------")
         data = bytes([Cmd.TEST_SETUP.value]) + bytes(test)
         self.tr.send(data)
-        if self.get_response() != Resp.OK:
+        if self.get_response()[0] != Resp.OK:
             raise RuntimeError("Test setup failed")
 
     def vectors_load(self, test):
@@ -115,7 +117,7 @@ class Tester:
 
             self.tr.send(data)
 
-            if self.get_response() != Resp.OK:
+            if self.get_response()[0] != Resp.OK:
                 raise RuntimeError("Vectors load failed")
 
     def run(self, loops, test):
@@ -126,7 +128,7 @@ class Tester:
         self.tr.send(data)
 
         start = time.time()
-        resp = self.get_response()
+        resp, payload = self.get_response()
         elapsed = time.time() - start
 
         if resp == Resp.PASS:
@@ -136,13 +138,17 @@ class Tester:
         else:
             self.failed += 1
 
-        # Read failed vector data for LOGIC tests (natural DUT pin order)
-        if test.type == TestType.LOGIC and resp == Resp.FAIL:
-            self.failed_vector_num = unpack("<H", self.tr.recv(2))[0]
-            self.failed_pin_vector = [*BV.int(self.tr.recv(), 8).reversed()]
-            self.failed_pin_vector.extend([*BV.int(self.tr.recv(), 8).reversed()])
-            if self.part.pincount > 16:
-                self.failed_pin_vector.extend([*BV.int(self.tr.recv(), 8).reversed()])
+        if resp == Resp.FAIL:
+            # Read failed vector data for LOGIC tests (natural DUT pin order)
+            if test.type == TestType.LOGIC:
+                self.failed_vector_num = unpack("<H", payload[0:2])[0]
+                self.failed_pin_vector = [*BV.int(payload[2], 8).reversed()]
+                self.failed_pin_vector.extend([*BV.int(payload[3], 8).reversed()])
+                if self.part.pincount > 16:
+                    self.failed_pin_vector.extend([*BV.int(payload[4], 8).reversed()])
+            # Read failed address and march step
+            if test.type == TestType.DRAM:
+                self.failed_row, self.failed_column, self.failed_march_step = unpack("<HHB", payload)
 
         return resp, elapsed
 

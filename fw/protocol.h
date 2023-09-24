@@ -110,8 +110,20 @@ struct vectors {
 	uint8_t vectors[];
 };
 
+struct resp_logic_fail {
+	uint16_t vector_num;
+	uint8_t vector[];
+};
+
+struct resp_dram_fail {
+	uint16_t row_address;
+	uint16_t column_address;
+	uint8_t march_step;
+};
+
 bool receive_cmd(uint8_t *buf, uint16_t buf_size);
 void reply(uint8_t res);
+void send_response(uint8_t *buf, uint16_t len);
 
 #endif
 

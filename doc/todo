@@ -28,6 +28,8 @@ review all sequential ICs (command changes vs clock, clock polarity, test suitab
 --- FW/protocol ----------------------------------------------------------
 should cfgnum be moved to zif.c?
 mem_setup(); is a part of mem test?
+generic "drivers" for tests
+cleanup mem/dram naming
 full error handling (protocol)
   * check everything everywhere, send meaningfull error codes
   * disallow only setups harmful to the device?
@@ -36,8 +38,11 @@ protocol and fw versioning?
 'IC state reset' non-test something? is it required?
 protocol frames
 PROM/EPROM reading?
+CRC?
 
 --- SW -------------------------------------------------------------------
+move test result decoding wherever it should live
+move DUT and test command execution to dut/test?
 wrong Bytes sent count?
 mode debug levels (commands, vectors, serial)
 bash completion?

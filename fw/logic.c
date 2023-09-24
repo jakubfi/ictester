@@ -191,15 +191,26 @@ uint8_t run_logic(uint8_t dut_pin_count, uint16_t loops)
 }
 
 // -----------------------------------------------------------------------
-uint8_t *get_failed_vector()
+uint16_t logic_store_result(uint8_t *buf, uint8_t dut_pin_count)
 {
-	return failed_vector;
-}
+	struct resp_logic_fail *resp = (struct resp_logic_fail*) buf;
+	resp->vector_num = failed_vector_pos;
 
-// -----------------------------------------------------------------------
-uint16_t get_failed_vector_pos()
-{
-	return failed_vector_pos;
+	for (uint8_t i=0 ; i<3 ; i++) resp->vector[i] = 0;
+
+	// translate vector from MCU port order to natural DUT pin order
+	for (uint8_t pin=0 ; pin<dut_pin_count ; pin++) {
+		uint8_t zif_pin = zif_pos(dut_pin_count, pin);
+		uint8_t mcu_port = zif_mcu_port(zif_pin);
+		uint8_t mcu_port_bit = zif_mcu_port_bit(zif_pin);
+		bool bit = failed_vector[mcu_port] & _BV(mcu_port_bit);
+		resp->vector[pin / 8] |= bit << (pin % 8);
+	}
+
+	uint16_t count = 4;
+	if (dut_pin_count > 16) count += 1;
+
+	return count;
 }
 
 // vim: tabstop=4 shiftwidth=4 autoindent
