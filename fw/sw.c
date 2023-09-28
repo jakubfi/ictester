@@ -29,7 +29,7 @@ const __flash struct switch_drv {
 };
 
 uint8_t switch_config[MAX_CONFIGS][SWITCH_CNT];
-uint8_t *switch_config_active = NULL;
+uint8_t *switch_config_active;
 
 // -----------------------------------------------------------------------
 void sw_init()
@@ -37,6 +37,7 @@ void sw_init()
 	i2c_a_init();
 	i2c_b_init();
 	sw_config_clear();
+	switch_config_active = NULL;
 }
 
 // -----------------------------------------------------------------------
@@ -102,7 +103,6 @@ void sw_config_clear()
 			switch_config[cfgnum][i] = 0;
 		}
 	}
-	switch_config_active = NULL;
 }
 
 // -----------------------------------------------------------------------

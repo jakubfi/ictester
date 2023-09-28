@@ -7,7 +7,14 @@
 #define NO_CONFIG -1
 
 struct mcu_port_config mcu_port[MAX_CONFIGS][MCU_PORT_CNT];
-struct mcu_port_config *mcu_config = NULL;
+struct mcu_port_config *mcu_config;
+
+// -----------------------------------------------------------------------
+void mcu_init()
+{
+	mcu_config_clear();
+	mcu_config = NULL;
+}
 
 // -----------------------------------------------------------------------
 void mcu_config_select(uint8_t cfgnum)
@@ -55,13 +62,6 @@ void mcu_config_clear()
 			mcu_port[cfgnum][i].pullup = 0;
 		}
 	}
-	mcu_config = NULL;
-}
-
-// -----------------------------------------------------------------------
-void mcu_init()
-{
-	mcu_config_clear();
 }
 
 // -----------------------------------------------------------------------
