@@ -228,8 +228,8 @@ for test in run_tests:
             print()
     elif resp.response == RespType.PASS:
         tests_passed += 1
-    elif resp.response == TespType.TIMING_ERROR:
-        tests_warnint += 1
+    elif resp.response == RespType.TIMING_ERROR:
+        tests_warning += 1
 
 # required only on success, but just in case do it always
 part.disconnect(transport)
