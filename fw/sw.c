@@ -108,7 +108,9 @@ void sw_config_clear()
 // -----------------------------------------------------------------------
 void sw_disconnect()
 {
-	// disconnect grouds last
+	if (!switch_config_active) return;
+
+	// disconnect grounds last
 	sw_push_config(SW_CFG_GND_ONLY);
 	sw_config_clear();
 	sw_push_config(SW_CFG_ALL);
