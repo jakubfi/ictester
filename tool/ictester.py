@@ -221,6 +221,8 @@ for test in run_tests:
     if resp.response == RespType.FAIL:
         tests_failed += 1
         if test.type == TestType.LOGIC:
+            print()
+            print(f"Test failed on loop: {test.failed_loop}")
             print_failed_vector(part, test, test.failed_vector_num, test.failed_pin_vector)
         if test.type == TestType.DRAM:
             print()

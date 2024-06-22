@@ -264,11 +264,12 @@ class TestLogic(Test):
         resp = super().run(tr, loops)
 
         if resp.response == RespType.FAIL:
-            self.failed_vector_num = unpack("<H", resp.payload[0:2])[0]
-            self.failed_pin_vector = [*BV.int(resp.payload[2], 8).reversed()]
-            self.failed_pin_vector.extend([*BV.int(resp.payload[3], 8).reversed()])
+            self.failed_loop = unpack("<H", resp.payload[0:2])[0]
+            self.failed_vector_num = unpack("<H", resp.payload[2:4])[0]
+            self.failed_pin_vector = [*BV.int(resp.payload[4], 8).reversed()]
+            self.failed_pin_vector.extend([*BV.int(resp.payload[5], 8).reversed()])
             if self.part.pincount > 16:
-                self.failed_pin_vector.extend([*BV.int(resp.payload[4], 8).reversed()])
+                self.failed_pin_vector.extend([*BV.int(resp.payload[6], 8).reversed()])
 
         return resp
 

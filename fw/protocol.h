@@ -118,6 +118,7 @@ struct vectors {
 };
 
 struct resp_logic_fail {
+	uint16_t loop_num;
 	uint16_t vector_num;
 	uint8_t vector[];
 };

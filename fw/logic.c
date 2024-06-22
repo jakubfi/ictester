@@ -22,7 +22,7 @@ static struct vector {
 } vectors[MAX_VECTORS];
 
 static uint16_t delay;
-
+static uint16_t rep;
 static uint8_t failed_vector[MCU_PORT_CNT];
 static uint16_t failed_vector_pos;
 
@@ -179,11 +179,11 @@ uint8_t logic_run(uint8_t dut_pin_count, uint16_t loops)
 	}
 
 	if (dut_pin_count <= 16) {
-		for (uint16_t rep=0 ; rep<loops ; rep++) {
+		for (rep=0 ; rep<loops ; rep++) {
 			if ((res = logic_run_2port(mcu_port_copy)) != RESP_PASS) return res;
 		}
 	} else {
-		for (uint16_t rep=0 ; rep<loops ; rep++) {
+		for (rep=0 ; rep<loops ; rep++) {
 			if ((res = logic_run_3port(mcu_port_copy)) != RESP_PASS) return res;
 		}
 	}
@@ -195,6 +195,7 @@ uint8_t logic_run(uint8_t dut_pin_count, uint16_t loops)
 uint16_t logic_store_result(uint8_t *buf, uint8_t dut_pin_count)
 {
 	struct resp_logic_fail *resp = (struct resp_logic_fail*) buf;
+	resp->loop_num = rep;
 	resp->vector_num = failed_vector_pos;
 
 	for (uint8_t i=0 ; i<3 ; i++) resp->vector[i] = 0;
@@ -208,7 +209,7 @@ uint16_t logic_store_result(uint8_t *buf, uint8_t dut_pin_count)
 		resp->vector[pin / 8] |= bit << (pin % 8);
 	}
 
-	uint16_t count = 4;
+	uint16_t count = 6;
 	if (dut_pin_count > 16) count += 1;
 
 	return count;
