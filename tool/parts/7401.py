@@ -22,7 +22,7 @@ class Part7401(PackageDIP14):
 
     tests = [
         TestLogic("Complete logic",
-            read_delay_us=0.6,  # Dunno why. Seriously. Tested on UCY7401 only, maybe it's CEMIs fault?
+            read_delay_us=0.6,
             inputs=[2, 3,  5, 6,  8, 9,  11, 12],
             outputs=[1, 4, 10, 13],
             body=[
