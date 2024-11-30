@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 
 from parts import catalog
-from prototypes import (Test, PinType)
+from test import (Test, TestType, TestLogic)
+from part import PinType
 
 for name, part in catalog.items():
     print(f"Checking: {name}")
@@ -27,17 +28,18 @@ for name, part in catalog.items():
 
     for test in part.tests:
         assert test.name
-        assert test.type in [Test.LOGIC, Test.DRAM, Test.UNIVIB]
-        assert test.inputs
-        assert test.outputs
-        assert len(test.params) == Test.MAX_TEST_PARAMS
-        for param in test.params:
-            assert param in range(0, 256)
+        assert test.type in [TestType.LOGIC, TestType.DRAM, TestType.UNIVIB]
+        if test.type == TestType.LOGIC:
+            assert test.inputs
+            assert test.outputs
+            assert len(test.params) == TestLogic.MAX_TEST_PARAMS
+            for param in test.params:
+                assert param in range(0, 256)
 
-        for v in test._body_data:
-            assert len(test.inputs) == len(v[0])
-            assert v[1] is None or len(test.outputs) == len(v[1])
-            two_vectors = set(['/', '\\']).intersection(v[0])
-            three_vectors = set(['+', '-']).intersection(v[0])
-            assert not all ([two_vectors, three_vectors])
+            for v in test._body_data:
+                assert len(test.inputs) == len(v[0])
+                assert v[1] is None or len(test.outputs) == len(v[1])
+                two_vectors = set(['/', '\\']).intersection(v[0])
+                three_vectors = set(['+', '-']).intersection(v[0])
+                assert not all ([two_vectors, three_vectors])
 
