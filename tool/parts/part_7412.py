@@ -1,6 +1,7 @@
-from part import (Pin, PinType, partimport)
+from part import (Pin, PinType)
+from parts.part_7410 import Part7410
 
-class Part7412(partimport("7410")):
+class Part7412(Part7410):
     name = "7412"
     desc = "Triple 3-input positive-NAND gates with open-collector outputs"
     pin_cfg = {

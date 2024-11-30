@@ -1,8 +1,8 @@
 from binvec import BV
-from part import partimport
 from test import TestLogic
+from parts.part_7489 import Part7489
 
-class Part780101(partimport("7489")):
+class Part780101(Part7489):
     name = "780101"
     '''
     Similar to 7489. Same pinout, but differences in behavior:

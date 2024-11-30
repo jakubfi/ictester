@@ -1,6 +1,7 @@
-from part import (Pin, PinType, partimport)
+from part import (Pin, PinType)
+from parts.part_7442 import Part7442
 
-class Part7445(partimport("7442")):
+class Part7445(Part7442):
     name = "7445"
     desc = "BCD-to-decimal decoders/drivers"
     pin_cfg = {

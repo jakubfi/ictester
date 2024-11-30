@@ -1,9 +1,9 @@
-from binvec import BV
-from part import (partimport, Pin, PinType)
+from part import (Pin, PinType)
+from parts.part_7400 import Part7400
 
-class Part7409(partimport("7408")):
-    name = "7409"
-    desc = "Quad 2-input positive-AND gates with open-collector outputs"
+class Part7438(Part7400):
+    name = "7438"
+    desc = "Quad 2-input positive-NAND buffers with open collector outputs"
     pin_cfg = {
         1: Pin("1A", PinType.IN),
         2: Pin("1B", PinType.IN),
@@ -18,4 +18,3 @@ class Part7409(partimport("7408")):
         12: Pin("4A", PinType.IN),
         13: Pin("4B", PinType.IN),
     }
-

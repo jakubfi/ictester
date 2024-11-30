@@ -1,8 +1,9 @@
 from binvec import BV
-from part import (Pin, PinType, partimport)
+from part import (Pin, PinType)
 from test import TestLogic
+from parts.part_7400 import Part7400
 
-class Part7403(partimport("7400")):
+class Part7403(Part7400):
     name = "7403"
     desc = "Quad 2-input positive-NAND gates with open-collector outputs"
     pin_cfg = {

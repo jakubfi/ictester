@@ -1,6 +1,7 @@
-from part import (Pin, PinType, partimport)
+from part import (Pin, PinType)
+from parts.part_7404 import Part7404
 
-class Part7405(partimport("7404")):
+class Part7405(Part7404):
     name = "7405"
     desc = "Hex inverters with open collector outputs"
     pin_cfg = {

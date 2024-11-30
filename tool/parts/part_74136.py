@@ -1,6 +1,7 @@
-from part import (Pin, PinType, partimport)
+from part import (Pin, PinType)
+from parts.part_7486 import Part7486
 
-class Part74136(partimport("7486")):
+class Part74136(Part7486):
     name = "74136"
     desc = "Quarduple 2-input exclusive-OR gates with open-collector outputs"
     pin_cfg = {

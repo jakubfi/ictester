@@ -1,8 +1,8 @@
 from binvec import BV
-from part import partimport
 from test import TestLogic
+from parts.part_7405 import Part7405
 
-class Part7407(partimport("7405")):
+class Part7407(Part7405):
     name = "7407"
     desc = "Hex Buffers/Drivers With Open-Collector High-Voltage Outputs"
 
