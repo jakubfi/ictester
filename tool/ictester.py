@@ -100,11 +100,6 @@ def print_failed_vector(part, test, failed_vector_num, failed_pin_vector, contex
 
 # ------------------------------------------------------------------------
 def parse_cmd():
-    # check early to not require "part" argument
-    if '--list-all' in sys.argv or '--list' in sys.argv:
-        print_parts(list_tests='--list-all' in sys.argv)
-        sys.exit(0)
-
     parser = argparse.ArgumentParser(description='IC tester controller')
     parser.add_argument('-d', '--device', default=None, help='Serial port where the IC tester is connected')
     parser.add_argument('-l', '--loops', type=int, default=None, help='Loop count (1..65535)')
@@ -113,7 +108,7 @@ def parse_cmd():
     parser.add_argument('-L', '--list', action="store_true", help='List all supported parts')
     parser.add_argument('-A', '--list-all', action="store_true", help='List all supported parts and all tests for each part')
     parser.add_argument('-v', '--verbose', action="count", default=0, help='Verbose output. Repeat for even more verbosity')
-    parser.add_argument('part', help='Part symbol')
+    parser.add_argument('part', help='Part symbol', nargs='?')
     args = parser.parse_args()
 
     logger.setLevel(21 - args.verbose)
@@ -126,6 +121,9 @@ def parse_cmd():
 
     if args.delay is not None and (args.delay < 0 or args.delay > 13107):
         parser.error("Delay should be between 0 and 13107")
+
+    if not args.list and not args.list_all and args.part is None:
+        parser.error("'part' argument is required")
 
     return args
 
@@ -164,6 +162,11 @@ def get_serial_port(device):
 # ------------------------------------------------------------------------
 
 args = parse_cmd()
+
+if args.list or args.list_all:
+    print_parts(list_tests=args.list_all)
+    sys.exit(0)
+
 part = get_part(args.part.upper())
 serial_port = get_serial_port(args.device)
 
