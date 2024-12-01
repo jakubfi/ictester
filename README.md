@@ -16,7 +16,7 @@ Main goal of this project was to make a logic IC tester that allows adding new t
 
 Project is split into three parts:
 
-* [hardware](hw) - KiCad project files (see also [this pdf](doc/ictester.pdf) for schematic)
+* [controller](controller) - software for controlling the tester. Look there for command line usage.
 * [firmware](fw) - IC tester firmware
-* [tool](tool) - software that controls the tester
+* [hardware](hw) - KiCad project files (see also [this pdf](doc/ictester.pdf) for schematic)
 
