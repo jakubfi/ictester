@@ -8,18 +8,22 @@ import difflib
 import logging
 import serial.tools.list_ports as listports
 from serial.serialutil import SerialException
+from colorama import just_fix_windows_console
+from colorama import Fore, Back, Style
 
 from ictester.test import TestType
 from ictester.transport import Transport
 from ictester.response import RespType
 from ictester.parts import catalog
 
-FAIL = '\033[91m\033[1m'
-OK = '\033[92m\033[1m'
-WARN = '\033[95m\033[1m'
-SKIP = '\033[93m\033[1m'
-HI = '\033[97m\033[1m'
-ENDC = '\033[0m'
+just_fix_windows_console()
+
+FAIL = Fore.RED + Style.BRIGHT
+OK = Fore.GREEN + Style.BRIGHT
+WARN = Fore.MAGENTA + Style.BRIGHT
+SKIP = Fore.YELLOW + Style.BRIGHT
+HI = Fore.WHITE + Style.BRIGHT
+ENDC = Style.RESET_ALL
 
 result_color = {
     RespType.HELLO: OK,

@@ -9,7 +9,7 @@ setup(
     author_email='jakubf@mera400.pl',    
     license='MIT',
     packages=['ictester', 'ictester/parts'],
-    install_requires=['pyserial'],
+    install_requires=['pyserial', 'colorama'],
 
     entry_points={
         'console_scripts': ['ictester = ictester.ictester:main'],
