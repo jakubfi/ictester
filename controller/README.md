@@ -6,16 +6,28 @@ It first sets up all the DUT connections according to IC pin description and the
 
 # Installation
 
-Tool requires python >=3.6 and `pyserial` to work.
+For both Linux and Windows installation requirements are the same:
 
-Create a new virtual environment:
+* `python` >=3.6
+* `git`
+
+Note for Windows users: both git and python need to be available in your PATH for the installation to work.
+
+Optionally create a new virtual environment:
 ```
 virtualenv ictester
 . ictester/bin/activate
 ```
+
 Install the package:
 ```
-pip install -e "git+https://github.com/jakubfi/ictester/#egg=ictester&subdirectory=controller"`
+pip install -e "git+https://github.com/jakubfi/ictester/#egg=ictester&subdirectory=controller"
+```
+Alternatively, clone the repo manually and install:
+```
+git clone https://github.com/jakubfi/ictester
+cd ictester/controller
+pip install .
 ```
 
 # Usage
@@ -23,6 +35,10 @@ pip install -e "git+https://github.com/jakubfi/ictester/#egg=ictester&subdirecto
 To list supported ICs use: `ictester --list`. `--list-all` will also list all tests for each part.
 To run tests for a selected part use: `ictester <part>`.
 To display help, use `ictester --help`
+
+Note for Windows users: you'll need Silicon Labs CP210x USB to UART Bridge Driver installed
+for the communication with IC tester to work. Also, device autodetection may fail.
+In such case, use `--device COMx` option.
 
 Other options when running a test:
 
