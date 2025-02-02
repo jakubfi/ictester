@@ -99,18 +99,18 @@ uint8_t logic_vectors_load(struct vectors *data, uint8_t dut_pin_count, uint8_t 
 static uint8_t handle_failure(uint16_t pos, struct mcu_port_config *mcu_port)
 {
 	// Retest current vector after 5us.
-	// If it passes this time, it's a test timing error.
+	// If it passes this time, it's a test timing error, not a failed IC.
 	_delay_us(5);
 
 	// store failed vector for the response data
 	failed_vector_pos = pos;
-	failed_vector[PA] = PINA;
-	failed_vector[PB] = PINB;
-	failed_vector[PC] = PINC;
+	failed_vector[ZIF_PORT_1] = ZIF_MCU_PIN_1;
+	failed_vector[ZIF_PORT_2] = ZIF_MCU_PIN_2;
+	failed_vector[ZIF_PORT_0] = ZIF_MCU_PIN_0;
 
-	if ((failed_vector[PA] & mcu_port[PA].mask) != vectors[pos].port[PA].out) return RESP_FAIL;
-	if ((failed_vector[PB] & mcu_port[PB].mask) != vectors[pos].port[PB].out) return RESP_FAIL;
-	if ((failed_vector[PC] & mcu_port[PC].mask) != vectors[pos].port[PC].out) return RESP_FAIL;
+	if ((failed_vector[ZIF_PORT_1] & mcu_port[ZIF_PORT_1].mask) != vectors[pos].port[ZIF_PORT_1].out) return RESP_FAIL;
+	if ((failed_vector[ZIF_PORT_2] & mcu_port[ZIF_PORT_2].mask) != vectors[pos].port[ZIF_PORT_2].out) return RESP_FAIL;
+	if ((failed_vector[ZIF_PORT_0] & mcu_port[ZIF_PORT_0].mask) != vectors[pos].port[ZIF_PORT_0].out) return RESP_FAIL;
 
 	return RESP_TIMING_ERROR;
 }
@@ -120,14 +120,14 @@ static inline uint8_t logic_run_2port(struct mcu_port_config *mcu_port)
 {
 	uint16_t local_delay = delay; // need to trick the optimizer :-(
 	for (uint16_t pos=0 ; pos<vectors_count ; pos++) {
-		PORTB = vectors[pos].port[PB].in;
-		PORTC = vectors[pos].port[PC].in;
+		ZIF_MCU_PORT_2 = vectors[pos].port[ZIF_PORT_2].in;
+		ZIF_MCU_PORT_0 = vectors[pos].port[ZIF_PORT_0].in;
 
 		if (!vectors[pos].check) continue;
 		if (local_delay) _delay_loop_2(local_delay);
 
-		if ((PINB & mcu_port[PB].mask) != vectors[pos].port[PB].out) return handle_failure(pos, mcu_port);
-		if ((PINC & mcu_port[PC].mask) != vectors[pos].port[PC].out) return handle_failure(pos, mcu_port);
+		if ((ZIF_MCU_PIN_2 & mcu_port[ZIF_PORT_2].mask) != vectors[pos].port[ZIF_PORT_2].out) return handle_failure(pos, mcu_port);
+		if ((ZIF_MCU_PIN_0 & mcu_port[ZIF_PORT_0].mask) != vectors[pos].port[ZIF_PORT_0].out) return handle_failure(pos, mcu_port);
 	}
 
 	return RESP_PASS;
@@ -138,16 +138,16 @@ static inline uint8_t logic_run_3port(struct mcu_port_config *mcu_port)
 {
 	uint16_t local_delay = delay; // need to trick the optimizer :-(
 	for (uint16_t pos=0 ; pos<vectors_count ; pos++) {
-		PORTA = vectors[pos].port[PA].in;
-		PORTB = vectors[pos].port[PB].in;
-		PORTC = vectors[pos].port[PC].in;
+		ZIF_MCU_PORT_1 = vectors[pos].port[ZIF_PORT_1].in;
+		ZIF_MCU_PORT_2 = vectors[pos].port[ZIF_PORT_2].in;
+		ZIF_MCU_PORT_0 = vectors[pos].port[ZIF_PORT_0].in;
 
 		if (!vectors[pos].check) continue;
 		if (local_delay) _delay_loop_2(local_delay);
 
-		if ((PINA & mcu_port[PA].mask) != vectors[pos].port[PA].out) return handle_failure(pos, mcu_port);
-		if ((PINB & mcu_port[PB].mask) != vectors[pos].port[PB].out) return handle_failure(pos, mcu_port);
-		if ((PINC & mcu_port[PC].mask) != vectors[pos].port[PC].out) return handle_failure(pos, mcu_port);
+		if ((ZIF_MCU_PIN_1 & mcu_port[ZIF_PORT_1].mask) != vectors[pos].port[ZIF_PORT_1].out) return handle_failure(pos, mcu_port);
+		if ((ZIF_MCU_PIN_2 & mcu_port[ZIF_PORT_2].mask) != vectors[pos].port[ZIF_PORT_2].out) return handle_failure(pos, mcu_port);
+		if ((ZIF_MCU_PIN_0 & mcu_port[ZIF_PORT_0].mask) != vectors[pos].port[ZIF_PORT_0].out) return handle_failure(pos, mcu_port);
 	}
 
 	return RESP_PASS;

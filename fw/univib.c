@@ -5,6 +5,7 @@
 #include <util/delay.h>
 
 #include "protocol.h"
+#include "zif.h"
 
 enum univib_devices {
 	UNIVIB_121			= 0,
@@ -29,38 +30,39 @@ uint8_t univib_test_type;
 
 // 74121
 
-#define VAL_121_A1 _BV(2)
-#define VAL_121_A2 _BV(3)
-#define VAL_121_B _BV(4)
-#define VAL_121_Q _BV(5)
-#define VAL_121_NQ _BV(0)
-#define VAL_121_Q_PULLUPS (_BV(0) | _BV(5))
+#define VAL_121_A1 _BV(ZIF_2_PORT_BIT)
+#define VAL_121_A2 _BV(ZIF_3_PORT_BIT)
+#define VAL_121_B _BV(ZIF_4_PORT_BIT)
+#define VAL_121_Q _BV(ZIF_5_PORT_BIT)
+#define VAL_121_NQ _BV(ZIF_0_PORT_BIT)
+#define VAL_121_Q_PULLUPS (_BV(ZIF_0_PORT_BIT) | _BV(ZIF_5_PORT_BIT))
 
 // 74122
 
-#define VAL_122_A1 _BV(0)
-#define VAL_122_A2 _BV(1)
-#define VAL_122_B1 _BV(2)
-#define VAL_122_B2 _BV(3)
-#define VAL_122_CLR _BV(4)
-#define VAL_122_NQ _BV(5)
-#define VAL_122_Q _BV(1)
-#define VAL_122_Q_PULLUPS _BV(5)
+#define VAL_122_A1 _BV(ZIF_0_PORT_BIT)
+#define VAL_122_A2 _BV(ZIF_1_PORT_BIT)
+#define VAL_122_B1 _BV(ZIF_2_PORT_BIT)
+#define VAL_122_B2 _BV(ZIF_3_PORT_BIT)
+#define VAL_122_CLR _BV(ZIF_4_PORT_BIT)
+#define VAL_122_NQ _BV(ZIF_5_PORT_BIT)
+#define VAL_122_Q _BV(ZIF_17_PORT_BIT)
+#define VAL_122_Q_PULLUPS _BV(ZIF_5_PORT_BIT) // only one because only ~Q is on the same port as triggers
 
 // 74123 1 and 2
 
-#define VAL_123_A _BV(0)
-#define VAL_123_B _BV(1)
-#define VAL_123_CLR _BV(2)
-#define VAL_123_Q _BV(4)
-#define VAL_123_NQ _BV(3)
-#define VAL_123_Q_PULLUPS (_BV(3) | _BV(4))
+#define VAL_123_A _BV(ZIF_0_PORT_BIT)
+#define VAL_123_B _BV(ZIF_1_PORT_BIT)
+#define VAL_123_CLR _BV(ZIF_2_PORT_BIT)
+#define VAL_123_Q _BV(ZIF_4_PORT_BIT)
+#define VAL_123_NQ _BV(ZIF_3_PORT_BIT)
+#define VAL_123_Q_PULLUPS (_BV(ZIF_3_PORT_BIT) | _BV(ZIF_4_PORT_BIT))
 
 // trig and notrig conditions
 
 #define RETRIG_LOOPS 6
 #define LAST_TRIG 0xff
 
+// {B, A2, A1} combinations that trigger 74121
 static const __flash uint8_t trigs_121[] = {
 	VAL_121_B |          0 |          0,
 	VAL_121_B |          0 | VAL_121_A1,
@@ -68,16 +70,18 @@ static const __flash uint8_t trigs_121[] = {
 	LAST_TRIG
 };
 
+// {B, A2, A1} combinations that don't trigger 74121
 static const __flash uint8_t notrigs_121[] = {
 	        0 |          0 |          0,
 	        0 |          0 | VAL_121_A1,
 	        0 | VAL_121_A2 |          0,
 	        0 | VAL_121_A2 | VAL_121_A1,
-	// trigs go here
+	// triggers taken from here
 	VAL_121_B | VAL_121_A2 | VAL_121_A1,
 	LAST_TRIG
 };
 
+// {CLR, B2, B1, A2, A1} combinations that trigger 74122
 static const __flash uint8_t trigs_122[] = {
 	VAL_122_CLR | VAL_122_B2 | VAL_122_B1 |          0 |          0,
 	VAL_122_CLR | VAL_122_B2 | VAL_122_B1 |          0 | VAL_122_A1,
@@ -85,6 +89,7 @@ static const __flash uint8_t trigs_122[] = {
 	LAST_TRIG
 };
 
+// {CLR, B2, B1, A2, A1} combinations that don't trigger 74122
 static const __flash uint8_t notrigs_122[] = {
 	          0 |          0 |          0 |          0 |          0,
 	          0 |          0 |          0 |          0 | VAL_122_A1,
@@ -114,16 +119,18 @@ static const __flash uint8_t notrigs_122[] = {
 	VAL_122_CLR | VAL_122_B2 |          0 |          0 | VAL_122_A1,
 	VAL_122_CLR | VAL_122_B2 |          0 | VAL_122_A2 |          0,
 	VAL_122_CLR | VAL_122_B2 |          0 | VAL_122_A2 | VAL_122_A1,
-	// trigs go here
+	// triggers taken from here
 	VAL_122_CLR | VAL_122_B2 | VAL_122_B1 | VAL_122_A2 | VAL_122_A1,
 	LAST_TRIG
 };
 
+// {CLR, B, A} combinations that trigger 74123
 static const __flash uint8_t trigs_123[] = {
 	VAL_123_CLR | VAL_123_B |         0,
 	LAST_TRIG
 };
 
+// {CLR, B, A} combinations that don't trigger 74123
 static const __flash uint8_t notrigs_123[] = {
 	          0 |         0 |         0,
 	          0 |         0 | VAL_123_A,
@@ -131,7 +138,7 @@ static const __flash uint8_t notrigs_123[] = {
 	          0 | VAL_123_B | VAL_123_A,
     VAL_123_CLR |         0 |         0,
 	VAL_123_CLR |         0 | VAL_123_A,
-	// trigs go here
+	// triggers taken from here
 	VAL_123_CLR | VAL_123_B | VAL_123_A,
 	LAST_TRIG
 };
@@ -152,9 +159,9 @@ static const __flash struct univib_test {
 	const __flash uint8_t *notrigs;		// all non-triggers
 } univib_test[4] = {
 	{ // 74121
-		.port_trig = &PORTC,
-		.pin_q = &PINC,
-		.pin_nq = &PINC,
+		.port_trig = &ZIF_MCU_PORT_0,
+		.pin_q = &ZIF_MCU_PIN_0,
+		.pin_nq = &ZIF_MCU_PIN_0,
 		.val_trig = VAL_121_B,
 		.val_notrig = VAL_121_A1 | VAL_121_A2,
 		.val_clear = 0,
@@ -165,9 +172,9 @@ static const __flash struct univib_test {
 		.notrigs = notrigs_121,
 	},
 	{ // 74122
-		.port_trig = &PORTC,
-		.pin_q = &PINB,
-		.pin_nq = &PINC,
+		.port_trig = &ZIF_MCU_PORT_0,
+		.pin_q = &ZIF_MCU_PIN_2,
+		.pin_nq = &ZIF_MCU_PIN_0,
 		.val_trig = VAL_122_B1 | VAL_122_B2 | VAL_122_CLR,
 		.val_notrig = VAL_122_A1 | VAL_122_A2 | VAL_122_CLR,
 		.val_clear = VAL_122_A1 | VAL_122_A2,
@@ -179,9 +186,9 @@ static const __flash struct univib_test {
 		.notrigs = notrigs_122,
 	},
 	{ // 74123 univibrator 1
-		.port_trig = &PORTC,
-		.pin_q = &PINB,
-		.pin_nq = &PINC,
+		.port_trig = &ZIF_MCU_PORT_0,
+		.pin_q = &ZIF_MCU_PIN_2,
+		.pin_nq = &ZIF_MCU_PIN_0,
 		.val_trig = VAL_123_B | VAL_123_CLR,
 		.val_notrig = VAL_123_A | VAL_123_CLR,
 		.val_clear = VAL_123_A,
@@ -193,9 +200,9 @@ static const __flash struct univib_test {
 		.notrigs = notrigs_123,
 	},
 	{ // 74123 univibrator 2
-		.port_trig = &PORTB,
-		.pin_q = &PINC,
-		.pin_nq = &PINB,
+		.port_trig = &ZIF_MCU_PORT_2,
+		.pin_q = &ZIF_MCU_PIN_0,
+		.pin_nq = &ZIF_MCU_PIN_2,
 		.val_trig = VAL_123_B | VAL_123_CLR,
 		.val_notrig = VAL_123_A | VAL_123_CLR,
 		.val_clear = VAL_123_A,

@@ -7,6 +7,7 @@
 #include <util/delay.h>
 
 #include "protocol.h"
+#include "zif.h"
 
 //    pin:  7    6    5    4    3    2    1    0
 // port C:  -   A1   A2   A0 ~RAS  ~WE   Di   A8*
@@ -14,20 +15,20 @@
 //
 // *only for 41256
 
-#define PORT_RAS	PORTC
-#define PORT_WE		PORTC
-#define PORT_DIN	PORTC
-#define PORT_CAS	PORTB
-#define PORT_DOUT	PORTB
-#define PIN_DOUT	PINB
-#define PORT_ADDR_L	PORTC
-#define PORT_ADDR_H	PORTB
+#define PORT_RAS	ZIF_MCU_PORT_0
+#define PORT_WE		ZIF_MCU_PORT_0
+#define PORT_DIN	ZIF_MCU_PORT_0
+#define PORT_CAS	ZIF_MCU_PORT_2
+#define PORT_DOUT	ZIF_MCU_PORT_2
+#define PIN_DOUT	ZIF_MCU_PIN_2
+#define PORT_ADDR_L	ZIF_MCU_PORT_0
+#define PORT_ADDR_H	ZIF_MCU_PORT_2
 
-#define VAL_WE		_BV(2)
-#define VAL_RAS		_BV(3)
-#define VAL_CAS		_BV(6)
-#define VAL_DO		_BV(5)
-#define VAL_DI		_BV(1)
+#define VAL_WE		_BV(ZIF_2_PORT_BIT)
+#define VAL_RAS		_BV(ZIF_3_PORT_BIT)
+#define VAL_CAS		_BV(ZIF_22_PORT_BIT)
+#define VAL_DO		_BV(ZIF_21_PORT_BIT)
+#define VAL_DI		_BV(ZIF_1_PORT_BIT)
 
 #define WE_OFF		PORT_WE |= VAL_WE
 #define WE_ON		PORT_WE &= ~VAL_WE
@@ -119,12 +120,14 @@ void dram_connect()
 	}
 }
 
+// WARNING: this is not port-mapping-agnostic!
 // -----------------------------------------------------------------------
 static inline uint8_t addr_low(uint16_t addr)
 {
 	return ((addr & 0b11100000) >> 1) | ((addr & 0b100000000) >> 8);
 }
 
+// WARNING: this is not port-mapping-agnostic!
 // -----------------------------------------------------------------------
 static inline uint8_t addr_high(uint16_t addr)
 {
