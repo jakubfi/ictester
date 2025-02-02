@@ -104,13 +104,13 @@ static uint8_t handle_failure(uint16_t pos, struct mcu_port_config *mcu_port)
 
 	// store failed vector for the response data
 	failed_vector_pos = pos;
+	failed_vector[ZIF_PORT_0] = ZIF_MCU_PIN_0;
 	failed_vector[ZIF_PORT_1] = ZIF_MCU_PIN_1;
 	failed_vector[ZIF_PORT_2] = ZIF_MCU_PIN_2;
-	failed_vector[ZIF_PORT_0] = ZIF_MCU_PIN_0;
 
+	if ((failed_vector[ZIF_PORT_0] & mcu_port[ZIF_PORT_0].mask) != vectors[pos].port[ZIF_PORT_0].out) return RESP_FAIL;
 	if ((failed_vector[ZIF_PORT_1] & mcu_port[ZIF_PORT_1].mask) != vectors[pos].port[ZIF_PORT_1].out) return RESP_FAIL;
 	if ((failed_vector[ZIF_PORT_2] & mcu_port[ZIF_PORT_2].mask) != vectors[pos].port[ZIF_PORT_2].out) return RESP_FAIL;
-	if ((failed_vector[ZIF_PORT_0] & mcu_port[ZIF_PORT_0].mask) != vectors[pos].port[ZIF_PORT_0].out) return RESP_FAIL;
 
 	return RESP_TIMING_ERROR;
 }
@@ -120,14 +120,14 @@ static inline uint8_t logic_run_2port(struct mcu_port_config *mcu_port)
 {
 	uint16_t local_delay = delay; // need to trick the optimizer :-(
 	for (uint16_t pos=0 ; pos<vectors_count ; pos++) {
-		ZIF_MCU_PORT_2 = vectors[pos].port[ZIF_PORT_2].in;
 		ZIF_MCU_PORT_0 = vectors[pos].port[ZIF_PORT_0].in;
+		ZIF_MCU_PORT_2 = vectors[pos].port[ZIF_PORT_2].in;
 
 		if (!vectors[pos].check) continue;
 		if (local_delay) _delay_loop_2(local_delay);
 
-		if ((ZIF_MCU_PIN_2 & mcu_port[ZIF_PORT_2].mask) != vectors[pos].port[ZIF_PORT_2].out) return handle_failure(pos, mcu_port);
 		if ((ZIF_MCU_PIN_0 & mcu_port[ZIF_PORT_0].mask) != vectors[pos].port[ZIF_PORT_0].out) return handle_failure(pos, mcu_port);
+		if ((ZIF_MCU_PIN_2 & mcu_port[ZIF_PORT_2].mask) != vectors[pos].port[ZIF_PORT_2].out) return handle_failure(pos, mcu_port);
 	}
 
 	return RESP_PASS;
@@ -138,16 +138,16 @@ static inline uint8_t logic_run_3port(struct mcu_port_config *mcu_port)
 {
 	uint16_t local_delay = delay; // need to trick the optimizer :-(
 	for (uint16_t pos=0 ; pos<vectors_count ; pos++) {
+		ZIF_MCU_PORT_0 = vectors[pos].port[ZIF_PORT_0].in;
 		ZIF_MCU_PORT_1 = vectors[pos].port[ZIF_PORT_1].in;
 		ZIF_MCU_PORT_2 = vectors[pos].port[ZIF_PORT_2].in;
-		ZIF_MCU_PORT_0 = vectors[pos].port[ZIF_PORT_0].in;
 
 		if (!vectors[pos].check) continue;
 		if (local_delay) _delay_loop_2(local_delay);
 
+		if ((ZIF_MCU_PIN_0 & mcu_port[ZIF_PORT_0].mask) != vectors[pos].port[ZIF_PORT_0].out) return handle_failure(pos, mcu_port);
 		if ((ZIF_MCU_PIN_1 & mcu_port[ZIF_PORT_1].mask) != vectors[pos].port[ZIF_PORT_1].out) return handle_failure(pos, mcu_port);
 		if ((ZIF_MCU_PIN_2 & mcu_port[ZIF_PORT_2].mask) != vectors[pos].port[ZIF_PORT_2].out) return handle_failure(pos, mcu_port);
-		if ((ZIF_MCU_PIN_0 & mcu_port[ZIF_PORT_0].mask) != vectors[pos].port[ZIF_PORT_0].out) return handle_failure(pos, mcu_port);
 	}
 
 	return RESP_PASS;
