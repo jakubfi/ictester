@@ -9,9 +9,14 @@
 #include "protocol.h"
 #include "zif.h"
 
-//    pin:  7    6    5    4    3    2    1    0
-// port C:  -   A1   A2   A0 ~RAS  ~WE   Di   A8*
-// port B:  - ~CAS   Do   A6   A3   A4   A5   A7
+// PORTC.0    A8* |''U''| Vss    PORTB.7
+// PORTC.1    Din |     | ~CAS   PORTB.6
+// PORTC.2    ~WE |     | Dout   PORTB.5
+// PORTC.3   ~RAS |     | A6     PORTB.4
+// PORTC.4     A0 |     | A3     PORTB.3
+// PORTC.5     A2 |     | A4     PORTB.2
+// PORTC.6     A1 |     | A5     PORTB.1
+// PORTC.7    GND |_____| A7     PORTB.0
 //
 // *only for 41256
 
