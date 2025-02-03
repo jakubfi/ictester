@@ -7,6 +7,11 @@
 
 #include "led.h"
 
+#define LED_STRIP_PORT PORTA
+#define LED_STRIP_DDR  DDRA
+#define LED_STRIP_PIN  0
+
+
 // -----------------------------------------------------------------------
 void led_init()
 {

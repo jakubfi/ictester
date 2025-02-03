@@ -3,10 +3,6 @@
 
 #include <inttypes.h>
 
-#define LED_STRIP_PORT PORTA
-#define LED_STRIP_DDR  DDRA
-#define LED_STRIP_PIN  0
-
 void led(uint8_t r, uint8_t g, uint8_t b);
 void led_init();
 void led_welcome();

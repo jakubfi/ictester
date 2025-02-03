@@ -3,10 +3,6 @@
 
 #include <inttypes.h>
 
-#define PA 0 // MCU port A
-#define PB 1 // MCU port B
-#define PC 2 // MCU port C
-
 #define MCU_PORT_CNT 3
 
 struct mcu_port_config {

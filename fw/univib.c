@@ -30,32 +30,32 @@ uint8_t univib_test_type;
 
 // 74121
 
-#define VAL_121_A1 _BV(ZIF_2_PORT_BIT)
-#define VAL_121_A2 _BV(ZIF_3_PORT_BIT)
-#define VAL_121_B _BV(ZIF_4_PORT_BIT)
-#define VAL_121_Q _BV(ZIF_5_PORT_BIT)
-#define VAL_121_NQ _BV(ZIF_0_PORT_BIT)
-#define VAL_121_Q_PULLUPS (_BV(ZIF_0_PORT_BIT) | _BV(ZIF_5_PORT_BIT))
+#define VAL_121_A1		_BV(ZIF_2_PORT_BIT)
+#define VAL_121_A2		_BV(ZIF_3_PORT_BIT)
+#define VAL_121_B		_BV(ZIF_4_PORT_BIT)
+#define VAL_121_Q		_BV(ZIF_5_PORT_BIT)
+#define VAL_121_NQ		_BV(ZIF_0_PORT_BIT)
+#define VAL_121_Q_PU	(_BV(ZIF_0_PORT_BIT) | _BV(ZIF_5_PORT_BIT))
 
 // 74122
 
-#define VAL_122_A1 _BV(ZIF_0_PORT_BIT)
-#define VAL_122_A2 _BV(ZIF_1_PORT_BIT)
-#define VAL_122_B1 _BV(ZIF_2_PORT_BIT)
-#define VAL_122_B2 _BV(ZIF_3_PORT_BIT)
-#define VAL_122_CLR _BV(ZIF_4_PORT_BIT)
-#define VAL_122_NQ _BV(ZIF_5_PORT_BIT)
-#define VAL_122_Q _BV(ZIF_17_PORT_BIT)
-#define VAL_122_Q_PULLUPS _BV(ZIF_5_PORT_BIT) // only one because only ~Q is on the same port as triggers
+#define VAL_122_A1		_BV(ZIF_0_PORT_BIT)
+#define VAL_122_A2		_BV(ZIF_1_PORT_BIT)
+#define VAL_122_B1		_BV(ZIF_2_PORT_BIT)
+#define VAL_122_B2		_BV(ZIF_3_PORT_BIT)
+#define VAL_122_CLR		_BV(ZIF_4_PORT_BIT)
+#define VAL_122_NQ		_BV(ZIF_5_PORT_BIT)
+#define VAL_122_Q		_BV(ZIF_17_PORT_BIT)
+#define VAL_122_Q_PU	_BV(ZIF_5_PORT_BIT) // only one because only ~Q is on the same port as triggers
 
 // 74123 1 and 2
 
-#define VAL_123_A _BV(ZIF_0_PORT_BIT)
-#define VAL_123_B _BV(ZIF_1_PORT_BIT)
-#define VAL_123_CLR _BV(ZIF_2_PORT_BIT)
-#define VAL_123_Q _BV(ZIF_4_PORT_BIT)
-#define VAL_123_NQ _BV(ZIF_3_PORT_BIT)
-#define VAL_123_Q_PULLUPS (_BV(ZIF_3_PORT_BIT) | _BV(ZIF_4_PORT_BIT))
+#define VAL_123_A		_BV(ZIF_0_PORT_BIT)
+#define VAL_123_B		_BV(ZIF_1_PORT_BIT)
+#define VAL_123_CLR		_BV(ZIF_2_PORT_BIT)
+#define VAL_123_Q		_BV(ZIF_4_PORT_BIT)
+#define VAL_123_NQ		_BV(ZIF_3_PORT_BIT)
+#define VAL_123_Q_PU	(_BV(ZIF_3_PORT_BIT) | _BV(ZIF_4_PORT_BIT))
 
 // trig and notrig conditions
 
@@ -167,7 +167,7 @@ static const __flash struct univib_test {
 		.val_clear = 0,
 		.val_q = VAL_121_Q,
 		.val_nq = VAL_121_NQ,
-		.val_q_pullups = VAL_121_Q_PULLUPS,
+		.val_q_pullups = VAL_121_Q_PU,
 		.trigs = trigs_121,
 		.notrigs = notrigs_121,
 	},
@@ -181,7 +181,7 @@ static const __flash struct univib_test {
 		.val_clear_trig = VAL_122_B1 | VAL_122_B2,
 		.val_q = VAL_122_Q,
 		.val_nq = VAL_122_NQ,
-		.val_q_pullups = VAL_122_Q_PULLUPS,
+		.val_q_pullups = VAL_122_Q_PU,
 		.trigs = trigs_122,
 		.notrigs = notrigs_122,
 	},
@@ -195,7 +195,7 @@ static const __flash struct univib_test {
 		.val_clear_trig = VAL_123_B,
 		.val_q = VAL_123_Q,
 		.val_nq = VAL_123_NQ,
-		.val_q_pullups = VAL_123_Q_PULLUPS,
+		.val_q_pullups = VAL_123_Q_PU,
 		.trigs = trigs_123,
 		.notrigs = notrigs_123,
 	},
@@ -209,18 +209,11 @@ static const __flash struct univib_test {
 		.val_clear_trig = VAL_123_B,
 		.val_q = VAL_123_Q,
 		.val_nq = VAL_123_NQ,
-		.val_q_pullups = VAL_123_Q_PULLUPS,
+		.val_q_pullups = VAL_123_Q_PU,
 		.trigs = trigs_123,
 		.notrigs = notrigs_123,
 	},
 };
-
-// NOTE: The trick to keep compiler optimizations in check and
-//       ensure proper test timings is to make sure 'uvt'
-//       can be resolved to a constant during compilation time.
-//       This makes the whole device/test selection logic dirty with all
-//       the (duplicated) switch/case statements and inlined test functions,
-//       but I'm afraid it's the only sensible way.
 
 // -----------------------------------------------------------------------
 uint8_t univib_test_setup(struct univib_params *params)
@@ -237,6 +230,13 @@ uint8_t univib_test_setup(struct univib_params *params)
 
 	return RESP_OK;
 }
+
+// NOTE: The trick to keep compiler optimizations in check and
+//       ensure proper test timings is to make sure 'uvt'
+//       can be resolved to a constant during compilation time.
+//       This makes the whole device/test selection logic dirty with all
+//       the (duplicated) switch/case statements and inlined test functions,
+//       but I'm afraid it's the only sensible way.
 
 // -----------------------------------------------------------------------
 static inline void input_set(const __flash struct univib_test *uvt, uint8_t val)

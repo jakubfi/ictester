@@ -3,6 +3,7 @@
 #include <avr/io.h>
 #include "protocol.h"
 #include "mcu.h"
+#include "zif.h"
 
 #define NO_CONFIG -1
 
@@ -25,12 +26,12 @@ void mcu_config_select(uint8_t cfgnum)
 // -----------------------------------------------------------------------
 void mcu_disconnect()
 {   
-	DDRA = 0;
-	PORTA = 0;
-	DDRB = 0;
-	PORTB = 0;
-	DDRC = 0;
-	PORTC = 0;
+	ZIF_MCU_DDR_0 = 0;
+	ZIF_MCU_PORT_0 = 0;
+	ZIF_MCU_DDR_1 = 0;
+	ZIF_MCU_PORT_1 = 0;
+	ZIF_MCU_DDR_2 = 0;
+	ZIF_MCU_PORT_2 = 0;
 	mcu_config = NULL;
 }	   
 
@@ -42,12 +43,12 @@ bool mcu_connect()
 		return false;
 	}
 
-	DDRA  = mcu_config[PA].output;
-	DDRB  = mcu_config[PB].output;
-	DDRC  = mcu_config[PC].output;
-	PORTA = mcu_config[PA].pullup;
-	PORTB = mcu_config[PB].pullup;
-	PORTC = mcu_config[PC].pullup;
+	ZIF_MCU_DDR_0 = mcu_config[ZIF_PORT_0].output;
+	ZIF_MCU_DDR_1 = mcu_config[ZIF_PORT_1].output;
+	ZIF_MCU_DDR_2 = mcu_config[ZIF_PORT_2].output;
+	ZIF_MCU_PORT_0 = mcu_config[ZIF_PORT_0].pullup;
+	ZIF_MCU_PORT_1 = mcu_config[ZIF_PORT_1].pullup;
+	ZIF_MCU_PORT_2 = mcu_config[ZIF_PORT_2].pullup;
 
 	return true;
 }

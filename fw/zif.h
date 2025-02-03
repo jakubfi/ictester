@@ -10,9 +10,13 @@
 //       require manual adjusting.
 
 // ZIF ports to MCU port numbers (indices for mcu_config), 0-based
-#define ZIF_PORT_0 PC
-#define ZIF_PORT_1 PA
-#define ZIF_PORT_2 PB
+#define ZIF_PORT_0 0
+#define ZIF_PORT_1 1
+#define ZIF_PORT_2 2
+// ZIF ports to MCU DDRs
+#define ZIF_MCU_DDR_0 DDRC
+#define ZIF_MCU_DDR_1 DDRA
+#define ZIF_MCU_DDR_2 DDRB
 // ZIF ports to MCU PORTs
 #define ZIF_MCU_PORT_0 PORTC
 #define ZIF_MCU_PORT_1 PORTA

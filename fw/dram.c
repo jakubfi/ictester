@@ -44,14 +44,14 @@
 
 #define DOUT_PULLUP	(PORT_DOUT & VAL_DO)
 
-#define READ_ZERO 0
-#define READ_ONE  VAL_DO
-#define READ_NONE 255
-#define WRITE_ZERO 0
-#define WRITE_ONE  VAL_DI
-#define WRITE_NONE 255
-#define DIR_UP 0
-#define DIR_DOWN 1
+#define READ_ZERO	0
+#define READ_ONE	VAL_DO
+#define READ_NONE	255
+#define WRITE_ZERO	0
+#define WRITE_ONE	VAL_DI
+#define WRITE_NONE	255
+#define DIR_UP		0
+#define DIR_DOWN	1
 
 enum dram_chip_type {
 	DRAM_4164		= 1,
