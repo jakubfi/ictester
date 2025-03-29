@@ -170,6 +170,9 @@ int main()
 	led_init();
 	led_welcome();
 
+	DDRD |= _BV(7);
+	PORTD |= _BV(7);
+
 	uint8_t resp;
 	uint8_t cmd;
 	uint8_t *data = buf+1;

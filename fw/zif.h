@@ -28,14 +28,14 @@
 
 // ZIF pins to MCU port bits, 0-based
 // on ZIF_PORT_0
-#define ZIF_0_PORT_BIT 0
-#define ZIF_1_PORT_BIT 1
-#define ZIF_2_PORT_BIT 2
-#define ZIF_3_PORT_BIT 3
-#define ZIF_4_PORT_BIT 4
-#define ZIF_5_PORT_BIT 5
-#define ZIF_6_PORT_BIT 6
-#define ZIF_7_PORT_BIT 7
+#define ZIF_0_PORT_BIT 7
+#define ZIF_1_PORT_BIT 6
+#define ZIF_2_PORT_BIT 5
+#define ZIF_3_PORT_BIT 4
+#define ZIF_4_PORT_BIT 3
+#define ZIF_5_PORT_BIT 2
+#define ZIF_6_PORT_BIT 1
+#define ZIF_7_PORT_BIT 0
 // on ZIF_PORT_1
 #define ZIF_8_PORT_BIT 7
 #define ZIF_9_PORT_BIT 6
@@ -46,14 +46,14 @@
 #define ZIF_14_PORT_BIT 1
 #define ZIF_15_PORT_BIT 0
 // on ZIF_PORT_2
-#define ZIF_16_PORT_BIT 0
-#define ZIF_17_PORT_BIT 1
-#define ZIF_18_PORT_BIT 2
-#define ZIF_19_PORT_BIT 3
-#define ZIF_20_PORT_BIT 4
-#define ZIF_21_PORT_BIT 5
-#define ZIF_22_PORT_BIT 6
-#define ZIF_23_PORT_BIT 7
+#define ZIF_16_PORT_BIT 7
+#define ZIF_17_PORT_BIT 6
+#define ZIF_18_PORT_BIT 5
+#define ZIF_19_PORT_BIT 4
+#define ZIF_20_PORT_BIT 3
+#define ZIF_21_PORT_BIT 2
+#define ZIF_22_PORT_BIT 1
+#define ZIF_23_PORT_BIT 0
 
 
 void zif_init();

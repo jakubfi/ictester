@@ -21,11 +21,11 @@ const __flash struct switch_drv {
 	uint8_t i2c_addr;
 	uint8_t gnd_mask;
 } zif_switch[SWITCH_CNT] = {
-	{i2c_a_start_wait, i2c_a_stop, i2c_a_write, 0x98, 0b00000001}, // A0
-	{i2c_a_start_wait, i2c_a_stop, i2c_a_write, 0x9a, 0b00011000}, // A1
-	{i2c_a_start_wait, i2c_a_stop, i2c_a_write, 0x9c, 0b00001001}, // A2
-	{i2c_b_start_wait, i2c_b_stop, i2c_b_write, 0x98, 0b01000100}, // B0
-	{i2c_b_start_wait, i2c_b_stop, i2c_b_write, 0x9a, 0b00100000}, // B1
+	{i2c_a_start_wait, i2c_a_stop, i2c_a_write, 0x98, 0b00000000}, // A0
+	{i2c_a_start_wait, i2c_a_stop, i2c_a_write, 0x9a, 0b10001001}, // A1
+	{i2c_a_start_wait, i2c_a_stop, i2c_a_write, 0x9c, 0b00000010}, // A2
+	{i2c_b_start_wait, i2c_b_stop, i2c_b_write, 0x98, 0b00101001}, // B0
+	{i2c_b_start_wait, i2c_b_stop, i2c_b_write, 0x9c, 0b00000000}, // B1 (i2c address is 2 instead of 1)
 };
 
 uint8_t switch_config[MAX_CONFIGS][SWITCH_CNT];
@@ -55,8 +55,8 @@ void sw_on(uint8_t port, uint8_t bit)
 // -----------------------------------------------------------------------
 bool sw_config_sane()
 {
-	if ((switch_config_active[A1] & 0b00001100) == 0b00001100) return false; // pin 8 VCC+GND
-	if ((switch_config_active[B0] & 0b00000110) == 0b00000110) return false; // pin 24 VCC+GND
+	if ((switch_config_active[A1] & 0b00001010) == 0b00001010) return false; // pin 8 VCC+GND
+	if ((switch_config_active[B0] & 0b00000011) == 0b00000011) return false; // pin 24 VCC+GND
 	// check for disallowed inter-config changes
 	return true;
 }

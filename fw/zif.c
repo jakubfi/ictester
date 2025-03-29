@@ -45,23 +45,23 @@ static const __flash struct coord zif_pin_to_mcu[ZIF_PIN_CNT] = {
 
 // Translates ZIF pin number (0-based) to SW port/bit for each function available
 static const __flash struct coord zif_vcc_coord[ZIF_PIN_CNT] = {
-	{NA, NA}, {NA, NA}, {NA, NA}, {A0, 5},  {A0, 7},  {NA, NA}, {NA, NA}, {A1, 2},  {NA, NA}, {NA, NA}, {NA, NA}, {NA, NA},
+	{NA, NA}, {NA, NA}, {NA, NA}, {A0, 4},  {A0, 5},  {NA, NA}, {NA, NA}, {A1, 1},  {A1,  5}, {NA, NA}, {NA, NA}, {NA, NA},
 	{NA, NA}, {NA, NA}, {NA, NA}, {NA, NA}, {NA, NA}, {NA, NA}, {NA, NA}, {NA, NA}, {NA, NA}, {NA, NA}, {NA, NA}, {B0, 1}
 };
 
 static const __flash struct coord zif_gnd_coord[ZIF_PIN_CNT] = {
-	{A0, 0},  {NA, NA}, {NA, NA}, {NA, NA}, {NA, NA}, {NA, NA}, {A1, 4},  {A1, 3},  {NA, NA}, {A2, 3},  {NA, NA}, {A2, 0},
-	{NA, NA}, {NA, NA}, {NA, NA}, {NA, NA}, {NA, NA}, {NA, NA}, {NA, NA}, {B1, 5},  {B0, 6},  {NA, NA}, {NA, NA}, {B0, 2}
+	{NA, NA}, {NA, NA}, {NA, NA}, {NA, NA}, {NA, NA}, {NA, NA}, {A1, 0},  {A1, 3},  {NA, NA}, {A1, 7},  {NA, NA}, {A2, 1},
+	{NA, NA}, {NA, NA}, {NA, NA}, {NA, NA}, {NA, NA}, {NA, NA}, {NA, NA}, {B0, 5},  {B0, 3},  {NA, NA}, {NA, NA}, {B0, 0}
 };
 
 static const __flash struct coord zif_pu_coord[ZIF_PIN_CNT] = {
-	{A0, 1},  {A0, 2},  {A0, 3},  {A0, 4},  {A0, 6},  {A1, 7},  {A1, 5},  {A1, 1},  {A1, 0},  {A2, 4},  {A2, 2},  {A2, 1},
-	{A2, 7},  {A2, 6},  {A2, 5},  {B1, 0},  {B1, 1},  {B1, 2},  {B1, 3},  {B1, 4},  {B1, 7},  {B0, 5},  {B0, 3},  {B0, 0}
+	{A0, 0},  {A0, 1},  {A0, 2},  {A0, 3},  {A0, 6},  {A0, 7},  {B1, 7},  {A1, 2},  {A1, 4},  {A1, 6},  {A2, 2},  {A2, 0},
+	{A2, 7},  {A2, 6},  {A2, 5},  {A2, 4},  {A2, 3},  {B0, 7},  {B0, 6},  {B0, 4},  {B1, 4},  {B1, 2},  {B1, 0},  {B0, 2}
 };
 
 static const __flash struct coord zif_c_coord[ZIF_PIN_CNT] = {
-	{NA, NA}, {NA, NA}, {NA, NA}, {NA, NA}, {NA, NA}, {A1, 6},  {NA, NA}, {NA, NA}, {NA, NA}, {NA, NA}, {NA, NA}, {NA, NA},
-	{NA, NA}, {NA, NA}, {NA, NA}, {NA, NA}, {NA, NA}, {NA, NA}, {NA, NA}, {B1, 6},  {B0, 7},  {B0, 4},  {NA, NA}, {NA, NA}
+	{NA, NA}, {NA, NA}, {NA, NA}, {NA, NA}, {NA, NA}, {B1, 6},  {NA, NA}, {NA, NA}, {NA, NA}, {NA, NA}, {NA, NA}, {NA, NA},
+	{NA, NA}, {NA, NA}, {NA, NA}, {NA, NA}, {NA, NA}, {NA, NA}, {NA, NA}, {B1, 5},  {B1, 3},  {B1, 1},  {NA, NA}, {NA, NA}
 };
 
 
