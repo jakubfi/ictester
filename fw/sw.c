@@ -21,10 +21,10 @@ const __flash struct switch_drv {
 	uint8_t i2c_addr;
 	uint8_t gnd_mask;
 } zif_switch[SWITCH_CNT] = {
-	{i2c_a_start_wait, i2c_a_stop, i2c_a_write, 0x98, 0b00000000}, // A0
-	{i2c_a_start_wait, i2c_a_stop, i2c_a_write, 0x9a, 0b10001001}, // A1
+	{i2c_a_start_wait, i2c_a_stop, i2c_a_write, 0x98, 0b00110000}, // A0
+	{i2c_a_start_wait, i2c_a_stop, i2c_a_write, 0x9a, 0b10101011}, // A1
 	{i2c_a_start_wait, i2c_a_stop, i2c_a_write, 0x9c, 0b00000010}, // A2
-	{i2c_b_start_wait, i2c_b_stop, i2c_b_write, 0x98, 0b00101001}, // B0
+	{i2c_b_start_wait, i2c_b_stop, i2c_b_write, 0x98, 0b00101011}, // B0
 	{i2c_b_start_wait, i2c_b_stop, i2c_b_write, 0x9c, 0b00000000}, // B1 (i2c address is 2 instead of 1)
 };
 
@@ -62,20 +62,23 @@ bool sw_config_sane()
 }
 
 // -----------------------------------------------------------------------
-void sw_push_config(uint8_t cfg)
+static void sw_push_config(uint8_t pin_type)
 {
 	const __flash struct switch_drv *sw = zif_switch;
 	for (uint8_t i=0 ; i<SWITCH_CNT ; i++, sw++) {
+		uint16_t switch_config = switch_config_active[i];
+		if (pin_type == SW_PINS_PWR) {
+			switch_config &= sw->gnd_mask;
+		}
 		sw->i2c_start_wait(sw->i2c_addr);
 		sw->i2c_write(0);
-		if (cfg == SW_CFG_GND_ONLY) sw->i2c_write(switch_config_active[i] & sw->gnd_mask);
-		else sw->i2c_write(switch_config_active[i]);
+		sw->i2c_write(switch_config);
 		sw->i2c_stop();
 	}
 }
 
 // -----------------------------------------------------------------------
-bool sw_connect()
+bool sw_connect(uint8_t pin_type)
 {
 	if (!switch_config_active) {
 		error(ERR_NO_PINCFG);
@@ -87,9 +90,7 @@ bool sw_connect()
 		return false;
 	}
 
-	// connect grounds first
-	sw_push_config(SW_CFG_GND_ONLY);
-	sw_push_config(SW_CFG_ALL);
+	sw_push_config(pin_type);
 	_delay_us(SWITCH_ON_DELAY_US);
 
 	return true;
@@ -111,9 +112,9 @@ void sw_disconnect()
 	if (!switch_config_active) return;
 
 	// disconnect grounds last
-	sw_push_config(SW_CFG_GND_ONLY);
+	sw_push_config(SW_PINS_PWR);
 	sw_config_clear();
-	sw_push_config(SW_CFG_ALL);
+	sw_push_config(SW_PINS_ALL);
 	_delay_us(SWITCH_ON_DELAY_US);
 	switch_config_active = NULL;
 }

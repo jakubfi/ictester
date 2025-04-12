@@ -6,6 +6,8 @@
 #include "zif.h"
 #include "sw.h"
 #include "mcu.h"
+#include "power.h"
+#include "isense.h"
 
 uint8_t zif_vcc_pin;
 
@@ -151,9 +153,29 @@ bool zif_func(uint8_t func, uint8_t zif_pin)
 }
 
 // -----------------------------------------------------------------------
+bool zif_power_up(uint16_t *vbus, int16_t *ivcc, int16_t *ignd, bool safety_off)
+{
+	if (!sw_connect(SW_PINS_PWR)) {
+		return false; // error set downstream
+	}
+
+	power_on();
+	isense_all(vbus, ivcc, ignd);
+	if ((*ivcc > SHUNT_190_MA) || (*ignd > SHUNT_190_MA)) {
+		if (!safety_off) {
+			zif_disconnect();
+		}
+		error(ERR_OVERCURRENT);
+		return false;
+	}
+
+	return true;
+}
+
+// -----------------------------------------------------------------------
 bool zif_connect()
 {
-	if (!sw_connect()) {
+	if (!sw_connect(SW_PINS_ALL)) {
 		return false; // error set downstream
 	}
 	if (!mcu_connect()) {
@@ -165,8 +187,16 @@ bool zif_connect()
 // -----------------------------------------------------------------------
 void zif_disconnect()
 {
-	mcu_disconnect();
+	// switch the main power off first
+	power_off();
+	// disconnect all switches
 	sw_disconnect();
+	// while DUT VCC is still connected (with its bypass caps)
+	// short all MCU pins to ground, to discharge all bypass and pin capacitances.
+	// This is safe as all MCU pins are protected with 120ohm resistors
+	mcu_drain_pins();
+	// Finally deconfigure MCU pins to HiZ
+	mcu_deconfigure();
 }
 
 // -----------------------------------------------------------------------

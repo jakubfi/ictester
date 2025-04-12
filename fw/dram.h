@@ -3,10 +3,11 @@
 
 #include <inttypes.h>
 
-void dram_connect();
+void dram_init();
 uint8_t dram_test_setup(struct dram_params *params);
 uint8_t dram_run(uint16_t loops);
 uint16_t dram_store_result(uint8_t *buf, uint8_t dut_pin_count);
+uint16_t dram_store_imeasure(uint8_t *buf, uint8_t dut_pin_count);
 
 #endif
 

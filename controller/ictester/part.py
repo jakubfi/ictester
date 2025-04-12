@@ -3,6 +3,7 @@ import logging
 from enum import Enum
 from ictester.command import CmdType
 from ictester.response import (Response, RespType)
+from struct import (iter_unpack, unpack)
 
 logger = logging.getLogger('ictester')
 
@@ -86,6 +87,7 @@ class Part:
     missing_tests = None
 
     def __init__(self):
+        self.imeasurements = []
         self.pins = {}
         self.pins.update(self.package_pins)
         self.pins.update(self.pin_cfg)
@@ -134,17 +136,25 @@ class Part:
         tr.send(data)
         resp = Response(tr)
 
-    def connect(self, tr, cfgnum):
-        logger.log(20, "---- DUT CONNECT ----------------------------------")
-        data = bytes([CmdType.DUT_CONNECT.value, cfgnum])
-        r.send(data)
+    def powerup(self, tr, safety_off):
+        logger.log(20, "---- DUT POWERUP ----------------------------------")
+        data = bytes([CmdType.DUT_POWERUP.value, safety_off])
+        tr.send(data)
         resp = Response(tr)
+        return resp
 
     def disconnect(self, tr):
         logger.log(20, "---- DUT DISCONNECT -------------------------------")
         data = bytes([CmdType.DUT_DISCONNECT.value])
         tr.send(data)
         resp = Response(tr)
+        self.vbus = unpack("<h", resp.payload[0:2])[0] * 1.6 / 1000
+        for x in iter_unpack("<hh", resp.payload[2:]):
+            shunt_to_ma = 1000 * 0.0000025 / 0.200  # 1000 * 2.5uV / 200mohm
+            ivcc = x[0] * shunt_to_ma
+            ignd = x[1] * shunt_to_ma
+            idelta = abs(ivcc-ignd)
+            self.imeasurements.append([ivcc, ignd, idelta])
 
 
 # ------------------------------------------------------------------------

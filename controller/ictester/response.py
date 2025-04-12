@@ -24,7 +24,7 @@ error_message = {
     6:  "Unsupported pin count",
     7:  "Unknown pin function",
     8:  "Bad pin function combination (eg. VCC+GND)",
-    9:  "(unknown)",
+    9:  "DUT not configured",
     10: "Unsupported test type",
     11: "(unknown)",
     12: "Wrong number of test vectors (<1 or too many)",
@@ -35,6 +35,7 @@ error_message = {
     17: "No pin configuration active",
     18: "Selected chip type is unknown",
     19: "No such test for selected chip",
+    20: "Overcurrent when connecting the DUT",
 }
 
 class Response:
@@ -46,6 +47,6 @@ class Response:
 
         if self.response == RespType.ERR:
             error_code = int(data[1])
-            raise ICTesterException(error_message[error_code])
-
-        self.payload = data[1:]
+            self.payload = data[2:]
+        else:
+            self.payload = data[1:]

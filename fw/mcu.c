@@ -1,6 +1,8 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <avr/io.h>
+#include <util/delay.h>
+
 #include "protocol.h"
 #include "mcu.h"
 #include "zif.h"
@@ -24,7 +26,7 @@ void mcu_config_select(uint8_t cfgnum)
 }
 
 // -----------------------------------------------------------------------
-void mcu_disconnect()
+void mcu_deconfigure()
 {   
 	ZIF_MCU_DDR_0 = 0;
 	ZIF_MCU_PORT_0 = 0;
@@ -34,6 +36,18 @@ void mcu_disconnect()
 	ZIF_MCU_PORT_2 = 0;
 	mcu_config = NULL;
 }	   
+
+// -----------------------------------------------------------------------
+void mcu_drain_pins()
+{
+	ZIF_MCU_DDR_0 = 0xff;
+	ZIF_MCU_PORT_0 = 0;
+	ZIF_MCU_DDR_1 = 0xff;
+	ZIF_MCU_PORT_1 = 0;
+	ZIF_MCU_DDR_2 = 0xff;
+	ZIF_MCU_PORT_2 = 0;
+	_delay_ms(3);
+}
 
 // -----------------------------------------------------------------------
 bool mcu_connect()

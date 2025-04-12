@@ -33,7 +33,16 @@ class Part74368(PackageDIP16):
         ]
     )
 
-    test_disabled = TestLogic("Outputs disabled, pulled high",
+    test_disabled_low = TestLogic("Outputs disabled, ext. pulled low",
+        cfgnum=0,
+        inputs=[1, 15,  2, 4, 6, 10, 12, 14],
+        outputs=[3, 5, 7, 9, 11, 13],
+        body=lambda: [
+            [[1, 1, *x], 6*[0]] for x in BV.range(0, 2**6)
+        ]
+    )
+
+    test_disabled_high = TestLogic("Outputs disabled, ext. pulled high",
         cfgnum=1,
         inputs=[1, 15,  2, 4, 6, 10, 12, 14],
         outputs=[3, 5, 7, 9, 11, 13],
@@ -42,4 +51,4 @@ class Part74368(PackageDIP16):
         ]
     )
 
-    tests = [test_enabled, test_disabled]
+    tests = [test_enabled, test_disabled_low, test_disabled_high]

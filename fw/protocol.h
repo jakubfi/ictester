@@ -8,7 +8,7 @@ enum commands {
 	CMD_NONE			= 0,
 	CMD_HELLO			= 1,
 	CMD_DUT_SETUP		= 2,
-	CMD_DUT_CONNECT		= 3,
+	CMD_DUT_POWERUP		= 3,
 	CMD_TEST_SETUP		= 4,
 	CMD_VECTORS_LOAD	= 5,
 	CMD_TEST_RUN		= 6,
@@ -35,7 +35,7 @@ enum error_types {
 	ERR_PIN_CNT		= 6,	// wrong DUT pin count
 	ERR_PIN_FUNC	= 7,	// unknown DUT pin function
 	ERR_PIN_COMB	= 8,	// wrong (unsafe) pin function combination
-	ERR_9			= 9,
+	ERR_NO_CONF		= 9,	// DUT not configured
 	ERR_TEST_TYPE	= 10,	// unknown test type
 	ERR_11			= 11,
 	ERR_VECT_NUM	= 12,	// too many vectors or no vectors at all
@@ -46,6 +46,7 @@ enum error_types {
 	ERR_NO_PINCFG	= 17,	// no pin configuration active
 	ERR_UNKNOWN_CHIP	= 18,	// selected chip type is unknown
 	ERR_UNKNOWN_TEST	= 19,	// no such test for selected chip
+	ERR_OVERCURRENT	= 20, // current to high (> 190mA)
 };
 
 enum test_type {
@@ -89,8 +90,8 @@ struct cmd_test_setup {
 	uint8_t params[];
 };
 
-struct cmd_dut_connect {
-	uint8_t cfg_num;
+struct cmd_dut_powerup {
+	uint8_t safety_off;
 };
 
 struct cmd_run {
@@ -127,6 +128,16 @@ struct resp_dram_fail {
 	uint16_t row_address;
 	uint16_t column_address;
 	uint8_t march_step;
+};
+
+struct resp_imeasure {
+	int16_t ivcc, ignd;
+};
+
+struct resp_logic_imeasure {
+	uint16_t min_vbus;
+	struct resp_imeasure max_ivcc, max_ignd;
+	struct resp_imeasure min_ivcc, min_ignd;
 };
 
 bool receive_cmd(uint8_t *buf, uint16_t buf_size);

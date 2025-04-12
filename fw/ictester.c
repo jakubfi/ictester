@@ -1,11 +1,14 @@
 #include <inttypes.h>
 #include <stdbool.h>
 #include <avr/io.h>
+#include <util/delay.h>
 
 #include "serial.h"
 #include "led.h"
 #include "protocol.h"
 #include "zif.h"
+#include "isense.h"
+#include "power.h"
 
 #include "logic.h"
 #include "dram.h"
@@ -20,8 +23,10 @@ uint8_t dut_package_type;
 uint8_t dut_pin_count;
 uint8_t test_type;
 
-uint8_t cfgnum;
-uint8_t cfgnum_active = NO_CONFIG;
+bool configured = false;
+
+uint16_t vbus;
+int16_t ivcc, ignd;
 
 // -----------------------------------------------------------------------
 static uint8_t handle_dut_setup(struct cmd_dut_setup *data)
@@ -64,17 +69,21 @@ static uint8_t handle_test_setup(struct cmd_test_setup *data)
 		return error(ERR_PINCFG_NUM);
 	}
 
-	cfgnum = data->cfg_num;
-	zif_config_select(cfgnum);
+	zif_config_select(data->cfg_num);
+	if (!zif_connect()) {
+		return RESP_ERR;
+	}
 	test_type = data->test_type;
 
 	uint8_t resp = RESP_OK;
 
 	switch (test_type) {
 		case TEST_LOGIC:
+			if (!configured) logic_init();
 			resp = logic_test_setup(dut_pin_count, (struct logic_params*) data->params);
 			break;
 		case TEST_DRAM:
+			if (!configured) dram_init();
 			resp = dram_test_setup((struct dram_params*) data->params);
 			break;
 		case TEST_UNIVIB:
@@ -84,41 +93,34 @@ static uint8_t handle_test_setup(struct cmd_test_setup *data)
 			resp = error(ERR_TEST_TYPE);
 	}
 
+	if (resp == RESP_OK) {
+		configured = true;
+	}
+
 	return resp;
 }
 
 // -----------------------------------------------------------------------
-static uint8_t do_connect()
+static uint8_t handle_dut_power_up(struct cmd_dut_powerup *data)
 {
+	zif_config_select(0);
+
+	if (!zif_power_up(&vbus, &ivcc, &ignd, data->safety_off)) {
+		if (!data->safety_off) {
+			return RESP_ERR; // cause set downstream.
+		}
+	}
+
 	led(LED_ACTIVE);
 
-	if (!zif_connect()) {
-		return RESP_ERR; // cause set downstream.
-	}
-
-	cfgnum_active = cfgnum;
-
-	// device specific "connects"
-	if (test_type == TEST_DRAM) {
-		dram_connect();
-	}
-
 	return RESP_OK;
-}
-
-// -----------------------------------------------------------------------
-static uint8_t handle_dut_connect(struct cmd_dut_connect *data)
-{
-	cfgnum = data->cfg_num;
-	zif_config_select(cfgnum);
-	return do_connect();
 }
 
 // -----------------------------------------------------------------------
 static uint8_t handle_dut_disconnect(uint8_t resp)
 {
 	zif_disconnect();
-	cfgnum_active = NO_CONFIG;
+	configured = false;
 
 	switch (resp) {
 		case RESP_ERR: led(LED_ERR); break;
@@ -135,9 +137,8 @@ static uint8_t handle_run(struct cmd_run *data)
 {
 	uint8_t res = RESP_PASS;
 
-	if (cfgnum_active != cfgnum) {
-		res = do_connect();
-		if (res != RESP_OK) return res;
+	if (!configured) {
+		return error(ERR_NO_CONF);
 	}
 
 	switch (test_type) {
@@ -165,13 +166,12 @@ static uint8_t handle_run(struct cmd_run *data)
 // -----------------------------------------------------------------------
 int main()
 {
+	power_init();
 	zif_init();
 	serial_init(LINK_SPEED);
 	led_init();
+	isense_init();
 	led_welcome();
-
-	DDRD |= _BV(7);
-	PORTD |= _BV(7);
 
 	uint8_t resp;
 	uint8_t cmd;
@@ -186,8 +186,8 @@ int main()
 				case CMD_DUT_SETUP:
 					resp = handle_dut_setup((struct cmd_dut_setup*) data);
 					break;
-				case CMD_DUT_CONNECT:
-					resp = handle_dut_connect((struct cmd_dut_connect*) data);
+				case CMD_DUT_POWERUP:
+					resp = handle_dut_power_up((struct cmd_dut_powerup*) data);
 					break;
 				case CMD_TEST_SETUP:
 					resp = handle_test_setup((struct cmd_test_setup*) data);
@@ -206,23 +206,35 @@ int main()
 			}
 		}
 
-		buf[0] = resp;
-		uint16_t count = 1;
+		uint16_t count = 0;
+		buf[count++] = resp;
 
 		if (resp == RESP_ERR) {
 			led(LED_ERR);
-			count += 1;
-			buf[1] = get_error();
+			buf[count++] = get_error();
 		} else if (resp == RESP_FAIL) {
 			switch (test_type) {
 				case TEST_LOGIC:
-					count += logic_store_result(buf+1, dut_pin_count);
+					count += logic_store_result(buf+count, dut_pin_count);
 					break;
 				case TEST_DRAM:
-					count += dram_store_result(buf+1, dut_pin_count);
+					count += dram_store_result(buf+count, dut_pin_count);
 					break;
 				default:
 					// test does not store result data
+					break;
+			}
+		}
+		if (cmd == CMD_DUT_POWERUP) {
+			buf[count++] = vbus & 0xff;
+			buf[count++] = vbus >> 8;
+		} else if (cmd == CMD_DUT_DISCONNECT) {
+			switch (test_type) {
+				case TEST_LOGIC:
+					count += logic_store_imeasure(buf+count, dut_pin_count);
+					break;
+				case TEST_DRAM:
+					count += dram_store_imeasure(buf+count, dut_pin_count);
 					break;
 			}
 		}

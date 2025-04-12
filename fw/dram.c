@@ -5,18 +5,21 @@
 #include <avr/interrupt.h>
 #include <avr/cpufunc.h>
 #include <util/delay.h>
+#include <string.h>
+#include <limits.h>
 
 #include "protocol.h"
 #include "zif.h"
+#include "isense.h"
 
-// PORTC.0    A8* |''U''| Vss    PORTB.7
-// PORTC.1    Din |     | ~CAS   PORTB.6
-// PORTC.2    ~WE |     | Dout   PORTB.5
-// PORTC.3   ~RAS |     | A6     PORTB.4
-// PORTC.4     A0 |     | A3     PORTB.3
-// PORTC.5     A2 |     | A4     PORTB.2
-// PORTC.6     A1 |     | A5     PORTB.1
-// PORTC.7    GND |_____| A7     PORTB.0
+// PORTC.7    A8* |''U''| Vss    PORTB.0
+// PORTC.6    Din |     | ~CAS   PORTB.1
+// PORTC.5    ~WE |     | Dout   PORTB.2
+// PORTC.4   ~RAS |     | A6     PORTB.3
+// PORTC.3     A0 |     | A3     PORTB.4
+// PORTC.2     A2 |     | A4     PORTB.5
+// PORTC.1     A1 |     | A5     PORTB.6
+// PORTC.0    GND |_____| A7     PORTB.7
 //
 // *only for 41256
 
@@ -85,11 +88,13 @@ static const struct march march_cm[MARCH_STEPS] = {
 
 typedef uint8_t (*march_fun)(uint8_t dir, uint8_t r, uint8_t w, uint16_t addr_space);
 
-uint8_t dram_device;
-uint8_t dram_test_type;
+static uint8_t dram_device;
+static uint8_t dram_test_type;
 
-uint16_t failing_row, failing_col;
-uint8_t failing_step;
+static uint16_t failing_row, failing_col;
+static uint8_t failing_step;
+
+static struct resp_logic_imeasure imeas;
 
 // -----------------------------------------------------------------------
 uint8_t dram_test_setup(struct dram_params *params)
@@ -108,8 +113,14 @@ uint8_t dram_test_setup(struct dram_params *params)
 }
 
 // -----------------------------------------------------------------------
-void dram_connect()
+void dram_init()
 {
+	imeas.max_ivcc.ivcc = 0;
+	imeas.max_ignd.ignd = 0;
+	imeas.min_ivcc.ivcc = SHRT_MAX;
+	imeas.min_ignd.ignd = SHRT_MAX;
+	imeas.min_vbus = USHRT_MAX;
+
 	CAS_OFF;
 	RAS_OFF;
 	WE_OFF;
@@ -129,14 +140,17 @@ void dram_connect()
 // -----------------------------------------------------------------------
 static inline uint8_t addr_low(uint16_t addr)
 {
-	return ((addr & 0b11100000) >> 1) | ((addr & 0b100000000) >> 8);
+	return
+		  ((addr & 0b100000000) >> 1)
+		| ((addr & 0b011100000) >> 4)
+	;
 }
 
 // WARNING: this is not port-mapping-agnostic!
 // -----------------------------------------------------------------------
 static inline uint8_t addr_high(uint16_t addr)
 {
-	return addr & 0b11111;
+	return (addr & 0b000011111) << 3;
 }
 
 // -----------------------------------------------------------------------
@@ -301,8 +315,74 @@ void test_speed(uint16_t loops)
 }
 
 // -----------------------------------------------------------------------
+void update_current_stats()
+{
+	int16_t ivcc, ignd;
+	uint16_t vbus;
+
+	isense_all(&vbus, &ivcc, &ignd);
+	if (ivcc > imeas.max_ivcc.ivcc) { imeas.max_ivcc.ivcc = ivcc; imeas.max_ivcc.ignd = ignd; }
+	if (ignd > imeas.max_ignd.ignd) { imeas.max_ignd.ivcc = ivcc; imeas.max_ignd.ignd = ignd; }
+	if (ivcc < imeas.min_ivcc.ivcc) { imeas.min_ivcc.ivcc = ivcc; imeas.min_ivcc.ignd = ignd; }
+	if (ignd < imeas.min_ignd.ignd) { imeas.min_ignd.ivcc = ivcc; imeas.min_ignd.ignd = ignd; }
+	if (vbus < imeas.min_vbus) { imeas.min_vbus = vbus; }
+}
+
+// -----------------------------------------------------------------------
+void dram_imeasure()
+{
+	// measure static current in few spots
+
+	update_current_stats();
+
+	set_row_addr(0, DIR_UP);
+	set_col_addr(0, DIR_UP);
+	write_data(0);
+	CAS_OFF;
+	RAS_OFF;
+
+	set_row_addr(0, DIR_UP);
+	set_col_addr(0, DIR_UP);
+	read_data(); update_current_stats();
+	CAS_OFF;
+	RAS_OFF;
+
+	set_row_addr(0b111111111, DIR_UP);
+	set_col_addr(0b111111111, DIR_UP);
+	write_data(1);
+	CAS_OFF;
+	RAS_OFF;
+
+	set_row_addr(0b111111111, DIR_UP);
+	set_col_addr(0b111111111, DIR_UP);
+	read_data(); update_current_stats();
+	CAS_OFF;
+	RAS_OFF;
+
+	set_row_addr(0, DIR_UP); update_current_stats();
+	set_col_addr(0, DIR_UP); update_current_stats();
+	write_data(0); update_current_stats();
+	CAS_OFF; update_current_stats();
+	RAS_OFF;
+
+	set_row_addr(0b111111111, DIR_UP); update_current_stats();
+	set_col_addr(0b111111111, DIR_UP); update_current_stats();
+	write_data(1); update_current_stats();
+	CAS_OFF; update_current_stats();
+	RAS_OFF;
+
+	set_row_addr(0b111111111, DIR_UP); update_current_stats();
+	set_col_addr(0b111111111, DIR_UP); update_current_stats();
+	read_data(); update_current_stats();
+	CAS_OFF; update_current_stats();
+	RAS_OFF;
+}
+
+// -----------------------------------------------------------------------
 uint8_t dram_run(uint16_t loops)
 {
+	uint8_t res = RESP_PASS;
+
 	march_fun m_funcs[4] = {
 		[DRAM_TEST_SPEED] = NULL,
 		[DRAM_TEST_MARCH_RMW] = march_step_rmw,
@@ -322,13 +402,15 @@ uint8_t dram_run(uint16_t loops)
 			return error(ERR_UNKNOWN_CHIP);
 	}
 
+	if (dram_test_type > DRAM_TEST_MAX) {
+		return error(ERR_UNKNOWN_TEST);
+	}
+
+	dram_imeasure();
+
 	if (dram_test_type == DRAM_TEST_SPEED) {
 		test_speed(loops);
 		return RESP_PASS;
-	}
-
-	if (dram_test_type > DRAM_TEST_MAX) {
-		return error(ERR_UNKNOWN_TEST);
 	}
 
 	march_fun m_fun = m_funcs[dram_test_type];
@@ -339,12 +421,12 @@ uint8_t dram_run(uint16_t loops)
 				failing_step = i;
 				CAS_OFF;
 				RAS_OFF;
-				return RESP_FAIL;
+				res = RESP_FAIL;
 			}
 		}
 	}
 
-	return RESP_PASS;
+	return res;
 }
 
 // -----------------------------------------------------------------------
@@ -355,6 +437,14 @@ uint16_t dram_store_result(uint8_t *buf, uint8_t dut_pin_count)
 	resp->column_address = failing_col;
 	resp->march_step = failing_step;
 	return 5;
+}
+
+// -----------------------------------------------------------------------
+uint16_t dram_store_imeasure(uint8_t *buf, uint8_t dut_pin_count)
+{
+	const uint8_t count = 2*2*4 + 2;
+	memcpy(buf, &imeas, count);
+	return count;
 }
 
 // vim: tabstop=4 shiftwidth=4 autoindent

@@ -17,7 +17,7 @@ All BYTES are unsigned. All WORDS are unsigned 16-bit values, little-endian.
 |----------------------|-------|---------------------------------------------------|
 | `CMD_HELLO`          | 1     | Check comms and get tester information            |
 | `CMD_DUT_SETUP`      | 2     | Configure tester for the DUT                      |
-| `CMD_DUT_CONNECT`    | 3     | Connect the DUT to the tester, power it up        |
+| `CMD_DUT_POWERUP`    | 3     | Power up the DUT                                  |
 | `CMD_TEST_SETUP`     | 4     | Setup the test                                    |
 | `CMD_VECTORS_LOAD`   | 5     | Load test vectors (optional, if used by the test) |
 | `CMD_TEST_RUN`       | 6     | Run the test                                      |
@@ -62,7 +62,7 @@ change from test to test.
 ### Command format
 
 * 1 BYTE: command: `CMD_DUT_SETUP`
-* 1 BYTE: `t` = package type  (1=DIP)
+* 1 BYTE: `t` = package type (1=DIP)
 * 1 BYTE: `p` = number of all DUT pins ([14, 16, 20, 24])
 * 1 BYTE: `c` = number of pin configurations (min 1, max 4)
 * `c` PIN CONFIGURATIONS (internally numbered starting from `0`):
@@ -86,21 +86,22 @@ change from test to test.
 * `RESP_ERR` - DUT configuration not accepted
 
 
-## DUT Connect
+## DUT Power Up
 
-This command causes the tester to configure its pin connections and apply power to the DUT. Requires the DUT to be set up first.
-Note that if DUT connect is not sent explicitely, first `CMD_TEST_RUN` command will connect the DUT.
+This command causes the tester to apply power to the DUT. Requires the DUT to be set up first.
 
 DUT connection is done in 3 steps:
 
-* connect GND pin(-s),
-* connect VCC, pull-ups and C pins,
-* configure MCU pins according to DUT pin functions.
+* connect GND and VCC pins,
+* apply power to the VCC pin
+* measure GND and VCC current and bus voltage
+
+If measured current exceeds 190mA, overcurrent is reported and DUT is disconnected.
 
 ### Command format
 
-* 1 BYTE: command: `CMD_DUT_CONNECT`
-* 1 BYTE: DUT pin configuration number used by the test
+* 1 BYTE: command: `CMD_DUT_POWERUP`
+* 1 BYTE: safety\_off: 1=disable overcurrent check, 0=check for overcurrent
 
 ### Valid responses
 
@@ -113,11 +114,12 @@ DUT connection is done in 3 steps:
 This command causes the tester to power down the DUT and deconfigure it's pin connections.
 Note that DUT is also immediately disconnected by the tester if a test fails.
 
-DUT disconnection is done in 3 steps (reversed order of what `CMD_DUT_CONNECT` does):
+DUT disconnection is done in 3 steps:
 
+* disconnect power to the DUT
+* disconnect VCC, GND, pull-ups and C pins,
+* drain charges from DUT pins and bypass caps
 * deconfigure MCU pins (set all pins as HiZ)
-* disconnect VCC, pull-ups and C pins,
-* disconnect GND pin(-s),
 
 ### Command format
 
@@ -244,8 +246,7 @@ only after the clock/strobe input changes.
 ## Run Test
 
 Run the uploaded test. Requires test to be set and vectors to be uploaded (if required by the test).
-Note that if `DUT_CONNECT` command has not been sent, `CMD_TEST_RUN` will first connect
-the DUT. If the test fails, DUT is immediately disconnected.
+If the test fails, DUT is immediately disconnected.
 
 ### Command format
 
@@ -310,7 +311,7 @@ This response is sent when a command cannot be executed or the execution failed.
 | `ERR_NO_PINCFG`            | 17    | No pin configuration active                       |
 | `ERR_UNKNOWN_CHIP`         | 18    | Selected chip type is unknown                     |
 | `ERR_UNKNOWN_TEST`         | 19    | No such test for selected chip                    |
-
+| `ERR_OVERCURRENT`          | 20    | Overcurrent detected while connecting DUT         |
 
 ## Test PASS
 

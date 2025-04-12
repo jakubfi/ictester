@@ -10,6 +10,7 @@ import serial.tools.list_ports as listports
 from serial.serialutil import SerialException
 from colorama import just_fix_windows_console
 from colorama import Fore, Back, Style
+from struct import unpack
 
 from ictester.test import TestType
 from ictester.transport import Transport
@@ -23,6 +24,8 @@ OK = Fore.GREEN + Style.BRIGHT
 WARN = Fore.MAGENTA + Style.BRIGHT
 SKIP = Fore.YELLOW + Style.BRIGHT
 HI = Fore.WHITE + Style.BRIGHT
+LO = Fore.WHITE + Style.DIM
+LAB = Fore.BLUE + Style.BRIGHT
 ENDC = Style.RESET_ALL
 
 result_color = {
@@ -62,9 +65,9 @@ def print_parts(list_tests=False):
 
 # ------------------------------------------------------------------------
 def print_part_info(part):
-    print(f"Part: {part.name}, {part.package_name} - {part.desc}")
+    print(f"Part: {HI}{part.name} ({part.package_name}) - {part.desc}{ENDC}")
     if part.missing_tests:
-        print(f"{WARN}WARNING: missing tests: {part.missing_tests}{ENDC}")
+        print(f"{WARN}WARNING:{ENDC} missing tests: {part.missing_tests}")
 
 # ------------------------------------------------------------------------
 def print_vector_chunk(prefix, vector, widths, vector_other=None, color=""):
@@ -75,7 +78,7 @@ def print_vector_chunk(prefix, vector, widths, vector_other=None, color=""):
 
 # ------------------------------------------------------------------------
 def print_vector(label, inputs, outputs, i_width, o_width, i_other=None, o_other=None, color="", separator=""):
-    print_vector_chunk(f" {HI}{label:<5}{ENDC}", inputs, i_width, i_other, color)
+    print_vector_chunk(f" {label:<5}", inputs, i_width, i_other, color)
     print_vector_chunk(separator.center(5), outputs, o_width, o_other, color)
     print()
 
@@ -92,14 +95,14 @@ def print_failed_vector(part, test, failed_vector_num, failed_pin_vector, contex
 
     print()
     start_vec = max(failed_vector_num - context, 0)
-    print_vector("", i_names, o_names, i_width, o_width, color=HI, separator="->")
+    print_vector("", i_names, o_names, i_width, o_width, color="", separator="->")
     for i in range(start_vec, failed_vector_num+1):
         inputs = [int(x) for x in test.vectors[i].input]
         outputs = [int(x) for x in test.vectors[i].output]
         if i != failed_vector_num:
-            print_vector(f"{i}:", inputs, outputs, i_width, o_width)
+            print_vector(f"{i}:", inputs, outputs, i_width, o_width, color=LO)
         else:
-            print_vector(f"{i}:", i_failed, o_failed, i_width, o_width, inputs, outputs)
+            print_vector(f"{i}:", i_failed, o_failed, i_width, o_width, inputs, outputs, color=HI)
     print()
 
 # ------------------------------------------------------------------------
@@ -111,6 +114,7 @@ def parse_cmd():
     parser.add_argument('-D', '--delay', type=float, default=None, help='additional DUT output read delay in μs (for logic tests only, 13107 μs max, rounded to nearest 0.2 μs)')
     parser.add_argument('-L', '--list', action="store_true", help='List all supported parts')
     parser.add_argument('-A', '--list-all', action="store_true", help='List all supported parts and all tests for each part')
+    parser.add_argument('--safety-off', action="store_true", help='Disable safety checks')
     parser.add_argument('-v', '--verbose', action="count", default=0, help='Verbose output. Repeat for even more verbosity')
     parser.add_argument('part', help='Part symbol', nargs='?')
     args = parser.parse_args()
@@ -203,12 +207,24 @@ def main():
     tests_warning = 0
     tests_passed = 0
 
+    print("DUT power up: ", end="")
+    resp = part.powerup(transport, args.safety_off)
+    vbus = unpack("<h", resp.payload)[0] * 1.6 / 1000
+    if resp.response == RespType.OK:
+        print(f"{OK}OK{ENDC}, ", end="");
+    else:
+        print(f"{FAIL}Overcurrent{ENDC}, ", end="")
+    print(f"Vbus idle = {HI}{vbus:5.3f} V{ENDC}");
+    print()
+    if resp.response == RespType.ERR and not args.safety_off:
+        return 3
+
     for test in run_tests:
         loops = args.loops if args.loops is not None else test.loops
         plural = "s" if loops != 1 else ""
         stats = f"({len(test.vectors)} vectors, {loops} loop{plural})"
         endc = "\n" if logger.isEnabledFor(20) else ""
-        print(f" * Testing: {test.name:{longest_desc}s}   {stats:25}  ... ", end=endc, flush=True)
+        print(f" * Testing: {HI}{test.name:{longest_desc}s}{ENDC}   {stats:25}  ... ", end=endc, flush=True)
 
         if tests_failed:
             print(f"\b\b\b\b{SKIP}SKIP{ENDC}")
@@ -230,7 +246,7 @@ def main():
             tests_failed += 1
             if test.type == TestType.LOGIC:
                 print()
-                print(f"Test failed on loop: {test.failed_loop}")
+                print(f"Test failed on loop: {HI}{test.failed_loop}{ENDC}")
                 print_failed_vector(part, test, test.failed_vector_num, test.failed_pin_vector)
             if test.type == TestType.DRAM:
                 print()
@@ -241,11 +257,19 @@ def main():
         elif resp.response == RespType.TIMING_ERROR:
             tests_warning += 1
 
-    # required only on success, but just in case do it always
     part.disconnect(transport)
 
     if resp.response != RespType.FAIL:
         print()
+
+    print(f"Lowest measured bus voltage: {HI}{part.vbus:5.3f} V{ENDC}")
+    print(f"Current measurements:")
+    print()
+    print(f"             Ivcc [mA]   Ignd [mA]   𝚫I [mA]")
+    measurements = [f"@max Ivcc", f"@max Ignd", f"@min Ivcc", f"@min Ignd"]
+    for name, m in zip(measurements, part.imeasurements):
+        print(f" {name}:  {HI}{m[0]:6.2f}      {m[1]:6.2f}      {m[2]:6.2f}{ENDC}")
+    print()
 
     logger.log(20, "Bytes sent: %s, received: %s", transport.bytes_sent, transport.bytes_received)
 

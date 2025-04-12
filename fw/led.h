@@ -12,6 +12,7 @@ void led_welcome();
 #define LED_ERR		4, 0, 3
 #define LED_ACTIVE	5, 2, 0
 #define LED_IDLE	3, 3, 3
+#define LED_DEBUG	0, 0, 10
 
 #endif
 
