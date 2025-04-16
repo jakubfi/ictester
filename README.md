@@ -1,12 +1,15 @@
 # Logic IC Tester
 ![IC Tester](doc/ictester.jpg)
+![Software](doc/controller.jpg)
 
-Main goal of this project was to make a logic IC tester that allows adding new tests and support for new ICs easily.
+Main goal of this project wass to make a logic IC tester that allows adding new tests and support for new ICs easily.
 
 ## Features
 
 * fully programmable (client-side, in python)
 * designed for 5 V TTL logic, but other 5 V logic families can be tested too
+* current limiting to 200mA
+* current and voltage measurement on VCC and GND pins
 * 1.7 μs (<=16-pin ICs) and 2.15 μs (>16-pin ICs) per single logic test cycle
 * built-in tests for 4164 and 41256 memories (MARCH C- test in read+write, read/write and page access modes)
 * built-in tests for 74121, 74122 and 74123 univibrators

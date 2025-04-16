@@ -47,6 +47,7 @@ Other options when running a test:
 * `-t TEST` or `--test TEST` - Selects specific test to run
 * `-D DELAY` or `--delay DELAY` - additional DUT output read delay in μs (for logic tests only, 13107 μs max, rounded to nearest 0.2 μs)
 * `-v` or `--verbose` - Verbose output. Repeat for even more verbosity.
+* `--safety-off` - Test the DUT even if overcurrent condition is detected.
 
 Apart from the program output, tester hardware signals its state with a status LED:
 
