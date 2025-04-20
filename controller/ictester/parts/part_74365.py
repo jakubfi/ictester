@@ -4,8 +4,8 @@ from ictester.test import TestLogic
 
 out_funcs = [ZIFFunc.IN_HIZ, ZIFFunc.IN_PU_STRONG]
 
-class Part74368(PackageDIP16):
-    name = "74368"
+class Part74365(PackageDIP16):
+    name = "74365"
     desc = "Hex Bus Drivers with 3-state Outputs"
     pin_cfg = {
         1: Pin("~1G", PinType.IN),
@@ -30,9 +30,8 @@ class Part74368(PackageDIP16):
         inputs=[1, 15,  2, 4, 6, 10, 12, 14],
         outputs=[3, 5, 7, 9, 11, 13],
         body=lambda: [
-            [[g1, g2, *x1, *x2], [*(~x1 | BV(4*[g1])), *(~x2 | BV(2*[g2]))] ]
-            for x1 in BV.range(0, 2**4)
-            for x2 in BV.range(0, 2**2)
+            [[g1, g2, *x], x | BV(6*[g1 | g2])]
+            for x in BV.range(0, 2**6)
             for g1 in [0, 1]
             for g2 in [0, 1]
         ]
@@ -45,9 +44,8 @@ class Part74368(PackageDIP16):
         inputs=[1, 15,  2, 4, 6, 10, 12, 14],
         outputs=[3, 5, 7, 9, 11, 13],
         body=lambda: [
-            [[g1, g2, *x1, *x2], [*(~x1 & ~BV(4*[g1])), *(~x2 & ~BV(2*[g2]))]]
-            for x1 in BV.range(0, 2**4)
-            for x2 in BV.range(0, 2**2)
+            [[g1, g2, *x], x & ~BV(6*[g1 | g2])]
+            for x in BV.range(0, 2**6)
             for g1 in [0, 1]
             for g2 in [0, 1]
         ]
