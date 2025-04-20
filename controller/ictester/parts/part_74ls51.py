@@ -4,7 +4,7 @@ from ictester.test import TestLogic
 
 class Part74LS51(PackageDIP14):
     name = "74LS51"
-    desc = "Invert Gates"
+    desc = "AND-OR-INVERT Gates"
     pin_cfg = {
         1: Pin("1A", PinType.IN),
         2: Pin("2A", PinType.IN),
