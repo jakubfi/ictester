@@ -25,12 +25,12 @@ class Part7483(PackageDIP16_vcc5):
     test_all = TestLogic("Complete logic",
         inputs=[13,  1, 3, 8, 10,  16, 4, 7, 11],
         outputs=[15, 2, 6, 9,  14],
-        body=lambda: [
+        body=(
             [[*c, *a, *b],  [*(a+b+c), (a+b+c).carry]]
             for a in BV.range(0, 2**4)
             for b in BV.range(0, 2**4)
             for c in BV.range(0, 2)
-        ]
+        )
     )
 
     tests = [test_all]

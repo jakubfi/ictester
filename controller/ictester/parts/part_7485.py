@@ -26,7 +26,7 @@ class Part7485(PackageDIP16):
         inputs=[2, 3, 4,  15, 13, 12, 10,  1, 14, 11, 9],
         outputs=[7, 6, 5],
         loops=256,
-        body=lambda: [
+        body=(
             [[ls, eq, gt, *a, *b],
             [
                 (a < b) or ((a == b) and not gt and not eq),
@@ -38,14 +38,14 @@ class Part7485(PackageDIP16):
             for ls in [0, 1]
             for eq in [0]
             for gt in [0, 1]
-        ]
+        )
     )
 
     test_all_1 = TestLogic("Full logic (A=B = 1)",
         inputs=[2, 3, 4,  15, 13, 12, 10,  1, 14, 11, 9],
         outputs=[7, 6, 5],
         loops=256,
-        body=lambda: [
+        body=(
             [[ls, eq, gt, *a, *b],
             [
                 (a < b) or ((a == b) and not gt and not eq),
@@ -57,7 +57,7 @@ class Part7485(PackageDIP16):
             for ls in [0, 1]
             for eq in [1]
             for gt in [0, 1]
-        ]
+        )
     )
 
     # cannot fit both tests in tester memory, merge when more memory available

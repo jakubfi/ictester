@@ -23,7 +23,7 @@ class Part7454(PackageDIP14):
     test_async = TestLogic("Asynchronous operation",
         inputs=[1, 13, 2, 3, 4, 5, 9, 10],
         outputs=[8],
-        body=lambda: [
+        body=(
             [
                 [*ab, *cd, *ef, *gh],
                 [not (ab.vand() or cd.vand() or ef.vand() or gh.vand())]
@@ -32,7 +32,7 @@ class Part7454(PackageDIP14):
             for cd in BV.range(0, 2**2)
             for ef in BV.range(0, 2**2)
             for gh in BV.range(0, 2**2)
-        ]
+        )
     )
 
     tests = [test_async]

@@ -35,14 +35,14 @@ class Part74181(PackageDIP24):
     # ------------------------------------------------------------------------
     def logic_test_gen(s, name, fun):
         # test vectors in [[inputs], [outputs]] order: [[1, s3-0, a3-0, b3-0], [f3-0, a=b]]
-        body = lambda: [
+        body = (
             [
                 [1, *BV.int(s, 4), *a, *b],
                 [*fun(a, b)]
             ]
             for a in BV.range(0, 16)
             for b in BV.range(0, 16)
-        ]
+        )
 
         return TestLogic(name,
             inputs=[8,  3, 4, 5, 6,  19, 21, 23, 2,  18, 20, 22, 1],
@@ -54,7 +54,7 @@ class Part74181(PackageDIP24):
     # ------------------------------------------------------------------------
     def arith_test_gen(s, name, fun):
         # test vectors in [[inputs], [outputs]] order: [[0, s3-0, cin, a3-0, b3-0], [f3-0, cout, a=b]]
-        body = lambda: [
+        body = (
             [
                 [0, *BV.int(s, 4), *~c, *a, *b],
                 [*(fun(a, b) + c), not (fun(a, b) + c).carry]
@@ -62,7 +62,7 @@ class Part74181(PackageDIP24):
             for a in BV.range(0, 16)
             for b in BV.range(0, 16)
             for c in BV.range(0, 2)
-        ]
+        )
         return TestLogic(name,
             inputs=[8,  3, 4, 5, 6,  7,  19, 21, 23, 2,  18, 20, 22, 1],
             outputs=[13, 11, 10, 9, 16],
@@ -106,10 +106,10 @@ class Part74181(PackageDIP24):
         TestLogic("A==B",
             inputs=[8,  3, 4, 5, 6,  7,  19, 21, 23, 2,  18, 20, 22, 1],
             outputs=[13, 11, 10, 9,  14],
-            body=[
+            body=(
                 [[1, *BV.int(15, 4), 0, *a, *BV.int(0, 4)], [*a, a.vand()]]
                 for a in BV.range(0, 16)
-            ]
+            )
         )
 
         # TODO: G, P (X, Y)

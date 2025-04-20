@@ -25,19 +25,24 @@ class Part74180(PackageDIP14):
 
     test_valid_even = TestLogic("Even upstream", default_inputs, default_outputs,
         loops=64,
-        body=lambda: [[[*data, 1, 0],  [data.even(), data.odd()]] for data in BV.range(0, 256)]
+        body=(
+            [[*data, 1, 0],  [data.even(), data.odd()]]
+            for data in BV.range(0, 256)
+        )
     )
     test_valid_odd = TestLogic("Odd upstream", default_inputs, default_outputs,
         loops=64,
-        body=lambda: [[[*data, 0, 1],  [data.odd(), data.even()]] for data in BV.range(0, 256)]
+        body=(
+            [[*data, 0, 1],  [data.odd(), data.even()]] for data in BV.range(0, 256)
+        )
     )
     test_invalid = TestLogic("Invalid upstream", default_inputs, default_outputs,
         loops=64,
-        body=lambda: [
+        body=(
             [[*data, *even_odd], ~BV(even_odd)]
             for data in BV.range(0, 256)
             for even_odd in [[1, 1], [0, 0]]
-        ]
+        )
     )
 
     tests = [test_valid_even, test_valid_odd, test_invalid]

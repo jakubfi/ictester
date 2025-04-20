@@ -26,13 +26,13 @@ class Part74H52(PackageDIP14):
         inputs=[1, 2,  3, 4, 5,  10, 11,  12, 13],
         outputs=[8],
         loops=128,
-        body=lambda: [
+        body=(
             [[*ab, *cde, *fg, *hi], [ab.vand() or cde.vand() or fg.vand() or hi.vand()]]
             for ab in BV.range(0, 2**2)
             for cde in BV.range(0, 2**3)
             for fg in BV.range(0, 2**2)
             for hi in BV.range(0, 2**2)
-        ]
+        )
     )
 
     tests = [test_async]
