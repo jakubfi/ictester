@@ -19,13 +19,14 @@ class Part7490(PackageDIP14_vcc5):
         14: Pin("CKA", PinType.IN),
     }
 
+    # R0(1), R0(2), R9(1), R9(2), CKA, CKB
     default_inputs = [2, 3,  6, 7,  14, 1]
     default_outputs = [11, 8, 9, 12]
 
     test_count_cka = TestLogic("Count CKA", default_inputs, default_outputs,
         body=[
             # reset R0
-            [[1, 1,  1, 0,  0, 0], [0, 0, 0, 0]],
+            [[1, 1,  0, 0,  0, 0], [0, 0, 0, 0]],
             # count CKA
             [[0, 0,  0, 0,  '\\', 0], [0, 0, 0, 1]],
             [[0, 0,  0, 0,  '\\', 0], [0, 0, 0, 0]],
@@ -42,10 +43,7 @@ class Part7490(PackageDIP14_vcc5):
             [[0, 0,  0, 0,  0, '\\'], [0, 1, 1, 0]],
             [[0, 0,  0, 0,  0, '\\'], [1, 0, 0, 0]],
             [[0, 0,  0, 0,  0, '\\'], [0, 0, 0, 0]],
-            # count CKB again to fill bits with 1s
             [[0, 0,  0, 0,  0, '\\'], [0, 0, 1, 0]],
-            [[0, 0,  0, 0,  0, '\\'], [0, 1, 0, 0]],
-            [[0, 0,  0, 0,  0, '\\'], [0, 1, 1, 0]],
         ]
     )
     test_resets = TestLogic("Resets", default_inputs, default_outputs,
@@ -58,6 +56,7 @@ class Part7490(PackageDIP14_vcc5):
             [[0, 0,  0, 0,  0, '\\'], [0, 0, 1, 1]],
             # no reset
             [[0, 1,  0, 1,  0, 0], [0, 0, 1, 1]],
+            [[0, 0,  0, 0,  0, 0], [0, 0, 1, 1]],
             [[1, 0,  1, 0,  0, 0], [0, 0, 1, 1]],
             # reset R9
             [[1, 1,  1, 1,  0, 0], [1, 0, 0, 1]],
