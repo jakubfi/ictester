@@ -5,8 +5,6 @@
 #include <avr/interrupt.h>
 #include <avr/cpufunc.h>
 #include <util/delay.h>
-#include <string.h>
-#include <limits.h>
 
 #include "protocol.h"
 #include "zif.h"
@@ -94,8 +92,6 @@ static uint8_t dram_test_type;
 static uint16_t failing_row, failing_col;
 static uint8_t failing_step;
 
-static struct resp_logic_imeasure imeas;
-
 // -----------------------------------------------------------------------
 uint8_t dram_test_setup(struct dram_params *params)
 {
@@ -115,12 +111,6 @@ uint8_t dram_test_setup(struct dram_params *params)
 // -----------------------------------------------------------------------
 void dram_init()
 {
-	imeas.max_ivcc.ivcc = 0;
-	imeas.max_ignd.ignd = 0;
-	imeas.min_ivcc.ivcc = SHRT_MAX;
-	imeas.min_ignd.ignd = SHRT_MAX;
-	imeas.min_vbus = USHRT_MAX;
-
 	CAS_OFF;
 	RAS_OFF;
 	WE_OFF;
@@ -315,20 +305,6 @@ void test_speed(uint16_t loops)
 }
 
 // -----------------------------------------------------------------------
-void update_current_stats()
-{
-	int16_t ivcc, ignd;
-	uint16_t vbus;
-
-	isense_all(&vbus, &ivcc, &ignd);
-	if (ivcc > imeas.max_ivcc.ivcc) { imeas.max_ivcc.ivcc = ivcc; imeas.max_ivcc.ignd = ignd; }
-	if (ignd > imeas.max_ignd.ignd) { imeas.max_ignd.ivcc = ivcc; imeas.max_ignd.ignd = ignd; }
-	if (ivcc < imeas.min_ivcc.ivcc) { imeas.min_ivcc.ivcc = ivcc; imeas.min_ivcc.ignd = ignd; }
-	if (ignd < imeas.min_ignd.ignd) { imeas.min_ignd.ivcc = ivcc; imeas.min_ignd.ignd = ignd; }
-	if (vbus < imeas.min_vbus) { imeas.min_vbus = vbus; }
-}
-
-// -----------------------------------------------------------------------
 void dram_imeasure()
 {
 	// measure static current in few spots
@@ -437,14 +413,6 @@ uint16_t dram_store_result(uint8_t *buf, uint8_t dut_pin_count)
 	resp->column_address = failing_col;
 	resp->march_step = failing_step;
 	return 5;
-}
-
-// -----------------------------------------------------------------------
-uint16_t dram_store_imeasure(uint8_t *buf, uint8_t dut_pin_count)
-{
-	const uint8_t count = 2*2*4 + 2;
-	memcpy(buf, &imeas, count);
-	return count;
 }
 
 // vim: tabstop=4 shiftwidth=4 autoindent

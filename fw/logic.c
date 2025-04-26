@@ -5,9 +5,6 @@
 #include <avr/cpufunc.h>
 #include <util/delay_basic.h>
 #include <util/delay.h>
-#include <math.h>
-#include <limits.h>
-#include <string.h>
 
 #include "zif.h"
 #include "mcu.h"
@@ -29,18 +26,6 @@ static uint16_t delay;
 static uint16_t rep;
 static uint8_t failed_vector[MCU_PORT_CNT];
 static uint16_t failed_vector_pos;
-
-static struct resp_logic_imeasure imeas;
-
-// -----------------------------------------------------------------------
-void logic_init()
-{
-	imeas.max_ivcc.ivcc = 0;
-	imeas.max_ignd.ignd = 0;
-	imeas.min_ivcc.ivcc = SHRT_MAX;
-	imeas.min_ignd.ignd = SHRT_MAX;
-	imeas.min_vbus = USHRT_MAX;
-}
 
 // -----------------------------------------------------------------------
 uint8_t logic_test_setup(uint8_t dut_pin_count, struct logic_params *params)
@@ -172,9 +157,6 @@ static inline uint8_t logic_run_3port(struct mcu_port_config *mcu_port)
 // -----------------------------------------------------------------------
 void logic_imeasure(uint8_t dut_pin_count)
 {
-	int16_t ivcc, ignd;
-	uint16_t vbus;
-
 	for (uint16_t pos=0 ; pos<vectors_count ; pos++) {
 		ZIF_MCU_PORT_0 = vectors[pos].port[ZIF_PORT_0].in;
 		ZIF_MCU_PORT_1 = vectors[pos].port[ZIF_PORT_1].in;
@@ -182,12 +164,7 @@ void logic_imeasure(uint8_t dut_pin_count)
 			ZIF_MCU_PORT_2 = vectors[pos].port[ZIF_PORT_2].in;
 		}
 
-		isense_all(&vbus, &ivcc, &ignd);
-		if (ivcc > imeas.max_ivcc.ivcc) { imeas.max_ivcc.ivcc = ivcc; imeas.max_ivcc.ignd = ignd; }
-		if (ignd > imeas.max_ignd.ignd) { imeas.max_ignd.ivcc = ivcc; imeas.max_ignd.ignd = ignd; }
-		if (ivcc < imeas.min_ivcc.ivcc) { imeas.min_ivcc.ivcc = ivcc; imeas.min_ivcc.ignd = ignd; }
-		if (ignd < imeas.min_ignd.ignd) { imeas.min_ignd.ivcc = ivcc; imeas.min_ignd.ignd = ignd; }
-		if (vbus < imeas.min_vbus) { imeas.min_vbus = vbus; }
+		update_current_stats();
 	}
 }
 
@@ -252,14 +229,6 @@ uint16_t logic_store_result(uint8_t *buf, uint8_t dut_pin_count)
 	uint16_t count = 6;
 	if (dut_pin_count > 16) count += 1;
 
-	return count;
-}
-
-// -----------------------------------------------------------------------
-uint16_t logic_store_imeasure(uint8_t *buf, uint8_t dut_pin_count)
-{
-	const uint8_t count = 2*2*4 + 2;
-	memcpy(buf, &imeas, count);
 	return count;
 }
 

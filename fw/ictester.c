@@ -58,6 +58,8 @@ static uint8_t handle_dut_setup(struct cmd_dut_setup *data)
 		}
 	}
 
+	clear_current_stats();
+
 	return RESP_OK;
 }
 
@@ -79,7 +81,6 @@ static uint8_t handle_test_setup(struct cmd_test_setup *data)
 
 	switch (test_type) {
 		case TEST_LOGIC:
-			if (!configured) logic_init();
 			resp = logic_test_setup(dut_pin_count, (struct logic_params*) data->params);
 			break;
 		case TEST_DRAM:
@@ -229,14 +230,7 @@ int main()
 			buf[count++] = vbus & 0xff;
 			buf[count++] = vbus >> 8;
 		} else if (cmd == CMD_DUT_DISCONNECT) {
-			switch (test_type) {
-				case TEST_LOGIC:
-					count += logic_store_imeasure(buf+count, dut_pin_count);
-					break;
-				case TEST_DRAM:
-					count += dram_store_imeasure(buf+count, dut_pin_count);
-					break;
-			}
+			count += store_current_stats(buf+count);
 		}
 
 		send_response(buf, count);
