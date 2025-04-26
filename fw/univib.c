@@ -6,6 +6,7 @@
 
 #include "protocol.h"
 #include "zif.h"
+#include "isense.h"
 
 enum univib_devices {
 	UNIVIB_121			= 0,
@@ -265,6 +266,26 @@ static inline bool other_output_active(const __flash struct univib_test *uvt)
 }
 
 // -----------------------------------------------------------------------
+static void test_imeasure(const __flash struct univib_test *uvt)
+{
+	const __flash uint8_t *i = uvt->notrigs;
+
+	while (*i != LAST_TRIG) {
+		input_set(uvt, *i);
+		update_current_stats();
+		i++;
+	}
+
+	i = uvt->trigs;
+
+	while (*i != LAST_TRIG) {
+		input_set(uvt, *i);
+		update_current_stats();
+		i++;
+	}
+}
+
+// -----------------------------------------------------------------------
 static inline uint8_t test_no_trig(const __flash struct univib_test *uvt)
 {
 	const __flash uint8_t *i = uvt->notrigs;
@@ -451,6 +472,8 @@ uint8_t univib_run(uint16_t loops)
 				return error(ERR_UNKNOWN_CHIP);
 		}
 	}
+
+	test_imeasure(univib_test + univib_device);
 
 	return RESP_PASS;
 }
