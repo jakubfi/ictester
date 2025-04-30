@@ -1558,6 +1558,19 @@
 		)
 		(uuid "97154641-456a-4e75-b549-f428d4aa8fa9")
 	)
+	(text "NOTE: There are two variants of INA236: \"A\" and \"B\".\n      They are functionally identical, but differ\n      in I2C addresses. Project uses \"A\" variant.\n      When using \"B\" variant, I2C addresses need to be\n      updated in the firmware."
+		(exclude_from_sim no)
+		(at 222.504 153.162 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+				(thickness 0.254)
+				(bold yes)
+			)
+			(justify left)
+		)
+		(uuid "bc003444-bd6b-4cf8-a5e0-126207c51eef")
+	)
 	(text "to/from DUT"
 		(exclude_from_sim no)
 		(at 101.346 107.188 0)
@@ -4320,7 +4333,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "INA236"
+		(property "Value" "INA236A"
 			(at 156.21 89.154 0)
 			(effects
 				(font
@@ -4545,7 +4558,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "INA236"
+		(property "Value" "INA236A"
 			(at 155.956 147.066 0)
 			(effects
 				(font
