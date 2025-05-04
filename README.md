@@ -2,7 +2,7 @@
 ![IC Tester](doc/ictester.jpg)
 ![Software](doc/controller.jpg)
 
-Main goal of this project wass to make a logic IC tester that allows adding new tests and support for new ICs easily.
+Main goal of this project was to make a logic IC tester that allows adding new tests and support for new ICs easily.
 
 ## Features
 
